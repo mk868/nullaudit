@@ -57,6 +57,7 @@
             <configuration>
               <commandlineArgs>
                 -B
+                -ntp
                 -f ${project.basedir}/src/test/resources/sample1/pom.xml
                 -DbuildDirectory=${project.build.testOutputDirectory}/sample1/target
                 clean package

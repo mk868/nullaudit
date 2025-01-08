@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.report;
 
-public record ProblemEntry(
-    String methodName,
+public record Issue(
+    String location,
     String message
 ) {
 

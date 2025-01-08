@@ -8,14 +8,16 @@ import org.jspecify.annotations.Nullable;
 
 public record MethodInfo(
     String methodName,
+    String descriptiveMethodName,
     String methodDescriptor,
     @Nullable String methodSignature,
     MethodSignature ms, // mutable
     Set<NullScopeAnnotation> annotations // mutable
 ) {
 
-  public MethodInfo(String methodName, String methodDescriptor, @Nullable String methodSignature,
+  public MethodInfo(String methodName, String descriptiveMethodName,
+      String methodDescriptor, @Nullable String methodSignature,
       MethodSignature ms) {
-    this(methodName, methodDescriptor, methodSignature, ms, new HashSet<>());
+    this(methodName, descriptiveMethodName, methodDescriptor, methodSignature, ms, new HashSet<>());
   }
 }

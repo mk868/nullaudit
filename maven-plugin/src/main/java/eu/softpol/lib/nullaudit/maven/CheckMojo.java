@@ -1,9 +1,7 @@
 package eu.softpol.lib.nullaudit.maven;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
-import eu.softpol.lib.nullaudit.core.report.Problem;
 import java.util.Arrays;
-import java.util.Collection;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -32,33 +30,26 @@ public class CheckMojo extends BaseMojo {
     var analyze = new NullAuditAnalyzer(getInput(), getExcludedPackages());
     var report = analyze.run();
 
-    if (report.problems().isEmpty()) {
-      getLog().info("No problems found.");
+    if (report.issues().isEmpty()) {
+      getLog().info("No issues found.");
     } else {
-      var totalProblems = report.problems().stream()
-          .map(Problem::entries)
-          .mapToLong(Collection::size)
-          .sum();
-      getLog().error("%d problems found.".formatted(totalProblems));
+      getLog().error("%d issues found.".formatted(report.issues().size()));
 
-      for (var problem : report.problems()) {
-        for (var problemEntry : problem.entries()) {
-          var message = "%s.%s: %s".formatted(
-              problem.className(),
-              problemEntry.methodName(),
-              problemEntry.message()
-          );
-          var lines = message.split("\n");
-          getLog().error(lines[0]);
-          Arrays.stream(lines)
-              .skip(1)
-              .map(l -> "    " + l)
-              .forEach(getLog()::error);
-        }
+      for (var issue : report.issues()) {
+        var message = "%s: %s".formatted(
+            issue.location(),
+            issue.message()
+        );
+        var lines = message.split("\n");
+        getLog().error(lines[0]);
+        Arrays.stream(lines)
+            .skip(1)
+            .map(l -> "    " + l)
+            .forEach(getLog()::error);
       }
 
       if (failOnError) {
-        throw new MojoExecutionException("%d problems found.".formatted(totalProblems));
+        throw new MojoExecutionException("%d issues found.".formatted(report.issues().size()));
       }
     }
   }

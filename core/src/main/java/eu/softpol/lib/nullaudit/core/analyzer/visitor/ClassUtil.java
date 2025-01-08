@@ -26,10 +26,28 @@ public class ClassUtil {
    * `aaa/bbb/ClassAbc` a `aaa.bbb.ClassAbc` will be returned.
    *
    * @param name internal class name
-   * @return package name
+   * @return class name
    */
   public static String getClassName(String name) {
     return name.replace("/", ".");
+  }
+
+  /**
+   * Get simple class name for specified internal class name. For example for the input class
+   * `aaa/bbb/ClassAbc$Def` a `Def` will be returned.
+   *
+   * @param name internal class name
+   * @return simple class name
+   */
+  public static String getSimpleClassName(String name) {
+    var className = getClassName(name);
+    if (className.contains(".")) {
+      className = className.substring(className.lastIndexOf(".") + 1);
+    }
+    if (className.contains("$")) {
+      className = className.substring(className.lastIndexOf("$") + 1);
+    }
+    return className;
   }
 
 }

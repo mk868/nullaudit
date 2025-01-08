@@ -29,13 +29,13 @@ class ExcludePackageTest {
   void shouldExcludePackage() {
     var analyzer = new NullAuditAnalyzer(dir, List.of("root.exclude"));
     var report = analyzer.run();
-    assertThat(report.problems()).isEmpty();
+    assertThat(report.issues()).isEmpty();
   }
 
   @Test
   void shouldNotExcludePackage() {
     var analyzer = new NullAuditAnalyzer(dir, List.of());
     var report = analyzer.run();
-    assertThat(report.problems()).isNotEmpty();
+    assertThat(report.issues()).isNotEmpty();
   }
 }

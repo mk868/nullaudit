@@ -31,7 +31,7 @@ class ClassMarkedTest {
   void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
     var analyzer = new NullAuditAnalyzer(dir, List.of());
     var report = analyzer.run();
-    assertThat(report.problems()).isEmpty();
+    assertThat(report.issues()).isEmpty();
   }
 
 }

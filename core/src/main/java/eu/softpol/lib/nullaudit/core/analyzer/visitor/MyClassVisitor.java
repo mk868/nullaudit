@@ -2,18 +2,20 @@ package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getClassName;
 import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getPackageName;
+import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getSimpleClassName;
 
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
 import eu.softpol.lib.nullaudit.core.comparator.CheckOrder;
-import eu.softpol.lib.nullaudit.core.report.ProblemEntry;
+import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import eu.softpol.lib.nullaudit.core.signature.SignatureAnalyzer;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +26,7 @@ import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
@@ -35,6 +38,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private final List<MethodInfo> methods = new ArrayList<>();
   private String packageName = "";
   private String className = "";
+  private String simpleClassName = "";
   private String sourceFileName;
 
   public MyClassVisitor(AnalysisContext context, ReportBuilder reportBuilder) {
@@ -48,6 +52,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       String[] interfaces) {
     packageName = getPackageName(name);
     className = getClassName(name);
+    simpleClassName = getSimpleClassName(name);
     super.visit(version, access, name, signature, superName, interfaces);
   }
 
@@ -100,7 +105,20 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       // alternatively, I can search for the ACC_SYNTHETIC field of outerClassName type, but the compiler can skip this field when it's not used.
     }
 
-    var methodInfo = new MethodInfo(methodName, methodDescriptor, methodSignature, ms);
+    String descriptiveMethodName;
+    if (methodName.equals("<init>")) {
+      descriptiveMethodName = simpleClassName;
+    } else {
+      descriptiveMethodName = methodName;
+    }
+    descriptiveMethodName += "(" +
+                             Arrays.stream(Type.getArgumentTypes(methodDescriptor))
+                                 .map(Type::getClassName)
+                                 .collect(Collectors.joining(", "))
+                             + ")";
+
+    var methodInfo = new MethodInfo(methodName, descriptiveMethodName, methodDescriptor,
+        methodSignature, ms);
     methods.add(methodInfo);
 
     return new MyMethodVisitor(methodInfo);
@@ -135,8 +153,8 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
                 .collect(Collectors.joining(", "))
         );
         if (s.contains("*")) {
-          appendProblemEntry(
-              methodInfo.methodName(),
+          appendIssue(
+              methodInfo.descriptiveMethodName(),
               """
                   Unspecified nullness found:
                   %s
@@ -152,15 +170,18 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     super.visitEnd();
   }
 
-  private void appendProblemEntry(String method, String message) {
-    reportBuilder.addProblemEntry(
-        context.getModuleName(),
-        className,
-        new ProblemEntry(
-            method,
-            message
-        )
-    );
+  private void appendIssue(String descriptiveMethodName, String message) {
+    var location = "";
+    if (context.getModuleName() != null) {
+      location = context.getModuleName() + "/";
+    }
+    location += className;
+    location += "#" + descriptiveMethodName;
+
+    reportBuilder.addIssue(new Issue(
+        location,
+        message
+    ));
   }
 
   private static NullScope getEffectiveNullMarkedScope(

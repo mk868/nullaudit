@@ -8,11 +8,11 @@ This command will produce the following output:
 
 ```
 ...
-[ERROR] 2 problems found.
-[ERROR] abc.Joiner.<init>: Unspecified nullness found:
+[ERROR] 2 issues found.
+[ERROR] abc.Joiner#Joiner(java.lang.String): Unspecified nullness found:
 [ERROR]     void <init>(java.lang.String*)
 [ERROR]                                 ^ 
-[ERROR] abc.Joiner.join: Unspecified nullness found:
+[ERROR] abc.Joiner#join(java.util.List): Unspecified nullness found:
 [ERROR]     java.lang.String* join(java.util.List*<java.lang.String*>)
 [ERROR]                     ^                    ^                 ^  
 ...

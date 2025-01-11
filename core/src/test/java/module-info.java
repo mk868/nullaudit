@@ -6,4 +6,5 @@ open module eu.softpol.lib.nullaudit.coretest {
   requires org.junit.jupiter.params;
   requires junit;
   requires com.google.common;
+  requires org.jspecify;
 }

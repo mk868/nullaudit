@@ -3,6 +3,7 @@ package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getClassName;
 import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getPackageName;
 import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getSimpleClassName;
+import static java.util.Objects.requireNonNullElse;
 
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
@@ -26,6 +27,7 @@ import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.RecordComponentVisitor;
 import org.objectweb.asm.Type;
 
 public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
@@ -35,10 +37,12 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private final AnalysisContext context;
   private final ReportBuilder reportBuilder;
   private final Set<NullScopeAnnotation> annotations = new HashSet<>();
+  private final List<ComponentInfo> components = new ArrayList<>();
   private final List<MethodInfo> methods = new ArrayList<>();
   private String packageName = "";
   private String className = "";
   private String simpleClassName = "";
+  private String superClassName = "";
   private String sourceFileName;
 
   public MyClassVisitor(AnalysisContext context, ReportBuilder reportBuilder) {
@@ -53,6 +57,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     packageName = getPackageName(name);
     className = getClassName(name);
     simpleClassName = getSimpleClassName(name);
+    superClassName = getClassName(superName);
     super.visit(version, access, name, signature, superName, interfaces);
   }
 
@@ -77,6 +82,17 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   }
 
   @Override
+  public RecordComponentVisitor visitRecordComponent(String name, String descriptor,
+      @Nullable String signature) {
+
+    var fs = SignatureAnalyzer.analyzeFieldSignature(requireNonNullElse(signature, descriptor));
+    var componentInfo = new ComponentInfo(name, descriptor, signature, fs);
+    components.add(componentInfo);
+
+    return new MyRecordComponentVisitor(fs);
+  }
+
+  @Override
   public MethodVisitor visitMethod(int access, String methodName, String methodDescriptor,
       @Nullable String methodSignature, String[] exceptions) {
     if ((access & Opcodes.ACC_SYNTHETIC) != 0) {
@@ -85,7 +101,8 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     final MethodSignature ms;
     try {
-      ms = SignatureAnalyzer.analyze(methodSignature == null ? methodDescriptor : methodSignature);
+      ms = SignatureAnalyzer.analyzeMethodSignature(
+          requireNonNullElse(methodSignature, methodDescriptor));
     } catch (RuntimeException e) {
       throw new RuntimeException(
           "Reading signature of " + methodName + methodDescriptor + " (" + methodSignature
@@ -128,7 +145,71 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   public void visitEnd() {
     context.setClassNullScope(className, NullScope.from(annotations));
 
+    for (var componentInfo : components) {
+      var classNullScope = new HashMap<String, NullScope>();
+      classNullScope.put(className, NullScope.from(annotations));
+      var tmp = className;
+      while (tmp.contains("$")) {
+        tmp = tmp.substring(0, tmp.lastIndexOf("$"));
+        classNullScope.put(tmp, context.getClassNullScope(tmp));
+      }
+      var effectiveNullMarkedScope = getEffectiveNullMarkedScope(
+          context.isModuleInfoNullMarked(),
+          context.getPackageNullScope(packageName),
+          classNullScope,
+          NullScope.NOT_DEFINED // todo...
+      );
+
+      if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
+        var s = "%s %s".formatted(
+            componentInfo.fs().toString(),
+            componentInfo.componentName()
+        );
+        if (s.contains("*")) {
+          appendIssue(
+              componentInfo.componentName(),
+              """
+                  Unspecified nullness found:
+                  %s
+                  %s
+                  """.formatted(
+                  s,
+                  s.replaceAll("[^*]", " ").replace("*", "^")
+              ));
+        }
+      }
+    }
+
     for (var methodInfo : methods) {
+      if (superClassName.equals("java.lang.Record")) {
+        var methodName = methodInfo.methodName();
+        if (methodName.equals("equals")) {
+          continue;
+        }
+        if (methodName.equals("toString")) {
+          continue;
+        }
+        if (components.stream()
+                .filter(c -> c.componentName().equals(methodName))
+                .anyMatch(c -> c.fs().toString().equals(methodInfo.ms().returnType().toString()))
+            && methodInfo.ms().parameterTypes().isEmpty()
+        ) {
+          // skip default getter
+          continue;
+        }
+        if (methodName.equals("<init>") && methodInfo.ms().parameterTypes().values()
+            .stream()
+            .map(TypeNode::toString)
+            .collect(Collectors.joining(",")).equals(components.stream()
+                .map(ComponentInfo::fs)
+                .map(TypeNode::toString)
+                .collect(Collectors.joining(",")))
+        ) {
+          // skip default constructor
+          continue;
+        }
+      }
+
       var classNullScope = new HashMap<String, NullScope>();
       classNullScope.put(className, NullScope.from(annotations));
       var tmp = className;

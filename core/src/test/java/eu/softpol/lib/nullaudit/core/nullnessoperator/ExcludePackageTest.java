@@ -1,8 +1,8 @@
 package eu.softpol.lib.nullaudit.core.nullnessoperator;
 
+import static com.google.common.truth.Truth.assertThat;
 import static eu.softpol.lib.nullaudit.core.Resources.SAMPLE1_CLASSES;
 import static eu.softpol.lib.nullaudit.core.nullnessoperator.SetupProject.setup;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import java.nio.file.Path;

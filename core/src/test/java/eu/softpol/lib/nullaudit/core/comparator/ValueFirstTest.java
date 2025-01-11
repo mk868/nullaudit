@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.comparator;
 
 import static eu.softpol.lib.nullaudit.core.comparator.ValueFirst.valueFirst;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.google.common.truth.Truth.assertThat;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

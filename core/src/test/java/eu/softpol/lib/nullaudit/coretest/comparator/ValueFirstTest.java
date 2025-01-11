@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.core.comparator;
+package eu.softpol.lib.nullaudit.coretest.comparator;
 
 import static eu.softpol.lib.nullaudit.core.comparator.ValueFirst.valueFirst;
 import static com.google.common.truth.Truth.assertThat;

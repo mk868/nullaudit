@@ -1,8 +1,8 @@
-package eu.softpol.lib.nullaudit.core.nullnessoperator.scope;
+package eu.softpol.lib.nullaudit.coretest.nullnessoperator.scope;
 
 import static com.google.common.truth.Truth.assertThat;
-import static eu.softpol.lib.nullaudit.core.Resources.SAMPLE1_CLASSES;
-import static eu.softpol.lib.nullaudit.core.nullnessoperator.SetupProject.setup;
+import static eu.softpol.lib.nullaudit.coretest.Resources.SAMPLE1_CLASSES;
+import static eu.softpol.lib.nullaudit.coretest.nullnessoperator.SetupProject.setup;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import java.nio.file.Path;
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class MethodUnmarkedTest {
+class InnerClassMarkedTest {
 
   @TempDir
   Path dir;
@@ -21,7 +21,7 @@ class MethodUnmarkedTest {
     setup(
         SAMPLE1_CLASSES,
         List.of(
-            "root/scope/methodunmarked"
+            "root/scope/innerclassmarked"
         ),
         dir
     );
@@ -31,7 +31,7 @@ class MethodUnmarkedTest {
   void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
     var analyzer = new NullAuditAnalyzer(dir, List.of());
     var report = analyzer.run();
-    assertThat(report.issues()).isNotEmpty();
+    assertThat(report.issues()).isEmpty();
   }
 
 }

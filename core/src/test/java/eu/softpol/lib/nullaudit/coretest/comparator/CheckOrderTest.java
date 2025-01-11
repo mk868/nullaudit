@@ -1,7 +1,8 @@
-package eu.softpol.lib.nullaudit.core.comparator;
+package eu.softpol.lib.nullaudit.coretest.comparator;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import eu.softpol.lib.nullaudit.core.comparator.CheckOrder;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;

@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.core.nullnessoperator;
+package eu.softpol.lib.nullaudit.coretest.nullnessoperator;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

@@ -1,7 +1,8 @@
-package eu.softpol.lib.nullaudit.core;
+package eu.softpol.lib.nullaudit.coretest;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;

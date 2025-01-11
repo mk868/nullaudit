@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.core;
+package eu.softpol.lib.nullaudit.coretest;
 
 import java.nio.file.Path;
 

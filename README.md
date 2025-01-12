@@ -1,23 +1,33 @@
 # NullAudit
 
-The tool to verify whether nullness annotations are applied to your codebase.
+A tool to verify whether JSpecify nullness annotations are applied to your codebase.  
+Check out the [sample project](examples/simple) for an example of actual usage.
 
 ## Features
 
-- Detects UNSPECIFIED nullness types based on `@Nullable`, `@NonNull`, `@NullMarked`, and
+- Detects unspecified nullness types based on `@Nullable`, `@NonNull`, `@NullMarked`, and
   `@NullUnmarked` annotations.
 - Analyzes `.jar` files or directories containing `.class` files.
-- Generates a JSON report of analysis results.
+- Generates a JSON report of the analysis results.
 - Maven plugin to simplify integration with CI/CD workflows.
 
 ## Requirements
 
-- **Java 17+**
-- **Maven**
+- Java 17+
+- Maven
 
 ## Usage
 
-### Maven plugin
+### Maven Plugin
+
+The plugin provides two goals:
+
+- **`check`** - Analyzes the codebase to detect types with an unspecified nullness value.  
+  If any are found, the execution fails and displays the details in the output.
+- **`report`** - Generates a JSON report containing details about places in the code where
+  nullness is unspecified.
+
+#### Usage in `pom.xml`
 
 To ensure your code is fully annotated with nullness annotations, add the following plugin
 configuration to your `pom.xml`:
@@ -44,14 +54,17 @@ configuration to your `pom.xml`:
 <!-- ... -->
 ```
 
-When the plugin detects unannotated types, it will fail the build and display the details in the
-output.
+#### Usage as a standalone tool
 
-### Use without Maven project
-
-You can use NullAudit outside of a Maven project.
-For example, to find missing nullness annotations in a `.jar` file:
+You can also use NullAudit outside of a Maven project.  
+For example, to find unspecified nullness in a `.jar` file, run:
 
 ```bash
 mvn eu.soft-pol.lib.nullaudit:nullaudit-maven-plugin:1.0-SNAPSHOT:check -Dnullaudit.input=log4j-core-2.24.3.jar
+```
+
+To generate a JSON report for a `.jar` file, run:
+
+```bash
+mvn eu.soft-pol.lib.nullaudit:nullaudit-maven-plugin:1.0-SNAPSHOT:report -Dnullaudit.input=log4j-core-2.24.3.jar -Dnullaudit.reportFile=report.json
 ```

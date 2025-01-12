@@ -1,6 +1,5 @@
 package eu.softpol.lib.nullaudit.core;
 
-import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.ClassFileAnalyzer;
 import eu.softpol.lib.nullaudit.core.report.Report;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
@@ -35,6 +34,14 @@ public class NullAuditAnalyzer {
       throw new RuntimeException("Unsupported file type: %s".formatted(input));
     }
 
+    reportBuilder.setCoveragePercentage(calculateCoveragePercentage(
+        reportBuilder.getSummaryTotalClasses(),
+        reportBuilder.getSummaryUnspecifiedNullnessClasses()
+    ));
     return reportBuilder.build();
+  }
+
+  private double calculateCoveragePercentage(int totalClasses, int unspecifiedNullnessClasses) {
+    return 100.0 * (totalClasses - unspecifiedNullnessClasses) / totalClasses;
   }
 }

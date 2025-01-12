@@ -145,6 +145,9 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   public void visitEnd() {
     context.setClassNullScope(className, NullScope.from(annotations));
 
+    reportBuilder.incSummaryTotalClasses();
+    boolean unspecifiedNullnessFound = false;
+
     for (var componentInfo : components) {
       var classNullScope = new HashMap<String, NullScope>();
       classNullScope.put(className, NullScope.from(annotations));
@@ -166,6 +169,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
             componentInfo.componentName()
         );
         if (s.contains("*")) {
+          unspecifiedNullnessFound = true;
           appendIssue(
               componentInfo.componentName(),
               """
@@ -181,6 +185,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     }
 
     for (var methodInfo : methods) {
+      reportBuilder.incSummaryTotalMethods();
       if (superClassName.equals("java.lang.Record")) {
         var methodName = methodInfo.methodName();
         if (methodName.equals("equals")) {
@@ -234,6 +239,8 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
                 .collect(Collectors.joining(", "))
         );
         if (s.contains("*")) {
+          unspecifiedNullnessFound = true;
+          reportBuilder.incSummaryUnspecifiedNullnessMethods();
           appendIssue(
               methodInfo.descriptiveMethodName(),
               """
@@ -246,6 +253,10 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
               ));
         }
       }
+    }
+
+    if (unspecifiedNullnessFound) {
+      reportBuilder.incSummaryUnspecifiedNullnessClasses();
     }
 
     super.visitEnd();

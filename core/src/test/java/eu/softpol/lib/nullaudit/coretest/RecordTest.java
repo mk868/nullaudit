@@ -52,7 +52,9 @@ class RecordTest {
     assertThat(summary.unspecifiedNullness().fields()).isEqualTo(2);
     var issues = report.issues();
     assertThat(issues).hasSize(2);
+    assertThat(issues.get(0).location()).isEqualTo("com.example.SimpleRecord#a");
     assertThat(issues.get(0).message()).contains("java.util.List*<java.lang.String*> a");
+    assertThat(issues.get(1).location()).isEqualTo("com.example.SimpleRecord#b");
     assertThat(issues.get(1).message()).contains("String* b");
   }
 

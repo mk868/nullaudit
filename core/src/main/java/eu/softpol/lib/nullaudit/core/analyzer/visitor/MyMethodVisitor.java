@@ -73,7 +73,7 @@ public class MyMethodVisitor extends MethodVisitor {
           typePathToParameterTypes.get(index).get(typePathStr).setOperator(operator);
         }
       } else if (sort == TypeReference.METHOD_TYPE_PARAMETER_BOUND) {
-        logger.log(Level.WARNING, "METHOD_TYPE_PARAMETER_BOUND not supported yet");
+        logger.log(Level.DEBUG, "METHOD_TYPE_PARAMETER_BOUND not supported yet");
       } else {
         throw new UnsupportedOperationException("Unsupported sort: " + sort);
       }

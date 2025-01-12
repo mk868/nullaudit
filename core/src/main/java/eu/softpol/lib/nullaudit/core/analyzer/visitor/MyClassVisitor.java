@@ -1,15 +1,11 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
-import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getClassName;
-import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getPackageName;
-import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getSimpleClassName;
 import static java.util.Objects.requireNonNullElse;
 
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
-import eu.softpol.lib.nullaudit.core.comparator.CheckOrder;
 import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
@@ -17,10 +13,8 @@ import eu.softpol.lib.nullaudit.core.signature.SignatureAnalyzer;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
@@ -42,6 +36,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private final List<FieldInfo> fields = new ArrayList<>();
   private final List<MethodInfo> methods = new ArrayList<>();
   private Clazz superClazz;
+  private final List<Clazz> outerClasses = new ArrayList<>();
   private Clazz thisClazz;
   private String sourceFileName;
 
@@ -57,6 +52,14 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     thisClazz = Clazz.of(name);
     superClazz = Clazz.of(superName);
     super.visit(version, access, name, signature, superName, interfaces);
+  }
+
+  @Override
+  public void visitInnerClass(String name, String outerName, String innerName, int access) {
+    if (thisClazz.internalName().startsWith(name)) {
+      outerClasses.add(Clazz.of(outerName));
+    }
+    super.visitInnerClass(name, outerName, innerName, access);
   }
 
   @Override
@@ -122,9 +125,9 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     }
     var parameterTypes = ms.parameterTypes();
 
-    if (thisClazz.name().contains("$")) {
+    if (!outerClasses.isEmpty()) {
       // it's probably inner class
-      var outerClassName = thisClazz.name().substring(0, thisClazz.name().lastIndexOf("$"));
+      var outerClassName = outerClasses.get(outerClasses.size() - 1).name();
       // check if the first constructor's argument has outer class type
       if (methodName.equals("<init>") &&
           !parameterTypes.isEmpty() &&
@@ -162,19 +165,9 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     for (var componentInfo : components) {
       reportBuilder.incSummaryTotalFields();
-      var classNullScope = new HashMap<String, NullScope>();
-      classNullScope.put(thisClazz.name(), NullScope.from(annotations));
-      var tmp = thisClazz.name();
-      while (tmp.contains("$")) {
-        tmp = tmp.substring(0, tmp.lastIndexOf("$"));
-        classNullScope.put(tmp, context.getClassNullScope(tmp));
-      }
-      var effectiveNullMarkedScope = getEffectiveNullMarkedScope(
-          context.isModuleInfoNullMarked(),
-          context.getPackageNullScope(thisClazz.packageName()),
-          classNullScope,
-          NullScope.NOT_DEFINED // todo...
-      );
+
+      var nullScopes = getNullScopesForClass();
+      var effectiveNullMarkedScope = getEffectiveNullMarkedScope(nullScopes);
 
       if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
         var s = "%s %s".formatted(
@@ -205,19 +198,8 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       }
       reportBuilder.incSummaryTotalFields();
 
-      var classNullScope = new HashMap<String, NullScope>();
-      classNullScope.put(thisClazz.name(), NullScope.from(annotations));
-      var tmp = thisClazz.name();
-      while (tmp.contains("$")) {
-        tmp = tmp.substring(0, tmp.lastIndexOf("$"));
-        classNullScope.put(tmp, context.getClassNullScope(tmp));
-      }
-      var effectiveNullMarkedScope = getEffectiveNullMarkedScope(
-          context.isModuleInfoNullMarked(),
-          context.getPackageNullScope(thisClazz.packageName()),
-          classNullScope,
-          NullScope.NOT_DEFINED // todo...
-      );
+      var nullScopes = getNullScopesForClass();
+      var effectiveNullMarkedScope = getEffectiveNullMarkedScope(nullScopes);
 
       if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
         var s = "%s %s".formatted(
@@ -272,19 +254,9 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
         }
       }
 
-      var classNullScope = new HashMap<String, NullScope>();
-      classNullScope.put(thisClazz.name(), NullScope.from(annotations));
-      var tmp = thisClazz.name();
-      while (tmp.contains("$")) {
-        tmp = tmp.substring(0, tmp.lastIndexOf("$"));
-        classNullScope.put(tmp, context.getClassNullScope(tmp));
-      }
-      var effectiveNullMarkedScope = getEffectiveNullMarkedScope(
-          context.isModuleInfoNullMarked(),
-          context.getPackageNullScope(thisClazz.packageName()),
-          classNullScope,
-          NullScope.from(methodInfo.annotations())
-      );
+      var nullScopes = getNullScopesForClass();
+      nullScopes.add(NullScope.from(methodInfo.annotations()));
+      var effectiveNullMarkedScope = getEffectiveNullMarkedScope(nullScopes);
 
       if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
         var s = "%s %s(%s)".formatted(
@@ -333,29 +305,28 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     ));
   }
 
-  private static NullScope getEffectiveNullMarkedScope(
-      boolean isModuleNullMarked,
-      NullScope packageNullScope,
-      Map<String, NullScope> classNullScope,
-      NullScope methodNullScope
-  ) {
-    if (methodNullScope != NullScope.NOT_DEFINED) {
-      return methodNullScope;
+  private List<NullScope> getNullScopesForClass() {
+    var nullScopes = new ArrayList<NullScope>();
+    if (context.isModuleInfoNullMarked()) {
+      nullScopes.add(NullScope.NULL_MARKED);
     }
+    nullScopes.add(context.getPackageNullScope(thisClazz.packageName()));
+    for (var outerClass : outerClasses) {
+      nullScopes.add(context.getClassNullScope(outerClass.name()));
+    }
+    nullScopes.add(context.getClassNullScope(thisClazz.name()));
+    return nullScopes;
+  }
+
+  private static NullScope getEffectiveNullMarkedScope(List<NullScope> nullScopes) {
     // from inner to outer
-    var sorted = classNullScope.entrySet().stream()
-        .sorted(Map.Entry.comparingByKey(CheckOrder.COMPARATOR.reversed()))
-        .map(Map.Entry::getValue)
-        .toList();
-    for (var scope : sorted) {
+    for (var i = nullScopes.size() - 1; i >= 0; i--) {
+      var scope = nullScopes.get(i);
       if (scope != NullScope.NOT_DEFINED) {
         return scope;
       }
     }
-    if (packageNullScope != NullScope.NOT_DEFINED) {
-      return packageNullScope;
-    }
-    return isModuleNullMarked ? NullScope.NULL_MARKED : NullScope.NULL_UNMARKED;
+    return NullScope.NULL_UNMARKED;
   }
 
 }

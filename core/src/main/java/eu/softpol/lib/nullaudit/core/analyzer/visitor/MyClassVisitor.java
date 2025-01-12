@@ -55,8 +55,8 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   }
 
   @Override
-  public void visitInnerClass(String name, String outerName, String innerName, int access) {
-    if (thisClazz.internalName().startsWith(name)) {
+  public void visitInnerClass(String name, @Nullable String outerName, @Nullable String innerName, int access) {
+    if (outerName != null && thisClazz.internalName().startsWith(name)) {
       outerClasses.add(Clazz.of(outerName));
     }
     super.visitInnerClass(name, outerName, innerName, access);

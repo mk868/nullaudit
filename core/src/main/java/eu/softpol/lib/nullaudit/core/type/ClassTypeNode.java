@@ -46,6 +46,13 @@ public final class ClassTypeNode extends TypeNode {
   }
 
   @Override
+  public TypeNode addUnboundedChild() {
+    var child = new UnboundedTypeNode(this);
+    children.add(child);
+    return child;
+  }
+
+  @Override
   public List<TypeNode> getChildren() {
     return List.copyOf(children);
   }

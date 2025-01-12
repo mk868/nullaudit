@@ -34,6 +34,11 @@ public final class VariableTypeNode extends TypeNode {
   }
 
   @Override
+  public TypeNode addUnboundedChild() {
+    throw createNoChildrenException();
+  }
+
+  @Override
   public void setOperator(NullnessOperator nullnessOperator) {
     //TODO not supported
   }

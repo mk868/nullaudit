@@ -116,6 +116,13 @@ public class MethodTypeTreeBuilder extends SignatureVisitor {
   }
 
   @Override
+  public void visitTypeArgument() {
+    node = node.addUnboundedChild();
+    goBack();
+    super.visitTypeArgument();
+  }
+
+  @Override
   public void visitEnd() {
     goBack();
     super.visitEnd();

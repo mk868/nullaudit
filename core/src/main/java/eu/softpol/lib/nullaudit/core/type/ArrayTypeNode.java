@@ -44,6 +44,11 @@ public final class ArrayTypeNode extends TypeNode {
     return child;
   }
 
+  @Override
+  public TypeNode addUnboundedChild() {
+    throw new UnsupportedOperationException("Array type cannot have unbounded child");
+  }
+
   public List<TypeNode> getChildren() {
     if (child == null) {
       throw new IllegalStateException("Array type has no children");

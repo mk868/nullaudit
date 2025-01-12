@@ -7,7 +7,7 @@ import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 public abstract sealed class TypeNode permits ArrayTypeNode, BaseTypeNode, ClassTypeNode,
-    VariableTypeNode {
+    UnboundedTypeNode, VariableTypeNode {
 
   protected final @Nullable TypeNode parent;
   protected final String value;
@@ -29,6 +29,8 @@ public abstract sealed class TypeNode permits ArrayTypeNode, BaseTypeNode, Class
   public abstract TypeNode addArrayChild();
 
   public abstract TypeNode addVariableChild(String name);
+
+  public abstract TypeNode addUnboundedChild();
 
   public String getValue() {
     return value;

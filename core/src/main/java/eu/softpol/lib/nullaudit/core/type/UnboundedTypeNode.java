@@ -3,14 +3,10 @@ package eu.softpol.lib.nullaudit.core.type;
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
 import java.util.List;
 
-public final class BaseTypeNode extends TypeNode {
+public final class UnboundedTypeNode extends TypeNode {
 
-  BaseTypeNode(TypeNode parent, char descriptor) {
-    super(parent, descriptorToString(descriptor));
-  }
-
-  public BaseTypeNode(char descriptor) {
-    super(descriptorToString(descriptor));
+  UnboundedTypeNode(TypeNode parent) {
+    super(parent, "?");
   }
 
   @Override
@@ -47,22 +43,7 @@ public final class BaseTypeNode extends TypeNode {
     return List.of();
   }
 
-  private static String descriptorToString(char descriptor) {
-    return switch (descriptor) {
-      case 'B' -> "byte";
-      case 'C' -> "char";
-      case 'D' -> "double";
-      case 'F' -> "float";
-      case 'I' -> "int";
-      case 'J' -> "long";
-      case 'S' -> "short";
-      case 'Z' -> "boolean";
-      case 'V' -> "void";
-      default -> throw new IllegalStateException("Unsupported descriptor: " + descriptor);
-    };
-  }
-
   private static RuntimeException createNoChildrenException() {
-    return new IllegalStateException("Base type has no children");
+    return new IllegalStateException("Wildcard type has no children");
   }
 }

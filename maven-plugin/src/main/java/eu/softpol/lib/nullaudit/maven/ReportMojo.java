@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.jspecify.annotations.Nullable;
 
 /**
  * The `report` goal generates a null-audit analysis report for a specified input, such as a
@@ -30,35 +29,25 @@ import org.jspecify.annotations.Nullable;
 public class ReportMojo extends BaseMojo {
 
   /**
-   * Specifies the directory where the null-audit report will be saved.
+   * Specifies the path of the output file where the null-audit analysis report will be saved.
    */
-  @Parameter(property = "nullaudit.reportDirectory", defaultValue = "nullaudit")
-  protected @Nullable String reportDirectory;
-  /**
-   * Specifies the name of the output file where the null-audit analysis report will be saved.
-   */
-  @Parameter(property = "nullaudit.reportFile", defaultValue = "report.json")
+  @Parameter(property = "nullaudit.reportFile", defaultValue = "nullaudit/report.json")
   private String reportFile;
 
   public void execute() throws MojoExecutionException {
     var analyze = new NullAuditAnalyzer(getInput(), getExcludedPackages());
     var report = analyze.run();
 
-    final File outputReport;
-    if (reportDirectory != null && !reportDirectory.isBlank()) {
-      var parentDir = Path.of(reportDirectory);
-      try {
-        Files.createDirectories(parentDir);
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
-      }
-      outputReport = parentDir.resolve(reportFile).toFile();
-    } else {
-      outputReport = new File(reportFile);
+    var reportPath = Path.of(reportFile).toAbsolutePath();
+
+    try {
+      Files.createDirectories(reportPath.getParent());
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
 
-    saveReport(report, outputReport);
-    getLog().info("Report saved to " + outputReport);
+    saveReport(report, reportPath.toFile());
+    getLog().info("Report saved to " + reportPath);
   }
 
   private void saveReport(Report report, File file) {

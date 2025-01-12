@@ -8,7 +8,10 @@ This command will produce the following output:
 
 ```
 ...
-[ERROR] 2 issues found.
+[ERROR] 3 issues found.
+[ERROR] abc.Joiner#delimiter: Unspecified nullness found:
+[ERROR]     java.lang.String* delimiter
+[ERROR]                     ^          
 [ERROR] abc.Joiner#Joiner(java.lang.String): Unspecified nullness found:
 [ERROR]     void <init>(java.lang.String*)
 [ERROR]                                 ^ 

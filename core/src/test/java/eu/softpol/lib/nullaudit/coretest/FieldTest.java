@@ -16,22 +16,21 @@ import javax.tools.JavaFileObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class RecordTest {
+class FieldTest {
 
   @Test
   void test(@TempDir Path tempDir) throws IOException {
-    JavaFileObject inputSource = JavaFileObjects.forSourceString("com.example.SimpleRecord", """
+    JavaFileObject inputSource = JavaFileObjects.forSourceString("com.example.SimpleClass", """
         package com.example;
         
         import java.util.List;
         
         import org.jspecify.annotations.Nullable;
         
-        record SimpleRecord(
-            List<String> a,
-            String b,
-            @Nullable List<@Nullable String> c
-        ){
+        class SimpleClass {
+            List<String> a;
+            String b;
+            @Nullable List<@Nullable String> c;
         
         }
         """);

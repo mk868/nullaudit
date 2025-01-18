@@ -1,7 +1,9 @@
 package eu.softpol.lib.nullaudit.maven;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
+import eu.softpol.lib.nullaudit.core.report.Issue;
 import java.util.Arrays;
+import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -25,6 +27,11 @@ public class CheckMojo extends BaseMojo {
    */
   @Parameter(property = "nullaudit.failOnError", defaultValue = "true")
   private boolean failOnError;
+  /**
+   * Limit the number of issues displayed on the console.
+   */
+  @Parameter(property = "nullaudit.maxErrors", defaultValue = "-1")
+  private int maxErrors;
 
   public void execute() throws MojoExecutionException {
     var analyze = new NullAuditAnalyzer(getInput(), getExcludedPackages());
@@ -33,9 +40,16 @@ public class CheckMojo extends BaseMojo {
     if (report.issues().isEmpty()) {
       getLog().info("No issues found.");
     } else {
-      getLog().error("%d issues found.".formatted(report.issues().size()));
+      var issuesCount = report.issues().size();
+      getLog().error("%d issues found.".formatted(issuesCount));
 
-      for (var issue : report.issues()) {
+      List<Issue> issues = report.issues();
+      int issuesToShow = issuesCount;
+      if (maxErrors > 0) {
+        issuesToShow = Math.min(issuesToShow, maxErrors);
+      }
+      for (int i = 0; i < issuesToShow; i++) {
+        var issue = issues.get(i);
         var message = "%s: %s".formatted(
             issue.location(),
             issue.message()
@@ -48,8 +62,14 @@ public class CheckMojo extends BaseMojo {
             .forEach(getLog()::error);
       }
 
+      var issuesLeft = issuesCount - issuesToShow;
+      if (issuesLeft > 0) {
+        getLog().error("... and %d more issue%s."
+            .formatted(issuesLeft, issuesLeft == 1 ? "" : "s"));
+      }
+
       if (failOnError) {
-        throw new MojoExecutionException("%d issues found.".formatted(report.issues().size()));
+        throw new MojoExecutionException("%d issues found.".formatted(issuesCount));
       }
     }
   }

@@ -169,6 +169,14 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     reportBuilder.incSummaryTotalClasses();
     boolean unspecifiedNullnessFound = false;
 
+    if (annotations.containsAll(
+        List.of(NullScopeAnnotation.NULL_MARKED, NullScopeAnnotation.NULL_UNMARKED))) {
+      appendIssue(
+          List.of(Kind.IRRELEVANT_ANNOTATION),
+          messageSolver.issueIrrelevantAnnotationNullUnMarkedClass()
+      );
+    }
+
     for (var componentInfo : components) {
       reportBuilder.incSummaryTotalFields();
 
@@ -185,6 +193,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           reportBuilder.incSummaryUnspecifiedNullnessFields();
           appendIssue(
               componentInfo.componentName(),
+              List.of(Kind.UNSPECIFIED_NULLNESS),
               messageSolver.issueUnspecifiedNullnessComponent(
                   s,
                   s.replaceAll("[^*]", " ").replace("*", "^")
@@ -213,6 +222,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           reportBuilder.incSummaryUnspecifiedNullnessFields();
           appendIssue(
               fieldInfo.fieldName(),
+              List.of(Kind.UNSPECIFIED_NULLNESS),
               messageSolver.issueUnspecifiedNullnessField(
                   s,
                   s.replaceAll("[^*]", " ").replace("*", "^")
@@ -223,6 +233,16 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     for (var methodInfo : methods) {
       reportBuilder.incSummaryTotalMethods();
+
+      if (methodInfo.annotations().containsAll(
+          List.of(NullScopeAnnotation.NULL_MARKED, NullScopeAnnotation.NULL_UNMARKED))) {
+        appendIssue(
+            methodInfo.descriptiveMethodName(),
+            List.of(Kind.IRRELEVANT_ANNOTATION),
+            messageSolver.issueIrrelevantAnnotationNullUnMarkedMethod()
+        );
+      }
+
       if (superClazz.name().equals("java.lang.Record")) {
         var methodName = methodInfo.methodName();
         if (methodName.equals("equals")) {
@@ -270,6 +290,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           reportBuilder.incSummaryUnspecifiedNullnessMethods();
           appendIssue(
               methodInfo.descriptiveMethodName(),
+              List.of(Kind.UNSPECIFIED_NULLNESS),
               messageSolver.issueUnspecifiedNullnessMethod(
                   s,
                   s.replaceAll("[^*]", " ").replace("*", "^")
@@ -285,17 +306,31 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     super.visitEnd();
   }
 
-  private void appendIssue(String descriptiveMethodName, String message) {
+  private void appendIssue(String name, List<Kind> kinds, String message) {
     var location = "";
     if (context.getModuleName() != null) {
       location = context.getModuleName() + "/";
     }
     location += thisClazz.name();
-    location += "#" + descriptiveMethodName;
+    location += "#" + name;
 
     reportBuilder.addIssue(new Issue(
         location,
-        List.of(Kind.UNSPECIFIED_NULLNESS),
+        kinds,
+        message
+    ));
+  }
+
+  private void appendIssue(List<Kind> kinds, String message) {
+    var location = "";
+    if (context.getModuleName() != null) {
+      location = context.getModuleName() + "/";
+    }
+    location += thisClazz.name();
+
+    reportBuilder.addIssue(new Issue(
+        location,
+        kinds,
         message
     ));
   }

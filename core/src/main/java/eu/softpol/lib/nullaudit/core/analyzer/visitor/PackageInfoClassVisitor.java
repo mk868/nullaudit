@@ -6,8 +6,11 @@ import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
+import eu.softpol.lib.nullaudit.core.report.Issue;
+import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
@@ -51,6 +54,27 @@ public class PackageInfoClassVisitor extends ClassVisitor {
   public void visitEnd() {
     var nullScope = NullScope.from(annotations);
     context.setPackageNullScope(packageName, nullScope);
+    if (annotations.containsAll(
+        List.of(NullScopeAnnotation.NULL_MARKED, NullScopeAnnotation.NULL_UNMARKED))) {
+      appendIssue(
+          List.of(Kind.IRRELEVANT_ANNOTATION),
+          messageSolver.issueIrrelevantAnnotationNullUnMarkedPackage()
+      );
+    }
     super.visitEnd();
+  }
+
+  private void appendIssue(List<Kind> kinds, String message) {
+    var location = "";
+    if (context.getModuleName() != null) {
+      location = context.getModuleName() + "/";
+    }
+    location += packageName + ".package-info";
+
+    reportBuilder.addIssue(new Issue(
+        location,
+        kinds,
+        message
+    ));
   }
 }

@@ -43,4 +43,16 @@ public class MessageSolver {
     );
   }
 
+  public String issueIrrelevantAnnotationNullUnMarkedPackage() {
+    return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION.NullUnMarked.package");
+  }
+
+  public String issueIrrelevantAnnotationNullUnMarkedClass() {
+    return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION.NullUnMarked.class");
+  }
+
+  public String issueIrrelevantAnnotationNullUnMarkedMethod() {
+    return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION.NullUnMarked.method");
+  }
+
 }

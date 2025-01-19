@@ -79,6 +79,30 @@ class MessageSolverTest {
         .isEqualTo(indexesOf(lineWithContent(msg, positions), '^'));
   }
 
+  @Test
+  void issueIrrelevantAnnotationNullUnMarkedPackageTest() {
+    // GIVEN/WHEN
+    var msg = messageSolver.issueIrrelevantAnnotationNullUnMarkedPackage();
+    // THEN
+    assertThat(msg).contains("package");
+  }
+
+  @Test
+  void issueIrrelevantAnnotationNullUnMarkedClassTest() {
+    // GIVEN/WHEN
+    var msg = messageSolver.issueIrrelevantAnnotationNullUnMarkedClass();
+    // THEN
+    assertThat(msg).contains("class");
+  }
+
+  @Test
+  void issueIrrelevantAnnotationNullUnMarkedMethodTest() {
+    // GIVEN/WHEN
+    var msg = messageSolver.issueIrrelevantAnnotationNullUnMarkedMethod();
+    // THEN
+    assertThat(msg).contains("method");
+  }
+
   static String lineWithContent(String str, String content) {
     return str.lines()
         .filter(a -> a.contains(content))

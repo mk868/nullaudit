@@ -5,6 +5,7 @@ import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getPackag
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.ModuleInfoClassVisitor;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.MyClassVisitor;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.PackageInfoClassVisitor;
+import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -21,6 +22,7 @@ public class ClassFileAnalyzer implements FileAnalyzer {
   private static final System.Logger logger = System.getLogger(ClassFileAnalyzer.class.getName());
 
   private final AnalysisContext context = new AnalysisContext();
+  private final MessageSolver messageSolver = new MessageSolver();
   private final ReportBuilder reportBuilder;
   private final List<String> excludePackages;
 
@@ -37,11 +39,11 @@ public class ClassFileAnalyzer implements FileAnalyzer {
         return true;
       }
       if (fileName.equals("package-info.class")) {
-        analyze(iss, new PackageInfoClassVisitor(context));
+        analyze(iss, new PackageInfoClassVisitor(context, messageSolver, reportBuilder));
         return true;
       }
       if (fileName.endsWith(".class")) {
-        analyze(iss, new MyClassVisitor(context, reportBuilder));
+        analyze(iss, new MyClassVisitor(context, messageSolver, reportBuilder));
         return true;
       }
     } catch (IOException e) {

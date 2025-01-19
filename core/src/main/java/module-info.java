@@ -4,8 +4,9 @@ import org.jspecify.annotations.NullMarked;
 module eu.softpol.lib.nullaudit.core {
   exports eu.softpol.lib.nullaudit.core;
   exports eu.softpol.lib.nullaudit.core.report;
-  exports eu.softpol.lib.nullaudit.core.comparator;
-  exports eu.softpol.lib.nullaudit.core.analyzer;
+  // tests
+  exports eu.softpol.lib.nullaudit.core.comparator to eu.softpol.lib.nullaudit.coretest;
+  exports eu.softpol.lib.nullaudit.core.i18n to eu.softpol.lib.nullaudit.coretest;
   exports eu.softpol.lib.nullaudit.core.signature to eu.softpol.lib.nullaudit.coretest;
   exports eu.softpol.lib.nullaudit.core.type to eu.softpol.lib.nullaudit.coretest;
 

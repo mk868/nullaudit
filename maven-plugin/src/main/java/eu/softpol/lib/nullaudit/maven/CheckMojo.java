@@ -55,11 +55,7 @@ public class CheckMojo extends BaseMojo {
             issue.message()
         );
         var lines = message.split("\n");
-        getLog().error(lines[0]);
-        Arrays.stream(lines)
-            .skip(1)
-            .map(l -> "    " + l)
-            .forEach(getLog()::error);
+        Arrays.stream(lines).forEach(getLog()::error);
       }
 
       var issuesLeft = issuesCount - issuesToShow;

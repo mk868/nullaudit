@@ -5,6 +5,8 @@ import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getPackag
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
+import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
+import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import java.util.HashSet;
 import java.util.Set;
 import org.objectweb.asm.AnnotationVisitor;
@@ -14,12 +16,17 @@ import org.objectweb.asm.Opcodes;
 public class PackageInfoClassVisitor extends ClassVisitor {
 
   private final AnalysisContext context;
+  private final MessageSolver messageSolver;
+  private final ReportBuilder reportBuilder;
   private final Set<NullScopeAnnotation> annotations = new HashSet<>();
   private String packageName;
 
-  public PackageInfoClassVisitor(AnalysisContext context) {
+  public PackageInfoClassVisitor(AnalysisContext context, MessageSolver messageSolver,
+      ReportBuilder reportBuilder) {
     super(Opcodes.ASM9);
     this.context = context;
+    this.messageSolver = messageSolver;
+    this.reportBuilder = reportBuilder;
   }
 
   @Override

@@ -6,6 +6,7 @@ import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
+import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
@@ -31,6 +32,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private static final System.Logger logger = System.getLogger(MyClassVisitor.class.getName());
 
   private final AnalysisContext context;
+  private final MessageSolver messageSolver;
   private final ReportBuilder reportBuilder;
   private final Set<NullScopeAnnotation> annotations = new HashSet<>();
   private final List<ComponentInfo> components = new ArrayList<>();
@@ -41,9 +43,11 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private Clazz thisClazz;
   private String sourceFileName;
 
-  public MyClassVisitor(AnalysisContext context, ReportBuilder reportBuilder) {
+  public MyClassVisitor(AnalysisContext context, MessageSolver messageSolver,
+      ReportBuilder reportBuilder) {
     super(Opcodes.ASM9);
     this.context = context;
+    this.messageSolver = messageSolver;
     this.reportBuilder = reportBuilder;
   }
 
@@ -56,7 +60,8 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   }
 
   @Override
-  public void visitInnerClass(String name, @Nullable String outerName, @Nullable String innerName, int access) {
+  public void visitInnerClass(String name, @Nullable String outerName, @Nullable String innerName,
+      int access) {
     if (outerName != null && thisClazz.internalName().startsWith(name)) {
       outerClasses.add(Clazz.of(outerName));
     }
@@ -180,11 +185,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           reportBuilder.incSummaryUnspecifiedNullnessFields();
           appendIssue(
               componentInfo.componentName(),
-              """
-                  Unspecified nullness found:
-                  %s
-                  %s
-                  """.formatted(
+              messageSolver.issueUnspecifiedNullnessComponent(
                   s,
                   s.replaceAll("[^*]", " ").replace("*", "^")
               ));
@@ -212,11 +213,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           reportBuilder.incSummaryUnspecifiedNullnessFields();
           appendIssue(
               fieldInfo.fieldName(),
-              """
-                  Unspecified nullness found:
-                  %s
-                  %s
-                  """.formatted(
+              messageSolver.issueUnspecifiedNullnessField(
                   s,
                   s.replaceAll("[^*]", " ").replace("*", "^")
               ));
@@ -273,11 +270,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           reportBuilder.incSummaryUnspecifiedNullnessMethods();
           appendIssue(
               methodInfo.descriptiveMethodName(),
-              """
-                  Unspecified nullness found:
-                  %s
-                  %s
-                  """.formatted(
+              messageSolver.issueUnspecifiedNullnessMethod(
                   s,
                   s.replaceAll("[^*]", " ").replace("*", "^")
               ));

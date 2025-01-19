@@ -37,11 +37,16 @@ public class CheckMojo extends BaseMojo {
     var analyze = new NullAuditAnalyzer(getInput(), getExcludedPackages());
     var report = analyze.run();
 
-    if (report.issues().isEmpty()) {
-      getLog().info("No issues found.");
+    var issuesCount = report.issues().size();
+
+    if (issuesCount == 0) {
+      getLog().info(messageSolver.checkNoIssuesFound());
     } else {
-      var issuesCount = report.issues().size();
-      getLog().error("%d issues found.".formatted(issuesCount));
+      getLog().error(
+          issuesCount == 1 ?
+              messageSolver.checkOneIssueFound() :
+              messageSolver.checkMultipleIssuesFound(issuesCount)
+      );
 
       List<Issue> issues = report.issues();
       int issuesToShow = issuesCount;
@@ -60,12 +65,19 @@ public class CheckMojo extends BaseMojo {
 
       var issuesLeft = issuesCount - issuesToShow;
       if (issuesLeft > 0) {
-        getLog().error("... and %d more issue%s."
-            .formatted(issuesLeft, issuesLeft == 1 ? "" : "s"));
+        getLog().error(
+            issuesLeft == 1 ?
+                messageSolver.checkOneMoreIssue() :
+                messageSolver.checkMultipleMoreIssues(issuesLeft)
+        );
       }
 
       if (failOnError) {
-        throw new MojoExecutionException("%d issues found.".formatted(issuesCount));
+        throw new MojoExecutionException(
+            issuesCount == 1 ?
+                messageSolver.checkOneIssueFound() :
+                messageSolver.checkMultipleIssuesFound(issuesCount)
+        );
       }
     }
   }

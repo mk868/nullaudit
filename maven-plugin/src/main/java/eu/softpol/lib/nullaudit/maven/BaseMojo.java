@@ -2,6 +2,7 @@ package eu.softpol.lib.nullaudit.maven;
 
 import static java.util.function.Predicate.not;
 
+import eu.softpol.lib.nullaudit.maven.i18n.MessageSolver;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,8 @@ import org.jspecify.annotations.Nullable;
 
 @SuppressWarnings("unused")
 public abstract class BaseMojo extends AbstractMojo {
+
+  protected final MessageSolver messageSolver = new MessageSolver();
 
   /**
    * Represents the input path for analysis. This variable specifies the location of the directory

@@ -47,7 +47,7 @@ public class ReportMojo extends BaseMojo {
     }
 
     saveReport(report, reportPath.toFile());
-    getLog().info("Report saved to " + reportPath);
+    getLog().info(messageSolver.reportReportSaved(reportPath.toString()));
   }
 
   private void saveReport(Report report, File file) {

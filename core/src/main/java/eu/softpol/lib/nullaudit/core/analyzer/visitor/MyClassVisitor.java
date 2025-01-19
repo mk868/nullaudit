@@ -7,6 +7,7 @@ import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
 import eu.softpol.lib.nullaudit.core.report.Issue;
+import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import eu.softpol.lib.nullaudit.core.signature.SignatureAnalyzer;
@@ -301,6 +302,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     reportBuilder.addIssue(new Issue(
         location,
+        List.of(Kind.UNSPECIFIED_NULLNESS),
         message
     ));
   }

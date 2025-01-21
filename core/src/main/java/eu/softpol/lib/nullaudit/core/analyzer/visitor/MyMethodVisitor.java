@@ -47,10 +47,11 @@ public class MyMethodVisitor extends MethodVisitor {
   @Override
   public AnnotationVisitor visitTypeAnnotation(int typeRef, @Nullable TypePath typePath,
       String descriptor, boolean visible) {
-    if (descriptor.contains(Descriptors.NULLABLE) ||
-        descriptor.contains(Descriptors.NON_NULL)
+    var annotation = KnownAnnotations.fromDescriptor(descriptor).orElse(null);
+    if (annotation == KnownAnnotations.NULLABLE ||
+        annotation == KnownAnnotations.NON_NULL
     ) {
-      var operator = descriptor.contains(Descriptors.NULLABLE) ?
+      var operator = annotation == KnownAnnotations.NULLABLE ?
           NullnessOperator.UNION_NULL : NullnessOperator.MINUS_NULL;
       var typeReference = new TypeReference(typeRef);
       var sort = typeReference.getSort();
@@ -83,10 +84,11 @@ public class MyMethodVisitor extends MethodVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    if (descriptor.contains(Descriptors.NULL_MARKED)) {
+    var annotation = KnownAnnotations.fromDescriptor(descriptor).orElse(null);
+    if (annotation == KnownAnnotations.NULL_MARKED) {
       methodInfo.annotations().add(NullScopeAnnotation.NULL_MARKED);
     }
-    if (descriptor.contains(Descriptors.NULL_UNMARKED)) {
+    if (annotation == KnownAnnotations.NULL_UNMARKED) {
       methodInfo.annotations().add(NullScopeAnnotation.NULL_UNMARKED);
     }
     return super.visitAnnotation(descriptor, visible);

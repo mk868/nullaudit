@@ -21,10 +21,11 @@ public class MyFieldVisitor extends FieldVisitor {
   @Override
   public AnnotationVisitor visitTypeAnnotation(int typeRef, @Nullable TypePath typePath,
       String descriptor, boolean visible) {
-    if (descriptor.contains(Descriptors.NULLABLE) ||
-        descriptor.contains(Descriptors.NON_NULL)
+    var annotation = KnownAnnotations.fromDescriptor(descriptor).orElse(null);
+    if (annotation == KnownAnnotations.NULLABLE ||
+        annotation == KnownAnnotations.NON_NULL
     ) {
-      var operator = descriptor.contains(Descriptors.NULLABLE) ?
+      var operator = annotation == KnownAnnotations.NULLABLE ?
           NullnessOperator.UNION_NULL : NullnessOperator.MINUS_NULL;
       var typeReference = new TypeReference(typeRef);
       var sort = typeReference.getSort();

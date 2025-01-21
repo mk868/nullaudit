@@ -41,10 +41,11 @@ public class PackageInfoClassVisitor extends ClassVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    if (descriptor.contains(Descriptors.NULL_MARKED)) {
+    var annotation = KnownAnnotations.fromDescriptor(descriptor).orElse(null);
+    if (annotation == KnownAnnotations.NULL_MARKED) {
       annotations.add(NullScopeAnnotation.NULL_MARKED);
     }
-    if (descriptor.contains(Descriptors.NULL_UNMARKED)) {
+    if (annotation == KnownAnnotations.NULL_UNMARKED) {
       annotations.add(NullScopeAnnotation.NULL_UNMARKED);
     }
     return super.visitAnnotation(descriptor, visible);

@@ -76,14 +76,13 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    if (descriptor.contains(Descriptors.NULL_MARKED)) {
-      annotations.add(NullScopeAnnotation.NULL_MARKED);
-    }
-    if (descriptor.contains(Descriptors.NULL_UNMARKED)) {
-      annotations.add(NullScopeAnnotation.NULL_UNMARKED);
-    }
-    if (descriptor.contains(Descriptors.KOTLIN_METADATA)) {
-      annotations.add(NullScopeAnnotation.KOTLIN_METADATA);
+    var annotationOpt = KnownAnnotations.fromDescriptor(descriptor);
+    if (annotationOpt.isPresent()) {
+      switch (annotationOpt.get()) {
+        case NULL_MARKED -> annotations.add(NullScopeAnnotation.NULL_MARKED);
+        case NULL_UNMARKED -> annotations.add(NullScopeAnnotation.NULL_UNMARKED);
+        case KOTLIN_METADATA -> annotations.add(NullScopeAnnotation.KOTLIN_METADATA);
+      }
     }
     return super.visitAnnotation(descriptor, visible);
   }

@@ -23,7 +23,8 @@ public class ModuleInfoClassVisitor extends ClassVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    if (descriptor.contains(Descriptors.NULL_MARKED)) {
+    var annotation = KnownAnnotations.fromDescriptor(descriptor).orElse(null);
+    if (annotation == KnownAnnotations.NULL_MARKED) {
       context.setModuleInfoNullMarked(true);
     }
     return super.visitAnnotation(descriptor, visible);

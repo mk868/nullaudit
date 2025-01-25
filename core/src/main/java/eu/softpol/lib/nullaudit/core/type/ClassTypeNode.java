@@ -2,19 +2,21 @@ package eu.softpol.lib.nullaudit.core.type;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class ClassTypeNode extends TypeNode {
 
   // generic types
   private final List<TypeNode> children = new ArrayList<>();
+  private final String clazz;
 
   ClassTypeNode(TypeNode parent, String clazz) {
-    super(parent, clazz);
+    super(parent);
+    this.clazz = clazz;
   }
 
   public ClassTypeNode(String clazz) {
-    super(clazz);
+    super();
+    this.clazz = clazz;
   }
 
   @Override
@@ -57,15 +59,7 @@ public final class ClassTypeNode extends TypeNode {
     return List.copyOf(children);
   }
 
-  @Override
-  public String toString() {
-    var result = value + nullnessOperatorToString();
-    if (!children.isEmpty()) {
-      result += "<" + children.stream()
-          .map(TypeNode::toString)
-          .collect(Collectors.joining(", "))
-                + ">";
-    }
-    return result;
+  public String getClazz() {
+    return clazz;
   }
 }

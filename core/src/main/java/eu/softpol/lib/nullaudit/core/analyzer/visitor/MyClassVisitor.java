@@ -12,7 +12,8 @@ import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import eu.softpol.lib.nullaudit.core.signature.SignatureAnalyzer;
-import eu.softpol.lib.nullaudit.core.type.TypeNode;
+import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
+import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -136,8 +137,9 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       // check if the first constructor's argument has outer class type
       if (methodName.equals("<init>") &&
           !parameterTypes.isEmpty() &&
-          parameterTypes.get(0).getValue().equals(outerClassName)) {
-        parameterTypes.get(0).setOperator(NullnessOperator.MINUS_NULL);
+          parameterTypes.get(0) instanceof ClassTypeNode classTypeNode &&
+          classTypeNode.getClazz().equals(outerClassName)) {
+        classTypeNode.setOperator(NullnessOperator.MINUS_NULL);
       }
       // alternatively, I can search for the ACC_SYNTHETIC field of outerClassName type, but the compiler can skip this field when it's not used.
     }
@@ -184,7 +186,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
       if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
         var s = "%s %s".formatted(
-            componentInfo.fs().toString(),
+            AugmentedStringTranslator.INSTANCE.translate(componentInfo.fs()),
             componentInfo.componentName()
         );
         if (s.contains("*")) {
@@ -213,7 +215,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
       if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
         var s = "%s %s".formatted(
-            fieldInfo.fs().toString(),
+            AugmentedStringTranslator.INSTANCE.translate(fieldInfo.fs()),
             fieldInfo.fieldName()
         );
         if (s.contains("*")) {
@@ -252,18 +254,19 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
         }
         if (components.stream()
                 .filter(c -> c.componentName().equals(methodName))
-                .anyMatch(c -> c.fs().toString().equals(methodInfo.ms().returnType().toString()))
+                .anyMatch(c -> AugmentedStringTranslator.INSTANCE.translate(c.fs())
+                    .equals(
+                        AugmentedStringTranslator.INSTANCE.translate(methodInfo.ms().returnType())))
             && methodInfo.ms().parameterTypes().isEmpty()
         ) {
           // skip default getter
           continue;
         }
-        if (methodName.equals("<init>") && methodInfo.ms().parameterTypes().values()
-            .stream()
-            .map(TypeNode::toString)
+        if (methodName.equals("<init>") && methodInfo.ms().parameterTypes().stream()
+            .map(AugmentedStringTranslator.INSTANCE::translate)
             .collect(Collectors.joining(",")).equals(components.stream()
                 .map(ComponentInfo::fs)
-                .map(TypeNode::toString)
+                .map(AugmentedStringTranslator.INSTANCE::translate)
                 .collect(Collectors.joining(",")))
         ) {
           // skip default constructor
@@ -277,11 +280,11 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
       if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
         var s = "%s %s(%s)".formatted(
-            methodInfo.ms().returnType(),
+            AugmentedStringTranslator.INSTANCE.translate(methodInfo.ms().returnType()),
             methodInfo.methodName(),
             methodInfo.ms()
-                .parameterTypes().values().stream()
-                .map(TypeNode::toString)
+                .parameterTypes().stream()
+                .map(AugmentedStringTranslator.INSTANCE::translate)
                 .collect(Collectors.joining(", "))
         );
         if (s.contains("*")) {

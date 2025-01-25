@@ -5,12 +5,16 @@ import java.util.List;
 
 public final class BaseTypeNode extends TypeNode {
 
+  private final char descriptor;
+
   BaseTypeNode(TypeNode parent, char descriptor) {
-    super(parent, descriptorToString(descriptor));
+    super(parent);
+    this.descriptor = descriptor;
   }
 
   public BaseTypeNode(char descriptor) {
-    super(descriptorToString(descriptor));
+    super();
+    this.descriptor = descriptor;
   }
 
   @Override
@@ -47,7 +51,11 @@ public final class BaseTypeNode extends TypeNode {
     return List.of();
   }
 
-  private static String descriptorToString(char descriptor) {
+  public char getDescriptor() {
+    return descriptor;
+  }
+
+  public String getName() {
     return switch (descriptor) {
       case 'B' -> "byte";
       case 'C' -> "char";

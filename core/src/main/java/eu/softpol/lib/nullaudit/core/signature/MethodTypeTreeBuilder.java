@@ -5,15 +5,15 @@ import eu.softpol.lib.nullaudit.core.type.BaseTypeNode;
 import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import eu.softpol.lib.nullaudit.core.type.VariableTypeNode;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.signature.SignatureVisitor;
 
 public class MethodTypeTreeBuilder extends SignatureVisitor {
 
-  private final Map<Integer, TypeNode> params = new HashMap<>();
+  private final List<TypeNode> params = new ArrayList<>();
   private @Nullable TypeNode returnType;
 
   int paramIndex = -1;
@@ -33,7 +33,7 @@ public class MethodTypeTreeBuilder extends SignatureVisitor {
   @Override
   public SignatureVisitor visitParameterType() {
     if (paramIndex >= 0) {
-      params.put(paramIndex, root);
+      params.add(root);
     }
     checkingElement = CHECKING_ELEMENT.PARAM;
     root = null;
@@ -44,7 +44,7 @@ public class MethodTypeTreeBuilder extends SignatureVisitor {
   @Override
   public SignatureVisitor visitReturnType() {
     if (paramIndex >= 0) {
-      params.put(paramIndex, root);
+      params.add(root);
     }
     root = null;
     checkingElement = CHECKING_ELEMENT.RETURN;
@@ -135,8 +135,8 @@ public class MethodTypeTreeBuilder extends SignatureVisitor {
     }
   }
 
-  public Map<Integer, TypeNode> getParams() {
-    return params;
+  public List<TypeNode> getParams() {
+    return List.copyOf(params);
   }
 
   public TypeNode getReturnType() {

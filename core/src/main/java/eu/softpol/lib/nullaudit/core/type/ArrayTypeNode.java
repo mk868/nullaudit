@@ -1,7 +1,6 @@
 package eu.softpol.lib.nullaudit.core.type;
 
 import java.util.List;
-import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 public final class ArrayTypeNode extends TypeNode {
@@ -9,11 +8,11 @@ public final class ArrayTypeNode extends TypeNode {
   private @Nullable TypeNode child;
 
   ArrayTypeNode(TypeNode parent) {
-    super(parent, "[]");
+    super(parent);
   }
 
   public ArrayTypeNode() {
-    super("[]");
+    super();
   }
 
   @Override
@@ -54,11 +53,6 @@ public final class ArrayTypeNode extends TypeNode {
       throw new IllegalStateException("Array type has no children");
     }
     return List.of(child);
-  }
-
-  @Override
-  public String toString() {
-    return Objects.requireNonNull(child) + "[]" + nullnessOperatorToString();
   }
 
   private void throwWhenChildAlreadySet() {

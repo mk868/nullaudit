@@ -3,10 +3,10 @@ package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
+import eu.softpol.lib.nullaudit.core.type.translator.ToTypePathTranslator;
 import java.lang.System.Logger.Level;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
@@ -30,13 +30,13 @@ public class MyMethodVisitor extends MethodVisitor {
     super(Opcodes.ASM9);
     this.methodInfo = methodInfo;
 
-    typePathToParameterTypes = methodInfo.ms().parameterTypes().entrySet()
-        .stream()
-        .collect(Collectors.toUnmodifiableMap(
-            Entry::getKey,
-            kv -> kv.getValue().toTypePath()
-        ));
-    typePathToReturnType = methodInfo.ms().returnType().toTypePath();
+    var tmp = new HashMap<Integer, Map<String, TypeNode>>();
+    var parameterTypes = methodInfo.ms().parameterTypes();
+    for (int i = 0; i < parameterTypes.size(); i++) {
+      tmp.put(i, ToTypePathTranslator.INSTANCE.translate(parameterTypes.get(i)));
+    }
+    typePathToParameterTypes = Map.copyOf(tmp);
+    typePathToReturnType = ToTypePathTranslator.INSTANCE.translate(methodInfo.ms().returnType());
   }
 
   @Override

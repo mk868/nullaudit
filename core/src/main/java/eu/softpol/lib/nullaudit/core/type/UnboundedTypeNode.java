@@ -6,7 +6,7 @@ import java.util.List;
 public final class UnboundedTypeNode extends TypeNode {
 
   UnboundedTypeNode(TypeNode parent) {
-    super(parent, "?");
+    super(parent);
   }
 
   @Override

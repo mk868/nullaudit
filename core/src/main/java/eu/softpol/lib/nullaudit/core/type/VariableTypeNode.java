@@ -5,12 +5,16 @@ import java.util.List;
 
 public final class VariableTypeNode extends TypeNode {
 
+  private final String name;
+
   VariableTypeNode(TypeNode parent, String name) {
-    super(parent, name);
+    super(parent);
+    this.name = name;
   }
 
   public VariableTypeNode(String name) {
-    super(name);
+    super();
+    this.name = name;
   }
 
   @Override
@@ -45,6 +49,10 @@ public final class VariableTypeNode extends TypeNode {
 
   public List<TypeNode> getChildren() {
     return List.of();
+  }
+
+  public String getName() {
+    return name;
   }
 
   private static RuntimeException createNoChildrenException() {

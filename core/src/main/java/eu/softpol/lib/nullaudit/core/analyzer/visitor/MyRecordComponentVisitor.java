@@ -2,6 +2,7 @@ package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
+import eu.softpol.lib.nullaudit.core.type.translator.ToTypePathTranslator;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Opcodes;
@@ -36,7 +37,7 @@ public class MyRecordComponentVisitor extends RecordComponentVisitor {
         } else if (typePathStr.contains(".")) {
           // TODO how to handle this case...
         } else {
-          fs.toTypePath().get(typePathStr).setOperator(operator);
+          ToTypePathTranslator.INSTANCE.translate(fs).get(typePathStr).setOperator(operator);
         }
       }
     }

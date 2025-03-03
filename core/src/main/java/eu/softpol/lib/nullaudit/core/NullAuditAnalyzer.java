@@ -42,6 +42,6 @@ public class NullAuditAnalyzer {
   }
 
   private double calculateCoveragePercentage(int totalClasses, int unspecifiedNullnessClasses) {
-    return 100.0 * (totalClasses - unspecifiedNullnessClasses) / totalClasses;
+    return Math.round(1000.0 * (totalClasses - unspecifiedNullnessClasses) / totalClasses) / 10.0;
   }
 }

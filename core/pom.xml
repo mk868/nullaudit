@@ -35,6 +35,11 @@
       <artifactId>compile-testing</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>io.github.ascopes.jct</groupId>
+      <artifactId>java-compiler-testing</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

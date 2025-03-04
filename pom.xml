@@ -92,9 +92,9 @@
         <version>1.4.4</version>
       </dependency>
       <dependency>
-        <groupId>com.google.testing.compile</groupId>
-        <artifactId>compile-testing</artifactId>
-        <version>0.21.0</version>
+        <groupId>io.github.ascopes.jct</groupId>
+        <artifactId>java-compiler-testing</artifactId>
+        <version>4.0.3</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>

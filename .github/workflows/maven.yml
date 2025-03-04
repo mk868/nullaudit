@@ -23,3 +23,4 @@ jobs:
       run: |
         mvn -B -ntp -f pom.xml package
         mvn -B -ntp -f examples/simple/pom.xml compiler:compile
+        mvn -B -ntp -f examples/irrelevant/pom.xml compiler:compile

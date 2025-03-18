@@ -94,7 +94,7 @@
       <dependency>
         <groupId>io.github.ascopes.jct</groupId>
         <artifactId>java-compiler-testing</artifactId>
-        <version>4.0.3</version>
+        <version>5.0.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>

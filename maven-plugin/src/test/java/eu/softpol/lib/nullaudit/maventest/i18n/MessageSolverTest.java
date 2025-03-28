@@ -1,6 +1,7 @@
 package eu.softpol.lib.nullaudit.maventest.i18n;
 
-import static com.google.common.truth.Truth.assertThat;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.maven.i18n.MessageSolver;
 import org.junit.jupiter.api.BeforeEach;

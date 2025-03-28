@@ -1,7 +1,6 @@
 package eu.softpol.lib.nullaudit.coretest.i18n;
 
-
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import java.util.HashSet;

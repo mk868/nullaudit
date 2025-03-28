@@ -1,8 +1,9 @@
 package eu.softpol.lib.nullaudit.coretest.nullnessoperator.scope;
 
-import static com.google.common.truth.Truth.assertThat;
-import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import io.github.ascopes.jct.compilers.JctCompiler;
 import io.github.ascopes.jct.compilers.JctCompilers;
 import io.github.ascopes.jct.workspaces.Workspaces;

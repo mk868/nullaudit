@@ -1,6 +1,6 @@
 package eu.softpol.lib.nullaudit.coretest;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import java.nio.file.Path;

@@ -1,12 +1,17 @@
 # NullAudit
 
 A tool to verify whether JSpecify nullness annotations are applied to your codebase.  
-Check out the [sample project](examples/simple) for an example of actual usage.
+Check out the [sample projects](examples) for the examples of actual usage.
 
-## Features
+## Checks
 
 - Detects unspecified nullness types based on `@Nullable`, `@NonNull`, `@NullMarked`, and
   `@NullUnmarked` annotations.
+- Detects the use of both `@NullMarked` and
+  `@NullUnmarked` annotations on the same package/class/method and reports it as an error.
+
+## Features
+
 - Analyzes `.jar` files or directories containing `.class` files.
 - Generates a JSON report of the analysis results.
 - Maven plugin to simplify integration with CI/CD workflows.
@@ -55,7 +60,7 @@ configuration to your `pom.xml`:
     </plugin>
   </plugins>
 </build>
-<!-- ... -->
+  <!-- ... -->
 ```
 
 #### Usage as a standalone tool

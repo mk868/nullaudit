@@ -33,6 +33,18 @@ public class ClassUtil {
   }
 
   /**
+   * Get class name for specified descriptor. For example for the input
+   * `Lorg/jspecify/annotations/Nullable;` a `org.jspecify.annotations.Nullable` will be returned.
+   *
+   * @param descriptor class descriptor
+   * @return class name
+   */
+  public static String getClassNameFromDescriptor(String descriptor) {
+    return descriptor.substring(1, descriptor.length() - 1)
+        .replace("/", ".");
+  }
+
+  /**
    * Get simple class name for specified internal class name. For example for the input class
    * `aaa/bbb/ClassAbc$Def` a `Def` will be returned.
    *

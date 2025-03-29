@@ -5,10 +5,6 @@ import java.util.List;
 
 public final class UnboundedTypeNode extends TypeNode {
 
-  UnboundedTypeNode(TypeNode parent) {
-    super(parent);
-  }
-
   @Override
   public TypeNode addClassChild(String value) {
     throw createNoChildrenException();

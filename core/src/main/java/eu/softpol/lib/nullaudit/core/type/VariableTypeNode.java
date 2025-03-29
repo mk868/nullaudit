@@ -7,13 +7,7 @@ public final class VariableTypeNode extends TypeNode {
 
   private final String name;
 
-  VariableTypeNode(TypeNode parent, String name) {
-    super(parent);
-    this.name = name;
-  }
-
   public VariableTypeNode(String name) {
-    super();
     this.name = name;
   }
 

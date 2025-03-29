@@ -9,47 +9,41 @@ public final class ClassTypeNode extends TypeNode {
   private final List<TypeNode> children = new ArrayList<>();
   private final String clazz;
 
-  ClassTypeNode(TypeNode parent, String clazz) {
-    super(parent);
-    this.clazz = clazz;
-  }
-
   public ClassTypeNode(String clazz) {
-    super();
     this.clazz = clazz;
   }
 
   @Override
   public TypeNode addClassChild(String value) {
-    var child = new ClassTypeNode(this, value);
+    var child = new ClassTypeNode(value);
     children.add(child);
     return child;
   }
 
   @Override
   public TypeNode addPrimitiveChild(char descriptor) {
-    var child = new PrimitiveTypeNode(this, descriptor);
+    var child = new PrimitiveTypeNode(descriptor);
     children.add(child);
     return child;
   }
 
   @Override
   public TypeNode addArrayChild() {
-    var child = new ArrayTypeNode(this);
+    var child = new ArrayTypeNode();
     children.add(child);
     return child;
   }
 
   @Override
   public TypeNode addVariableChild(String name) {
-    var child = new VariableTypeNode(this, name);
+    var child = new VariableTypeNode(name);
     children.add(child);
     return child;
   }
 
   @Override
   public TypeNode addUnboundedChild() {
-    var child = new UnboundedTypeNode(this);
+    var child = new UnboundedTypeNode();
     children.add(child);
     return child;
   }

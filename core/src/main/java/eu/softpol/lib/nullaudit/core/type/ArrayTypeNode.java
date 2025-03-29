@@ -7,39 +7,31 @@ public final class ArrayTypeNode extends TypeNode {
 
   private @Nullable TypeNode child;
 
-  ArrayTypeNode(TypeNode parent) {
-    super(parent);
-  }
-
-  public ArrayTypeNode() {
-    super();
-  }
-
   @Override
   public TypeNode addClassChild(String value) {
     throwWhenChildAlreadySet();
-    child = new ClassTypeNode(this, value);
+    child = new ClassTypeNode(value);
     return child;
   }
 
   @Override
   public TypeNode addPrimitiveChild(char descriptor) {
     throwWhenChildAlreadySet();
-    child = new PrimitiveTypeNode(this, descriptor);
+    child = new PrimitiveTypeNode(descriptor);
     return child;
   }
 
   @Override
   public TypeNode addArrayChild() {
     throwWhenChildAlreadySet();
-    child = new ArrayTypeNode(this);
+    child = new ArrayTypeNode();
     return child;
   }
 
   @Override
   public TypeNode addVariableChild(String name) {
     throwWhenChildAlreadySet();
-    child = new VariableTypeNode(this, name);
+    child = new VariableTypeNode(name);
     return child;
   }
 

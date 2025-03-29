@@ -1,16 +1,19 @@
 package eu.softpol.lib.nullaudit.core.signature;
 
 import eu.softpol.lib.nullaudit.core.type.ArrayTypeNode;
-import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
+import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import eu.softpol.lib.nullaudit.core.type.VariableTypeNode;
+import java.util.HashMap;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.signature.SignatureVisitor;
 
 public class FieldTypeTreeBuilder extends SignatureVisitor {
 
+  private final Map<TypeNode, TypeNode> nodeToParent = new HashMap<>();
   private @Nullable TypeNode node;
   private @Nullable TypeNode root;
 
@@ -24,7 +27,7 @@ public class FieldTypeTreeBuilder extends SignatureVisitor {
     if (root == null) {
       root = node = new ClassTypeNode(clazz);
     } else {
-      node = node.addClassChild(clazz);
+      goToChild(node.addClassChild(clazz));
     }
     super.visitFormalTypeParameter(name);
   }
@@ -35,7 +38,7 @@ public class FieldTypeTreeBuilder extends SignatureVisitor {
     if (root == null) {
       root = node = new ClassTypeNode(clazz);
     } else {
-      node = node.addClassChild(clazz);
+      goToChild(node.addClassChild(clazz));
     }
     super.visitClassType(name);
   }
@@ -45,7 +48,7 @@ public class FieldTypeTreeBuilder extends SignatureVisitor {
     if (root == null) {
       root = node = new ArrayTypeNode();
     } else {
-      node = node.addArrayChild();
+      goToChild(node.addArrayChild());
     }
     return super.visitArrayType();
   }
@@ -55,7 +58,7 @@ public class FieldTypeTreeBuilder extends SignatureVisitor {
     if (root == null) {
       root = node = new PrimitiveTypeNode(descriptor);
     } else {
-      node = node.addPrimitiveChild(descriptor);
+      goToChild(node.addPrimitiveChild(descriptor));
       goBack();
     }
   }
@@ -65,7 +68,7 @@ public class FieldTypeTreeBuilder extends SignatureVisitor {
     if (root == null) {
       root = node = new VariableTypeNode(name);
     } else {
-      node = node.addVariableChild(name);
+      goToChild(node.addVariableChild(name));
       goBack();
     }
     super.visitTypeVariable(name);
@@ -73,7 +76,7 @@ public class FieldTypeTreeBuilder extends SignatureVisitor {
 
   @Override
   public void visitTypeArgument() {
-    node = node.addUnboundedChild();
+    goToChild(node.addUnboundedChild());
     goBack();
     super.visitTypeArgument();
   }
@@ -85,10 +88,15 @@ public class FieldTypeTreeBuilder extends SignatureVisitor {
   }
 
   private void goBack() {
-    node = node.getParent();
+    node = nodeToParent.get(node);
     while (node instanceof ArrayTypeNode) {
-      node = node.getParent();
+      node = nodeToParent.get(node);
     }
+  }
+
+  private void goToChild(TypeNode child) {
+    nodeToParent.put(child, node);
+    node = child;
   }
 
   public TypeNode getFieldType() {

@@ -7,13 +7,7 @@ public final class PrimitiveTypeNode extends TypeNode {
 
   private final char descriptor;
 
-  PrimitiveTypeNode(TypeNode parent, char descriptor) {
-    super(parent);
-    this.descriptor = descriptor;
-  }
-
   public PrimitiveTypeNode(char descriptor) {
-    super();
     this.descriptor = descriptor;
   }
 

@@ -1,9 +1,9 @@
-package eu.softpol.lib.nullaudit.core.analyzer.visitor;
+package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import org.jspecify.annotations.Nullable;
 
-public record FieldInfo(
+public record VisitedField(
     String fieldName,
     String fieldDescriptor,
     @Nullable String fieldSignature,

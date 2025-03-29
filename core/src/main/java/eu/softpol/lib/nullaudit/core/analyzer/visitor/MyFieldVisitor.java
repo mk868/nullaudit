@@ -1,6 +1,8 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedField;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedMethod;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import eu.softpol.lib.nullaudit.core.type.translator.ToTypePathTranslator;
 import org.jspecify.annotations.Nullable;
@@ -12,11 +14,11 @@ import org.objectweb.asm.TypeReference;
 
 public class MyFieldVisitor extends FieldVisitor {
 
-  private final TypeNode fs;
+  private final VisitedField visitedField;
 
-  protected MyFieldVisitor(TypeNode fs) {
+  protected MyFieldVisitor(VisitedField visitedField) {
     super(Opcodes.ASM9);
-    this.fs = fs;
+    this.visitedField = visitedField;
   }
 
   @Override
@@ -37,7 +39,7 @@ public class MyFieldVisitor extends FieldVisitor {
         } else if (typePathStr.contains(".")) {
           // TODO how to handle this case...
         } else {
-          ToTypePathTranslator.INSTANCE.translate(fs).get(typePathStr).setOperator(operator);
+          ToTypePathTranslator.INSTANCE.translate(visitedField.fs()).get(typePathStr).setOperator(operator);
         }
       }
     }

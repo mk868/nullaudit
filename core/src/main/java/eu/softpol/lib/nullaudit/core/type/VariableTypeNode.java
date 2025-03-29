@@ -23,7 +23,7 @@ public final class VariableTypeNode extends TypeNode {
   }
 
   @Override
-  public TypeNode addBaseChild(char descriptor) {
+  public TypeNode addPrimitiveChild(char descriptor) {
     throw createNoChildrenException();
   }
 

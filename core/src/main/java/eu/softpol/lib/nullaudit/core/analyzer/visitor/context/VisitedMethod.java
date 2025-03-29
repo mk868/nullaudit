@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.core.analyzer.visitor;
+package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
-public record MethodInfo(
+public record VisitedMethod(
     String methodName,
     String descriptiveMethodName,
     String methodDescriptor,
@@ -15,7 +15,7 @@ public record MethodInfo(
     Set<NullScopeAnnotation> annotations // mutable
 ) {
 
-  public MethodInfo(String methodName, String descriptiveMethodName,
+  public VisitedMethod(String methodName, String descriptiveMethodName,
       String methodDescriptor, @Nullable String methodSignature,
       MethodSignature ms) {
     this(methodName, descriptiveMethodName, methodDescriptor, methodSignature, ms, new HashSet<>());

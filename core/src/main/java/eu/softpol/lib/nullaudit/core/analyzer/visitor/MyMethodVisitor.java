@@ -2,6 +2,7 @@ package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedMethod;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import eu.softpol.lib.nullaudit.core.type.translator.ToTypePathTranslator;
 import java.lang.System.Logger.Level;
@@ -24,19 +25,19 @@ public class MyMethodVisitor extends MethodVisitor {
 
   private final Map<Integer, Map<String, TypeNode>> typePathToParameterTypes;
   private final Map<String, TypeNode> typePathToReturnType;
-  private final MethodInfo methodInfo;
+  private final VisitedMethod visitedMethod;
 
-  protected MyMethodVisitor(MethodInfo methodInfo) {
+  protected MyMethodVisitor(VisitedMethod visitedMethod) {
     super(Opcodes.ASM9);
-    this.methodInfo = methodInfo;
+    this.visitedMethod = visitedMethod;
 
     var tmp = new HashMap<Integer, Map<String, TypeNode>>();
-    var parameterTypes = methodInfo.ms().parameterTypes();
+    var parameterTypes = visitedMethod.ms().parameterTypes();
     for (int i = 0; i < parameterTypes.size(); i++) {
       tmp.put(i, ToTypePathTranslator.INSTANCE.translate(parameterTypes.get(i)));
     }
     typePathToParameterTypes = Map.copyOf(tmp);
-    typePathToReturnType = ToTypePathTranslator.INSTANCE.translate(methodInfo.ms().returnType());
+    typePathToReturnType = ToTypePathTranslator.INSTANCE.translate(visitedMethod.ms().returnType());
   }
 
   @Override
@@ -86,10 +87,10 @@ public class MyMethodVisitor extends MethodVisitor {
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
     var annotation = KnownAnnotations.fromDescriptor(descriptor).orElse(null);
     if (annotation == KnownAnnotations.NULL_MARKED) {
-      methodInfo.annotations().add(NullScopeAnnotation.NULL_MARKED);
+      visitedMethod.annotations().add(NullScopeAnnotation.NULL_MARKED);
     }
     if (annotation == KnownAnnotations.NULL_UNMARKED) {
-      methodInfo.annotations().add(NullScopeAnnotation.NULL_UNMARKED);
+      visitedMethod.annotations().add(NullScopeAnnotation.NULL_UNMARKED);
     }
     return super.visitAnnotation(descriptor, visible);
   }

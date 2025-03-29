@@ -6,6 +6,9 @@ import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedComponent;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedField;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedMethod;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.Kind;
@@ -36,9 +39,9 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private final MessageSolver messageSolver;
   private final ReportBuilder reportBuilder;
   private final Set<NullScopeAnnotation> annotations = new HashSet<>();
-  private final List<ComponentInfo> components = new ArrayList<>();
-  private final List<FieldInfo> fields = new ArrayList<>();
-  private final List<MethodInfo> methods = new ArrayList<>();
+  private final List<VisitedComponent> components = new ArrayList<>();
+  private final List<VisitedField> fields = new ArrayList<>();
+  private final List<VisitedMethod> methods = new ArrayList<>();
   private Clazz superClazz;
   private final List<Clazz> outerClasses = new ArrayList<>();
   private Clazz thisClazz;
@@ -93,10 +96,10 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       @Nullable String signature) {
 
     var fs = SignatureAnalyzer.analyzeFieldSignature(requireNonNullElse(signature, descriptor));
-    var componentInfo = new ComponentInfo(name, descriptor, signature, fs);
-    components.add(componentInfo);
+    var visitedComponent = new VisitedComponent(name, descriptor, signature, fs);
+    components.add(visitedComponent);
 
-    return new MyRecordComponentVisitor(fs);
+    return new MyRecordComponentVisitor(visitedComponent);
   }
 
   @Override
@@ -107,10 +110,10 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     }
 
     var fs = SignatureAnalyzer.analyzeFieldSignature(requireNonNullElse(signature, descriptor));
-    var fieldInfo = new FieldInfo(name, descriptor, signature, fs);
-    fields.add(fieldInfo);
+    var visitedField = new VisitedField(name, descriptor, signature, fs);
+    fields.add(visitedField);
 
-    return new MyFieldVisitor(fs);
+    return new MyFieldVisitor(visitedField);
   }
 
   @Override
@@ -156,7 +159,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
                                  .collect(Collectors.joining(", "))
                              + ")";
 
-    var methodInfo = new MethodInfo(methodName, descriptiveMethodName, methodDescriptor,
+    var methodInfo = new VisitedMethod(methodName, descriptiveMethodName, methodDescriptor,
         methodSignature, ms);
     methods.add(methodInfo);
 
@@ -265,7 +268,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
         if (methodName.equals("<init>") && methodInfo.ms().parameterTypes().stream()
             .map(AugmentedStringTranslator.INSTANCE::translate)
             .collect(Collectors.joining(",")).equals(components.stream()
-                .map(ComponentInfo::fs)
+                .map(VisitedComponent::fs)
                 .map(AugmentedStringTranslator.INSTANCE::translate)
                 .collect(Collectors.joining(",")))
         ) {

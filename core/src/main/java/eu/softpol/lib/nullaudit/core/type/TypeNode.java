@@ -4,7 +4,7 @@ import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
-public abstract sealed class TypeNode permits ArrayTypeNode, BaseTypeNode, ClassTypeNode,
+public abstract sealed class TypeNode permits ArrayTypeNode, PrimitiveTypeNode, ClassTypeNode,
     UnboundedTypeNode, VariableTypeNode {
 
   protected final @Nullable TypeNode parent;
@@ -20,7 +20,7 @@ public abstract sealed class TypeNode permits ArrayTypeNode, BaseTypeNode, Class
 
   public abstract TypeNode addClassChild(String value);
 
-  public abstract TypeNode addBaseChild(char descriptor);
+  public abstract TypeNode addPrimitiveChild(char descriptor);
 
   public abstract TypeNode addArrayChild();
 

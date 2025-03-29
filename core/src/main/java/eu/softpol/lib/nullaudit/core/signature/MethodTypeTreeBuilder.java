@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.signature;
 
 import eu.softpol.lib.nullaudit.core.type.ArrayTypeNode;
-import eu.softpol.lib.nullaudit.core.type.BaseTypeNode;
+import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import eu.softpol.lib.nullaudit.core.type.VariableTypeNode;
@@ -97,9 +97,9 @@ public class MethodTypeTreeBuilder extends SignatureVisitor {
   @Override
   public void visitBaseType(char descriptor) {
     if (root == null) {
-      root = node = new BaseTypeNode(descriptor);
+      root = node = new PrimitiveTypeNode(descriptor);
     } else {
-      node = node.addBaseChild(descriptor);
+      node = node.addPrimitiveChild(descriptor);
       goBack();
     }
   }

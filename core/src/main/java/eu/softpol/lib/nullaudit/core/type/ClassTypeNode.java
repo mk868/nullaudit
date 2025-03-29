@@ -27,8 +27,8 @@ public final class ClassTypeNode extends TypeNode {
   }
 
   @Override
-  public TypeNode addBaseChild(char descriptor) {
-    var child = new BaseTypeNode(this, descriptor);
+  public TypeNode addPrimitiveChild(char descriptor) {
+    var child = new PrimitiveTypeNode(this, descriptor);
     children.add(child);
     return child;
   }

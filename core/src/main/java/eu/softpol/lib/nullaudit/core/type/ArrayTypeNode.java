@@ -23,9 +23,9 @@ public final class ArrayTypeNode extends TypeNode {
   }
 
   @Override
-  public TypeNode addBaseChild(char descriptor) {
+  public TypeNode addPrimitiveChild(char descriptor) {
     throwWhenChildAlreadySet();
-    child = new BaseTypeNode(this, descriptor);
+    child = new PrimitiveTypeNode(this, descriptor);
     return child;
   }
 

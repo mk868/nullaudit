@@ -3,16 +3,16 @@ package eu.softpol.lib.nullaudit.core.type;
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
 import java.util.List;
 
-public final class BaseTypeNode extends TypeNode {
+public final class PrimitiveTypeNode extends TypeNode {
 
   private final char descriptor;
 
-  BaseTypeNode(TypeNode parent, char descriptor) {
+  PrimitiveTypeNode(TypeNode parent, char descriptor) {
     super(parent);
     this.descriptor = descriptor;
   }
 
-  public BaseTypeNode(char descriptor) {
+  public PrimitiveTypeNode(char descriptor) {
     super();
     this.descriptor = descriptor;
   }
@@ -23,7 +23,7 @@ public final class BaseTypeNode extends TypeNode {
   }
 
   @Override
-  public TypeNode addBaseChild(char descriptor) {
+  public TypeNode addPrimitiveChild(char descriptor) {
     throw createNoChildrenException();
   }
 

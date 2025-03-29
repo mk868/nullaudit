@@ -2,7 +2,7 @@ package eu.softpol.lib.nullaudit.core.type.translator;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
 import eu.softpol.lib.nullaudit.core.type.ArrayTypeNode;
-import eu.softpol.lib.nullaudit.core.type.BaseTypeNode;
+import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import eu.softpol.lib.nullaudit.core.type.UnboundedTypeNode;
@@ -21,8 +21,8 @@ public class AugmentedStringTranslator implements Translator<String> {
     if (typeNode instanceof ArrayTypeNode arrayTypeNode) {
       return translate(arrayTypeNode.getChildren().get(0)) + "[]"
              + nullnessOperatorToString(arrayTypeNode.getOperator());
-    } else if (typeNode instanceof BaseTypeNode baseTypeNode) {
-      return baseTypeNode.getName();
+    } else if (typeNode instanceof PrimitiveTypeNode primitiveTypeNode) {
+      return primitiveTypeNode.getName();
     } else if (typeNode instanceof ClassTypeNode classTypeNode) {
       var result = classTypeNode.getClazz() + nullnessOperatorToString(classTypeNode.getOperator());
       if (!classTypeNode.getChildren().isEmpty()) {

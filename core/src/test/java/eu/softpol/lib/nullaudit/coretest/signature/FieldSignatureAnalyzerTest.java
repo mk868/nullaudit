@@ -2,7 +2,7 @@ package eu.softpol.lib.nullaudit.coretest.signature;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import eu.softpol.lib.nullaudit.core.signature.SignatureAnalyzer;
+import eu.softpol.lib.nullaudit.core.signature.FieldSignatureAnalyzer;
 import eu.softpol.lib.nullaudit.core.type.translator.RawStringTranslator;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,7 +57,7 @@ class FieldSignatureAnalyzerTest {
   @ParameterizedTest(name = "[{index}] {1}")
   @MethodSource("args")
   void test(String signature, String expected) {
-    var typeNode = SignatureAnalyzer.analyzeFieldSignature(signature);
+    var typeNode = FieldSignatureAnalyzer.analyze(signature);
     assertThat(RawStringTranslator.INSTANCE.translate(typeNode)).isEqualTo(expected);
   }
 

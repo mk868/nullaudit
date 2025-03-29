@@ -2,7 +2,7 @@ package eu.softpol.lib.nullaudit.coretest.signature;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import eu.softpol.lib.nullaudit.core.signature.SignatureAnalyzer;
+import eu.softpol.lib.nullaudit.core.signature.MethodSignatureAnalyzer;
 import eu.softpol.lib.nullaudit.core.type.translator.RawStringTranslator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -90,7 +90,7 @@ class MethodSignatureAnalyzerTest {
   @ParameterizedTest(name = "[{index}] {1}")
   @MethodSource("args")
   void test(String signature, String expected) {
-    var s = SignatureAnalyzer.analyzeMethodSignature(signature);
+    var s = MethodSignatureAnalyzer.analyze(signature);
     var str = RawStringTranslator.INSTANCE.translate(s.returnType()) + " method" +
               s.parameterTypes().stream()
                   .map(RawStringTranslator.INSTANCE::translate)

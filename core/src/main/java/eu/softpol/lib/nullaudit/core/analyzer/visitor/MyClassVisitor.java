@@ -14,7 +14,8 @@ import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
-import eu.softpol.lib.nullaudit.core.signature.SignatureAnalyzer;
+import eu.softpol.lib.nullaudit.core.signature.FieldSignatureAnalyzer;
+import eu.softpol.lib.nullaudit.core.signature.MethodSignatureAnalyzer;
 import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
 import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
 import java.util.ArrayList;
@@ -95,7 +96,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   public RecordComponentVisitor visitRecordComponent(String name, String descriptor,
       @Nullable String signature) {
 
-    var fs = SignatureAnalyzer.analyzeFieldSignature(requireNonNullElse(signature, descriptor));
+    var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
     var visitedComponent = new VisitedComponent(name, descriptor, signature, fs);
     components.add(visitedComponent);
 
@@ -109,7 +110,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       return super.visitField(access, name, descriptor, signature, value);
     }
 
-    var fs = SignatureAnalyzer.analyzeFieldSignature(requireNonNullElse(signature, descriptor));
+    var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
     var visitedField = new VisitedField(name, descriptor, signature, fs);
     fields.add(visitedField);
 
@@ -125,8 +126,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     final MethodSignature ms;
     try {
-      ms = SignatureAnalyzer.analyzeMethodSignature(
-          requireNonNullElse(methodSignature, methodDescriptor));
+      ms = MethodSignatureAnalyzer.analyze(requireNonNullElse(methodSignature, methodDescriptor));
     } catch (RuntimeException e) {
       throw new RuntimeException(
           "Reading signature of " + methodName + methodDescriptor + " (" + methodSignature

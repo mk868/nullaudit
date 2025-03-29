@@ -5,64 +5,20 @@ import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
 import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import eu.softpol.lib.nullaudit.core.type.VariableTypeNode;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.signature.SignatureVisitor;
 
-public class MethodTypeTreeBuilder extends SignatureVisitor {
+public class FieldSignatureVisitor extends SignatureVisitor {
 
   private final Map<TypeNode, TypeNode> nodeToParent = new HashMap<>();
-  private final List<TypeNode> params = new ArrayList<>();
-  private @Nullable TypeNode returnType;
-
-  int paramIndex = -1;
-
-  enum CHECKING_ELEMENT {
-    PARAM, RETURN, EXCEPTION;
-  }
-
-  private CHECKING_ELEMENT checkingElement = CHECKING_ELEMENT.PARAM;
   private @Nullable TypeNode node;
   private @Nullable TypeNode root;
 
-  public MethodTypeTreeBuilder() {
+  public FieldSignatureVisitor() {
     super(Opcodes.ASM9);
-  }
-
-  @Override
-  public SignatureVisitor visitParameterType() {
-    if (paramIndex >= 0) {
-      params.add(root);
-    }
-    checkingElement = CHECKING_ELEMENT.PARAM;
-    root = null;
-    paramIndex++;
-    return super.visitParameterType();
-  }
-
-  @Override
-  public SignatureVisitor visitReturnType() {
-    if (paramIndex >= 0) {
-      params.add(root);
-    }
-    root = null;
-    checkingElement = CHECKING_ELEMENT.RETURN;
-    return super.visitReturnType();
-  }
-
-  @Override
-  public SignatureVisitor visitExceptionType() {
-    if (returnType == null && checkingElement == CHECKING_ELEMENT.RETURN) {
-      returnType = root;
-    }
-    // TODO not implemented
-    root = null;
-    checkingElement = CHECKING_ELEMENT.EXCEPTION;
-    return super.visitExceptionType();
   }
 
   @Override
@@ -143,18 +99,7 @@ public class MethodTypeTreeBuilder extends SignatureVisitor {
     node = child;
   }
 
-  public List<TypeNode> getParams() {
-    return List.copyOf(params);
-  }
-
-  public TypeNode getReturnType() {
-    if (returnType == null && checkingElement == CHECKING_ELEMENT.RETURN) {
-      returnType = root;
-      root = null;
-    }
-    if (returnType == null) {
-      throw new IllegalStateException("Return type not yet built");
-    }
-    return returnType;
+  public TypeNode getFieldType() {
+    return root;
   }
 }

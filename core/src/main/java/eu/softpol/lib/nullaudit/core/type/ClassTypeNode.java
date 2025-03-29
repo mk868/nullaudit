@@ -14,38 +14,8 @@ public final class ClassTypeNode extends TypeNode {
   }
 
   @Override
-  public TypeNode addClassChild(String value) {
-    var child = new ClassTypeNode(value);
+  protected void addChild(TypeNode child) {
     children.add(child);
-    return child;
-  }
-
-  @Override
-  public TypeNode addPrimitiveChild(char descriptor) {
-    var child = new PrimitiveTypeNode(descriptor);
-    children.add(child);
-    return child;
-  }
-
-  @Override
-  public TypeNode addArrayChild() {
-    var child = new ArrayTypeNode();
-    children.add(child);
-    return child;
-  }
-
-  @Override
-  public TypeNode addVariableChild(String name) {
-    var child = new VariableTypeNode(name);
-    children.add(child);
-    return child;
-  }
-
-  @Override
-  public TypeNode addUnboundedChild() {
-    var child = new UnboundedTypeNode();
-    children.add(child);
-    return child;
   }
 
   @Override

@@ -12,28 +12,8 @@ public final class VariableTypeNode extends TypeNode {
   }
 
   @Override
-  public TypeNode addClassChild(String value) {
-    throw createNoChildrenException();
-  }
-
-  @Override
-  public TypeNode addPrimitiveChild(char descriptor) {
-    throw createNoChildrenException();
-  }
-
-  @Override
-  public TypeNode addArrayChild() {
-    throw createNoChildrenException();
-  }
-
-  @Override
-  public TypeNode addVariableChild(String name) {
-    throw createNoChildrenException();
-  }
-
-  @Override
-  public TypeNode addUnboundedChild() {
-    throw createNoChildrenException();
+  protected void addChild(TypeNode child) {
+    throw new IllegalStateException("Variable type has no children");
   }
 
   @Override
@@ -41,6 +21,7 @@ public final class VariableTypeNode extends TypeNode {
     //TODO not supported
   }
 
+  @Override
   public List<TypeNode> getChildren() {
     return List.of();
   }
@@ -49,7 +30,4 @@ public final class VariableTypeNode extends TypeNode {
     return name;
   }
 
-  private static RuntimeException createNoChildrenException() {
-    return new IllegalStateException("Variable type has no children");
-  }
 }

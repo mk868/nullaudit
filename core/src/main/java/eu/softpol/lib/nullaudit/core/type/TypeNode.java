@@ -11,15 +11,37 @@ public abstract sealed class TypeNode permits ArrayTypeNode, PrimitiveTypeNode, 
   protected TypeNode() {
   }
 
-  public abstract TypeNode addClassChild(String value);
+  protected abstract void addChild(TypeNode child);
 
-  public abstract TypeNode addPrimitiveChild(char descriptor);
+  public TypeNode addClassChild(String value) {
+    var child = new ClassTypeNode(value);
+    addChild(child);
+    return child;
+  }
 
-  public abstract TypeNode addArrayChild();
+  public TypeNode addPrimitiveChild(char descriptor) {
+    var child = new PrimitiveTypeNode(descriptor);
+    addChild(child);
+    return child;
+  }
 
-  public abstract TypeNode addVariableChild(String name);
+  public TypeNode addArrayChild() {
+    var child = new ArrayTypeNode();
+    addChild(child);
+    return child;
+  }
 
-  public abstract TypeNode addUnboundedChild();
+  public TypeNode addVariableChild(String name) {
+    var child = new VariableTypeNode(name);
+    addChild(child);
+    return child;
+  }
+
+  public TypeNode addUnboundedChild() {
+    var child = new UnboundedTypeNode();
+    addChild(child);
+    return child;
+  }
 
   public NullnessOperator getOperator() {
     return nullnessOperator;

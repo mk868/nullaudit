@@ -8,31 +8,9 @@ public final class ArrayTypeNode extends TypeNode {
   private @Nullable TypeNode child;
 
   @Override
-  public TypeNode addClassChild(String value) {
+  protected void addChild(TypeNode child) {
     throwWhenChildAlreadySet();
-    child = new ClassTypeNode(value);
-    return child;
-  }
-
-  @Override
-  public TypeNode addPrimitiveChild(char descriptor) {
-    throwWhenChildAlreadySet();
-    child = new PrimitiveTypeNode(descriptor);
-    return child;
-  }
-
-  @Override
-  public TypeNode addArrayChild() {
-    throwWhenChildAlreadySet();
-    child = new ArrayTypeNode();
-    return child;
-  }
-
-  @Override
-  public TypeNode addVariableChild(String name) {
-    throwWhenChildAlreadySet();
-    child = new VariableTypeNode(name);
-    return child;
+    this.child = child;
   }
 
   @Override
@@ -40,6 +18,7 @@ public final class ArrayTypeNode extends TypeNode {
     throw new UnsupportedOperationException("Array type cannot have unbounded child");
   }
 
+  @Override
   public List<TypeNode> getChildren() {
     if (child == null) {
       throw new IllegalStateException("Array type has no children");

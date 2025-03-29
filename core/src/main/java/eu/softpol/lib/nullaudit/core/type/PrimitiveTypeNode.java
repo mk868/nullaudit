@@ -12,28 +12,8 @@ public final class PrimitiveTypeNode extends TypeNode {
   }
 
   @Override
-  public TypeNode addClassChild(String value) {
-    throw createNoChildrenException();
-  }
-
-  @Override
-  public TypeNode addPrimitiveChild(char descriptor) {
-    throw createNoChildrenException();
-  }
-
-  @Override
-  public TypeNode addArrayChild() {
-    throw createNoChildrenException();
-  }
-
-  @Override
-  public TypeNode addVariableChild(String name) {
-    throw createNoChildrenException();
-  }
-
-  @Override
-  public TypeNode addUnboundedChild() {
-    throw createNoChildrenException();
+  protected void addChild(TypeNode child) {
+    throw new IllegalStateException("Base type has no children");
   }
 
   @Override
@@ -41,6 +21,7 @@ public final class PrimitiveTypeNode extends TypeNode {
     throw new UnsupportedOperationException("Base type has no nullness operator");
   }
 
+  @Override
   public List<TypeNode> getChildren() {
     return List.of();
   }
@@ -64,7 +45,4 @@ public final class PrimitiveTypeNode extends TypeNode {
     };
   }
 
-  private static RuntimeException createNoChildrenException() {
-    return new IllegalStateException("Base type has no children");
-  }
 }

@@ -6,28 +6,8 @@ import java.util.List;
 public final class UnboundedTypeNode extends TypeNode {
 
   @Override
-  public TypeNode addClassChild(String value) {
-    throw createNoChildrenException();
-  }
-
-  @Override
-  public TypeNode addPrimitiveChild(char descriptor) {
-    throw createNoChildrenException();
-  }
-
-  @Override
-  public TypeNode addArrayChild() {
-    throw createNoChildrenException();
-  }
-
-  @Override
-  public TypeNode addVariableChild(String name) {
-    throw createNoChildrenException();
-  }
-
-  @Override
-  public TypeNode addUnboundedChild() {
-    throw createNoChildrenException();
+  protected void addChild(TypeNode child) {
+    throw new IllegalStateException("Wildcard type has no children");
   }
 
   @Override
@@ -35,11 +15,9 @@ public final class UnboundedTypeNode extends TypeNode {
     throw new UnsupportedOperationException("Base type has no nullness operator");
   }
 
+  @Override
   public List<TypeNode> getChildren() {
     return List.of();
   }
 
-  private static RuntimeException createNoChildrenException() {
-    return new IllegalStateException("Wildcard type has no children");
-  }
 }

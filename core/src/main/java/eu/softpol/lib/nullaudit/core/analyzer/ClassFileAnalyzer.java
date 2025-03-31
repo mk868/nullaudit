@@ -5,6 +5,7 @@ import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getPackag
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.ModuleInfoClassVisitor;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.MyClassVisitor;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.PackageInfoClassVisitor;
+import eu.softpol.lib.nullaudit.core.check.IrrelevantMarkedCheck;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import java.io.IOException;
@@ -29,6 +30,10 @@ public class ClassFileAnalyzer implements FileAnalyzer {
   public ClassFileAnalyzer(ReportBuilder reportBuilder, List<String> excludePackages) {
     this.reportBuilder = reportBuilder;
     this.excludePackages = List.copyOf(excludePackages);
+
+    context.getChecks().addAll(List.of(
+        new IrrelevantMarkedCheck(messageSolver)
+    ));
   }
 
   @Override
@@ -39,7 +44,7 @@ public class ClassFileAnalyzer implements FileAnalyzer {
         return true;
       }
       if (fileName.equals("package-info.class")) {
-        analyze(iss, new PackageInfoClassVisitor(context, messageSolver, reportBuilder));
+        analyze(iss, new PackageInfoClassVisitor(context, reportBuilder));
         return true;
       }
       if (fileName.endsWith(".class")) {

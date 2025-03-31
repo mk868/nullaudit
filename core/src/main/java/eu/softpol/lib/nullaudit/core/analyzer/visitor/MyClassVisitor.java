@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNullElse;
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedComponent;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedField;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedMethod;
@@ -47,6 +48,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private final List<Clazz> outerClasses = new ArrayList<>();
   private Clazz thisClazz;
   private String sourceFileName;
+  private VisitedClass visitedClass;
 
   public MyClassVisitor(AnalysisContext context, MessageSolver messageSolver,
       ReportBuilder reportBuilder) {
@@ -61,6 +63,10 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       String[] interfaces) {
     thisClazz = Clazz.of(name);
     superClazz = Clazz.of(superName);
+    visitedClass = new VisitedClass(
+        new ArrayList<>(),
+        new HashSet<>()
+    );
     super.visit(version, access, name, signature, superName, interfaces);
   }
 
@@ -81,13 +87,16 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    var annotationOpt = KnownAnnotations.fromDescriptor(descriptor);
+    var annotationOpt = KnownAnnotations.fromDescriptor(descriptor)
+        .map(x -> switch (x) {
+          case NULL_MARKED -> NullScopeAnnotation.NULL_MARKED;
+          case NULL_UNMARKED -> NullScopeAnnotation.NULL_UNMARKED;
+          case KOTLIN_METADATA -> NullScopeAnnotation.KOTLIN_METADATA;
+          default -> null;
+        });
     if (annotationOpt.isPresent()) {
-      switch (annotationOpt.get()) {
-        case NULL_MARKED -> annotations.add(NullScopeAnnotation.NULL_MARKED);
-        case NULL_UNMARKED -> annotations.add(NullScopeAnnotation.NULL_UNMARKED);
-        case KOTLIN_METADATA -> annotations.add(NullScopeAnnotation.KOTLIN_METADATA);
-      }
+      annotations.add(annotationOpt.get());
+      visitedClass.annotations().add(annotationOpt.get());
     }
     return super.visitAnnotation(descriptor, visible);
   }
@@ -161,6 +170,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     var methodInfo = new VisitedMethod(methodName, descriptiveMethodName, methodDescriptor,
         methodSignature, ms);
+    visitedClass.methods().add(methodInfo);
     methods.add(methodInfo);
 
     return new MyMethodVisitor(methodInfo);
@@ -174,13 +184,9 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     reportBuilder.incSummaryTotalClasses();
     boolean unspecifiedNullnessFound = false;
 
-    if (annotations.containsAll(
-        List.of(NullScopeAnnotation.NULL_MARKED, NullScopeAnnotation.NULL_UNMARKED))) {
-      appendIssue(
-          List.of(Kind.IRRELEVANT_ANNOTATION),
-          messageSolver.issueIrrelevantAnnotationNullUnMarkedClass()
-      );
-    }
+    context.getChecks()
+        .forEach(c -> c.checkClass(visitedClass, this::appendIssue, this::appendIssue,
+            this::appendIssue));
 
     for (var componentInfo : components) {
       reportBuilder.incSummaryTotalFields();
@@ -235,15 +241,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     for (var methodInfo : methods) {
       reportBuilder.incSummaryTotalMethods();
-
-      if (methodInfo.annotations().containsAll(
-          List.of(NullScopeAnnotation.NULL_MARKED, NullScopeAnnotation.NULL_UNMARKED))) {
-        appendIssue(
-            methodInfo.descriptiveMethodName(),
-            List.of(Kind.IRRELEVANT_ANNOTATION),
-            messageSolver.issueIrrelevantAnnotationNullUnMarkedMethod()
-        );
-      }
 
       if (superClazz.name().equals("java.lang.Record")) {
         var methodName = methodInfo.methodName();
@@ -313,13 +310,15 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     super.visitEnd();
   }
 
-  private void appendIssue(String name, List<Kind> kinds, String message) {
+  private void appendIssue(@Nullable String name, List<Kind> kinds, String message) {
     var location = "";
     if (context.getModuleName() != null) {
       location = context.getModuleName() + "/";
     }
     location += thisClazz.name();
-    location += "#" + name;
+    if (name != null) {
+      location += "#" + name;
+    }
 
     reportBuilder.addIssue(new Issue(
         location,
@@ -329,17 +328,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   }
 
   private void appendIssue(List<Kind> kinds, String message) {
-    var location = "";
-    if (context.getModuleName() != null) {
-      location = context.getModuleName() + "/";
-    }
-    location += thisClazz.name();
-
-    reportBuilder.addIssue(new Issue(
-        location,
-        kinds,
-        message
-    ));
+    appendIssue(null, kinds, message);
   }
 
   private List<NullScope> getNullScopesForClass() {

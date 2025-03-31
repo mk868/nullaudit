@@ -1,12 +1,13 @@
 package eu.softpol.lib.nullaudit.core.type;
 
-import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
+import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract sealed class TypeNode permits ArrayTypeNode, PrimitiveTypeNode, ClassTypeNode,
     UnboundedTypeNode, VariableTypeNode {
 
-  protected NullnessOperator nullnessOperator = NullnessOperator.UNSPECIFIED;
+  private final List<TypeUseAnnotation> annotations = new ArrayList<>();
 
   protected TypeNode() {
   }
@@ -43,12 +44,12 @@ public abstract sealed class TypeNode permits ArrayTypeNode, PrimitiveTypeNode, 
     return child;
   }
 
-  public NullnessOperator getOperator() {
-    return nullnessOperator;
+  public void addAnnotation(TypeUseAnnotation annotation) {
+    annotations.add(annotation);
   }
 
-  public void setOperator(NullnessOperator nullnessOperator) {
-    this.nullnessOperator = nullnessOperator;
+  public List<TypeUseAnnotation> getAnnotations() {
+    return annotations;
   }
 
   public abstract List<TypeNode> getChildren();

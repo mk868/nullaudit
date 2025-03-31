@@ -5,16 +5,16 @@ import static java.util.Objects.requireNonNullElse;
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
-import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedComponent;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedField;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedMethod;
+import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
-import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import eu.softpol.lib.nullaudit.core.signature.FieldSignatureAnalyzer;
+import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignatureAnalyzer;
 import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
 import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
@@ -142,7 +142,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           !parameterTypes.isEmpty() &&
           parameterTypes.get(0) instanceof ClassTypeNode classTypeNode &&
           classTypeNode.getClazz().equals(outerClassName)) {
-        classTypeNode.setOperator(NullnessOperator.MINUS_NULL);
+        classTypeNode.addAnnotation(TypeUseAnnotation.JSPECIFY_NON_NULL); // TODO should not be here
       }
       // alternatively, I can search for the ACC_SYNTHETIC field of outerClassName type, but the compiler can skip this field when it's not used.
     }
@@ -169,6 +169,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   @Override
   public void visitEnd() {
     context.setClassNullScope(thisClazz.name(), NullScope.from(annotations));
+    var nullScopes = getNullScopesForClass();
 
     reportBuilder.incSummaryTotalClasses();
     boolean unspecifiedNullnessFound = false;
@@ -183,13 +184,11 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     for (var componentInfo : components) {
       reportBuilder.incSummaryTotalFields();
-
-      var nullScopes = getNullScopesForClass();
       var effectiveNullMarkedScope = getEffectiveNullMarkedScope(nullScopes);
 
       if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
         var s = "%s %s".formatted(
-            AugmentedStringTranslator.INSTANCE.translate(componentInfo.fs()),
+            new AugmentedStringTranslator(effectiveNullMarkedScope).translate(componentInfo.fs()),
             componentInfo.componentName()
         );
         if (s.contains("*")) {
@@ -213,12 +212,11 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       }
       reportBuilder.incSummaryTotalFields();
 
-      var nullScopes = getNullScopesForClass();
       var effectiveNullMarkedScope = getEffectiveNullMarkedScope(nullScopes);
 
       if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
         var s = "%s %s".formatted(
-            AugmentedStringTranslator.INSTANCE.translate(fieldInfo.fs()),
+            new AugmentedStringTranslator(effectiveNullMarkedScope).translate(fieldInfo.fs()),
             fieldInfo.fieldName()
         );
         if (s.contains("*")) {
@@ -255,21 +253,24 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
         if (methodName.equals("toString")) {
           continue;
         }
+
+        var effectiveNullMarkedScope = getEffectiveNullMarkedScope(nullScopes);
+
+        var augmentedStringTranslator = new AugmentedStringTranslator(effectiveNullMarkedScope);
         if (components.stream()
                 .filter(c -> c.componentName().equals(methodName))
-                .anyMatch(c -> AugmentedStringTranslator.INSTANCE.translate(c.fs())
-                    .equals(
-                        AugmentedStringTranslator.INSTANCE.translate(methodInfo.ms().returnType())))
+                .anyMatch(c -> augmentedStringTranslator.translate(c.fs())
+                    .equals(augmentedStringTranslator.translate(methodInfo.ms().returnType())))
             && methodInfo.ms().parameterTypes().isEmpty()
         ) {
           // skip default getter
           continue;
         }
         if (methodName.equals("<init>") && methodInfo.ms().parameterTypes().stream()
-            .map(AugmentedStringTranslator.INSTANCE::translate)
+            .map(augmentedStringTranslator::translate)
             .collect(Collectors.joining(",")).equals(components.stream()
                 .map(VisitedComponent::fs)
-                .map(AugmentedStringTranslator.INSTANCE::translate)
+                .map(augmentedStringTranslator::translate)
                 .collect(Collectors.joining(",")))
         ) {
           // skip default constructor
@@ -277,17 +278,18 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
         }
       }
 
-      var nullScopes = getNullScopesForClass();
-      nullScopes.add(NullScope.from(methodInfo.annotations()));
-      var effectiveNullMarkedScope = getEffectiveNullMarkedScope(nullScopes);
+      var methodNullScope = new ArrayList<>(nullScopes);
+      methodNullScope.add(NullScope.from(methodInfo.annotations()));
+      var effectiveNullMarkedScope = getEffectiveNullMarkedScope(methodNullScope);
 
       if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
+        var augmentedStringTranslator = new AugmentedStringTranslator(effectiveNullMarkedScope);
         var s = "%s %s(%s)".formatted(
-            AugmentedStringTranslator.INSTANCE.translate(methodInfo.ms().returnType()),
+            augmentedStringTranslator.translate(methodInfo.ms().returnType()),
             methodInfo.methodName(),
             methodInfo.ms()
                 .parameterTypes().stream()
-                .map(AugmentedStringTranslator.INSTANCE::translate)
+                .map(augmentedStringTranslator::translate)
                 .collect(Collectors.joining(", "))
         );
         if (s.contains("*")) {
@@ -350,7 +352,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       nullScopes.add(context.getClassNullScope(outerClass.name()));
     }
     nullScopes.add(context.getClassNullScope(thisClazz.name()));
-    return nullScopes;
+    return List.copyOf(nullScopes);
   }
 
   private static NullScope getEffectiveNullMarkedScope(List<NullScope> nullScopes) {

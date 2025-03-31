@@ -24,10 +24,9 @@ public class RawStringTranslator implements Translator<String> {
     } else if (typeNode instanceof ClassTypeNode classTypeNode) {
       var result = classTypeNode.getClazz();
       if (!classTypeNode.getChildren().isEmpty()) {
-        result += "<" + classTypeNode.getChildren().stream()
+        result += classTypeNode.getChildren().stream()
             .map(this::translate)
-            .collect(Collectors.joining(", "))
-                  + ">";
+            .collect(Collectors.joining(", ", "<", ">"));
       }
       return result;
     } else if (typeNode instanceof UnboundedTypeNode) {

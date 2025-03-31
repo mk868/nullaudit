@@ -1,10 +1,8 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
-import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedField;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedMethod;
-import eu.softpol.lib.nullaudit.core.type.TypeNode;
-import eu.softpol.lib.nullaudit.core.type.translator.ToTypePathTranslator;
+import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
+import eu.softpol.lib.nullaudit.core.type.QueryNode;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
@@ -24,23 +22,17 @@ public class MyFieldVisitor extends FieldVisitor {
   @Override
   public AnnotationVisitor visitTypeAnnotation(int typeRef, @Nullable TypePath typePath,
       String descriptor, boolean visible) {
-    var annotation = KnownAnnotations.fromDescriptor(descriptor).orElse(null);
-    if (annotation == KnownAnnotations.NULLABLE ||
-        annotation == KnownAnnotations.NON_NULL
-    ) {
-      var operator = annotation == KnownAnnotations.NULLABLE ?
-          NullnessOperator.UNION_NULL : NullnessOperator.MINUS_NULL;
-      var typeReference = new TypeReference(typeRef);
-      var sort = typeReference.getSort();
-      var typePathStr = typePath == null ? "" : typePath.toString();
-      if (sort == TypeReference.FIELD) {
-        if (typePathStr.contains("*")) {
-          // TODO super not yet supported
-        } else if (typePathStr.contains(".")) {
-          // TODO how to handle this case...
-        } else {
-          ToTypePathTranslator.INSTANCE.translate(visitedField.fs()).get(typePathStr).setOperator(operator);
-        }
+    var annotation = TypeUseAnnotation.ofDescriptor(descriptor);
+    var typeReference = new TypeReference(typeRef);
+    var sort = typeReference.getSort();
+    var typePathStr = typePath == null ? "" : typePath.toString();
+    if (sort == TypeReference.FIELD) {
+      if (typePathStr.contains("*")) {
+        // TODO super not yet supported
+      } else if (typePathStr.contains(".")) {
+        // TODO how to handle this case...
+      } else {
+        QueryNode.find(visitedField.fs(), typePath).addAnnotation(annotation);
       }
     }
     return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);

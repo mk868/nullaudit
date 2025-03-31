@@ -1,6 +1,5 @@
 package eu.softpol.lib.nullaudit.core.type;
 
-import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
 import java.util.List;
 
 public final class VariableTypeNode extends TypeNode {
@@ -14,11 +13,6 @@ public final class VariableTypeNode extends TypeNode {
   @Override
   protected void addChild(TypeNode child) {
     throw new IllegalStateException("Variable type has no children");
-  }
-
-  @Override
-  public void setOperator(NullnessOperator nullnessOperator) {
-    //TODO not supported
   }
 
   @Override

@@ -8,10 +8,13 @@ import java.util.function.BiConsumer;
 
 public interface Check {
 
-  @FunctionalInterface
-  interface AddIssueConsumer {
+  interface AddIssue {
 
-    void accept(String name, List<Kind> kinds, String message);
+    void addIssueForClass(List<Kind> kinds, String message);
+
+    void addIssueForField(String name, List<Kind> kinds, String message);
+
+    void addIssueForMethod(String name, List<Kind> kinds, String message);
   }
 
   default void checkModule() {
@@ -23,12 +26,7 @@ public interface Check {
   ) {
   }
 
-  default void checkClass(
-      VisitedClass visitedClass,
-      BiConsumer<List<Kind>, String> addIssue,
-      AddIssueConsumer addFieldIssue,
-      AddIssueConsumer addMethodIssue
-  ) {
+  default void checkClass(VisitedClass visitedClass, AddIssue addIssue) {
   }
 
 }

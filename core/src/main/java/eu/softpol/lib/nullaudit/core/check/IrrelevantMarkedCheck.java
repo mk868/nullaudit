@@ -31,14 +31,9 @@ public class IrrelevantMarkedCheck implements Check {
   }
 
   @Override
-  public void checkClass(
-      VisitedClass visitedClass,
-      BiConsumer<List<Kind>, String> addIssue,
-      AddIssueConsumer addFieldIssue,
-      AddIssueConsumer addMethodIssue
-  ) {
+  public void checkClass(VisitedClass visitedClass, AddIssue addIssue) {
     if (visitedClass.annotations().containsAll(IRRELEVANT_ANNOTATIONS)) {
-      addIssue.accept(
+      addIssue.addIssueForClass(
           List.of(Kind.IRRELEVANT_ANNOTATION),
           messageSolver.issueIrrelevantAnnotationNullUnMarkedClass()
       );
@@ -46,7 +41,7 @@ public class IrrelevantMarkedCheck implements Check {
 
     visitedClass.methods().forEach(visitedMethod -> {
       if (visitedMethod.annotations().containsAll(IRRELEVANT_ANNOTATIONS)) {
-        addMethodIssue.accept(
+        addIssue.addIssueForMethod(
             visitedMethod.descriptiveMethodName(),
             List.of(Kind.IRRELEVANT_ANNOTATION),
             messageSolver.issueIrrelevantAnnotationNullUnMarkedMethod()

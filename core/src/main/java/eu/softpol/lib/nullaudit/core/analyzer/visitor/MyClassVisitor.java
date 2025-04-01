@@ -10,6 +10,7 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedComponent;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedField;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedMethod;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
+import eu.softpol.lib.nullaudit.core.check.Check.AddIssue;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.Kind;
@@ -65,6 +66,8 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     superClazz = Clazz.of(superName);
     visitedClass = new VisitedClass(
         new ArrayList<>(),
+        new ArrayList<>(),
+        new ArrayList<>(),
         new HashSet<>()
     );
     super.visit(version, access, name, signature, superName, interfaces);
@@ -108,6 +111,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
     var visitedComponent = new VisitedComponent(name, descriptor, signature, fs);
     components.add(visitedComponent);
+    visitedClass.components().add(visitedComponent);
 
     return new MyRecordComponentVisitor(visitedComponent);
   }
@@ -122,6 +126,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
     var visitedField = new VisitedField(name, descriptor, signature, fs);
     fields.add(visitedField);
+    visitedClass.fields().add(visitedField);
 
     return new MyFieldVisitor(visitedField);
   }
@@ -185,8 +190,22 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     boolean unspecifiedNullnessFound = false;
 
     context.getChecks()
-        .forEach(c -> c.checkClass(visitedClass, this::appendIssue, this::appendIssue,
-            this::appendIssue));
+        .forEach(c -> c.checkClass(visitedClass, new AddIssue() {
+          @Override
+          public void addIssueForClass(List<Kind> kinds, String message) {
+            MyClassVisitor.this.appendIssue(kinds, message);
+          }
+
+          @Override
+          public void addIssueForField(String name, List<Kind> kinds, String message) {
+            MyClassVisitor.this.appendIssue(name, kinds, message);
+          }
+
+          @Override
+          public void addIssueForMethod(String name, List<Kind> kinds, String message) {
+            MyClassVisitor.this.appendIssue(name, kinds, message);
+          }
+        }));
 
     for (var componentInfo : components) {
       reportBuilder.incSummaryTotalFields();

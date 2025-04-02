@@ -7,8 +7,42 @@ Check out the [sample projects](examples) for the examples of actual usage.
 
 - Detects unspecified nullness types based on `@Nullable`, `@NonNull`, `@NullMarked`, and
   `@NullUnmarked` annotations.
+  ```java
+  public class SayHello {
+    public void say(String message) {
+      System.out.println(message);
+    }
+  }
+  ```
+  Gives:
+  ```
+  SayHello#say(java.lang.String): Unspecified nullness found:
+  void say(java.lang.String*)
+                           ^
+  ```
 - Detects the use of both `@NullMarked` and
   `@NullUnmarked` annotations on the same package/class/method and reports it as an error.
+  ```java
+  @NullMarked
+  @NullUnmarked
+  class SampleClass {
+  }
+  ```
+  Gives:
+  ```
+  SampleClass: Irrelevant annotations, the class should not be annotated with both @NullMarked and @NullUnmarked at the same time!
+  ```
+- Detects unexpected annotations on the primitive types.
+  ```java
+  @NullMarked
+  class DataHolder {
+    private @Nullable byte[] data;
+  }
+  ```
+  Gives:
+  ```
+  DataHolder#data: Primitive type cannot be annotated with @Nullable or @NonNull!
+  ```
 
 ## Features
 

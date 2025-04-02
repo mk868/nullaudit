@@ -22,9 +22,7 @@ import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
 import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;
@@ -41,13 +39,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private final AnalysisContext context;
   private final MessageSolver messageSolver;
   private final ReportBuilder reportBuilder;
-  private final Set<NullScopeAnnotation> annotations = new HashSet<>();
-  private final List<VisitedComponent> components = new ArrayList<>();
-  private final List<VisitedField> fields = new ArrayList<>();
-  private final List<VisitedMethod> methods = new ArrayList<>();
-  private Clazz superClazz;
   private final List<Clazz> outerClasses = new ArrayList<>();
-  private Clazz thisClazz;
   private String sourceFileName;
   private VisitedClass visitedClass;
 
@@ -62,8 +54,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   @Override
   public void visit(int version, int access, String name, String signature, String superName,
       String[] interfaces) {
-    thisClazz = Clazz.of(name);
-    superClazz = Clazz.of(superName);
     visitedClass = new VisitedClass(
         Clazz.of(name),
         Clazz.of(superName)
@@ -74,7 +64,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   @Override
   public void visitInnerClass(String name, @Nullable String outerName, @Nullable String innerName,
       int access) {
-    if (outerName != null && thisClazz.internalName().startsWith(name)) {
+    if (outerName != null && visitedClass.thisClazz().internalName().startsWith(name)) {
       outerClasses.add(Clazz.of(outerName));
     }
     super.visitInnerClass(name, outerName, innerName, access);
@@ -96,7 +86,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           default -> null;
         });
     if (annotationOpt.isPresent()) {
-      annotations.add(annotationOpt.get());
       visitedClass.annotations().add(annotationOpt.get());
     }
     return super.visitAnnotation(descriptor, visible);
@@ -108,7 +97,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
     var visitedComponent = new VisitedComponent(name, descriptor, signature, fs);
-    components.add(visitedComponent);
     visitedClass.components().add(visitedComponent);
 
     return new MyRecordComponentVisitor(visitedComponent);
@@ -123,7 +111,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
     var visitedField = new VisitedField(name, descriptor, signature, fs);
-    fields.add(visitedField);
     visitedClass.fields().add(visitedField);
 
     return new MyFieldVisitor(visitedField);
@@ -161,27 +148,25 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     String descriptiveMethodName;
     if (methodName.equals("<init>")) {
-      descriptiveMethodName = thisClazz.simpleName();
+      descriptiveMethodName = visitedClass.thisClazz().simpleName();
     } else {
       descriptiveMethodName = methodName;
     }
-    descriptiveMethodName += "(" +
-                             Arrays.stream(Type.getArgumentTypes(methodDescriptor))
-                                 .map(Type::getClassName)
-                                 .collect(Collectors.joining(", "))
-                             + ")";
+    descriptiveMethodName += Arrays.stream(Type.getArgumentTypes(methodDescriptor))
+        .map(Type::getClassName)
+        .collect(Collectors.joining(", ", "(", ")"));
 
     var methodInfo = new VisitedMethod(methodName, descriptiveMethodName, methodDescriptor,
         methodSignature, ms);
     visitedClass.methods().add(methodInfo);
-    methods.add(methodInfo);
 
     return new MyMethodVisitor(methodInfo);
   }
 
   @Override
   public void visitEnd() {
-    context.setClassNullScope(thisClazz.name(), NullScope.from(annotations));
+    context.setClassNullScope(visitedClass.thisClazz().name(),
+        NullScope.from(visitedClass.annotations()));
     var nullScopes = getNullScopesForClass();
 
     reportBuilder.incSummaryTotalClasses();
@@ -205,7 +190,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           }
         }));
 
-    for (var componentInfo : components) {
+    for (var componentInfo : visitedClass.components()) {
       reportBuilder.incSummaryTotalFields();
       var effectiveNullMarkedScope = getEffectiveNullMarkedScope(nullScopes);
 
@@ -228,8 +213,8 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       }
     }
 
-    for (var fieldInfo : fields) {
-      if (superClazz.name().equals("java.lang.Record")) {
+    for (var fieldInfo : visitedClass.fields()) {
+      if (visitedClass.isRecord()) {
         // generated by compiler - ignore
         continue;
       }
@@ -256,10 +241,10 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       }
     }
 
-    for (var methodInfo : methods) {
+    for (var methodInfo : visitedClass.methods()) {
       reportBuilder.incSummaryTotalMethods();
 
-      if (superClazz.name().equals("java.lang.Record")) {
+      if (visitedClass.isRecord()) {
         var methodName = methodInfo.methodName();
         if (methodName.equals("equals")) {
           continue;
@@ -271,10 +256,10 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
         var effectiveNullMarkedScope = getEffectiveNullMarkedScope(nullScopes);
 
         var augmentedStringTranslator = new AugmentedStringTranslator(effectiveNullMarkedScope);
-        if (components.stream()
-                .filter(c -> c.componentName().equals(methodName))
-                .anyMatch(c -> augmentedStringTranslator.translate(c.fs())
+        if (visitedClass.getComponent(methodName)
+                .filter(c -> augmentedStringTranslator.translate(c.fs())
                     .equals(augmentedStringTranslator.translate(methodInfo.ms().returnType())))
+                .isPresent()
             && methodInfo.ms().parameterTypes().isEmpty()
         ) {
           // skip default getter
@@ -282,7 +267,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
         }
         if (methodName.equals("<init>") && methodInfo.ms().parameterTypes().stream()
             .map(augmentedStringTranslator::translate)
-            .collect(Collectors.joining(",")).equals(components.stream()
+            .collect(Collectors.joining(",")).equals(visitedClass.components().stream()
                 .map(VisitedComponent::fs)
                 .map(augmentedStringTranslator::translate)
                 .collect(Collectors.joining(",")))
@@ -332,7 +317,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     if (context.getModuleName() != null) {
       location = context.getModuleName() + "/";
     }
-    location += thisClazz.name();
+    location += visitedClass.thisClazz().name();
     if (name != null) {
       location += "#" + name;
     }
@@ -353,11 +338,11 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     if (context.isModuleInfoNullMarked()) {
       nullScopes.add(NullScope.NULL_MARKED);
     }
-    nullScopes.add(context.getPackageNullScope(thisClazz.packageName()));
+    nullScopes.add(context.getPackageNullScope(visitedClass.thisClazz().packageName()));
     for (var outerClass : outerClasses) {
       nullScopes.add(context.getClassNullScope(outerClass.name()));
     }
-    nullScopes.add(context.getClassNullScope(thisClazz.name()));
+    nullScopes.add(context.getClassNullScope(visitedClass.thisClazz().name()));
     return List.copyOf(nullScopes);
   }
 

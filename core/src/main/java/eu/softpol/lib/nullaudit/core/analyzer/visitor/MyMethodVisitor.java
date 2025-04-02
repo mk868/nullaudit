@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedMethod;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableVisitedMethod;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.type.QueryNode;
 import java.lang.System.Logger.Level;
@@ -20,9 +20,9 @@ public class MyMethodVisitor extends MethodVisitor {
 
   private static final System.Logger logger = System.getLogger(MyMethodVisitor.class.getName());
 
-  private final VisitedMethod visitedMethod;
+  private final MutableVisitedMethod visitedMethod;
 
-  protected MyMethodVisitor(VisitedMethod visitedMethod) {
+  protected MyMethodVisitor(MutableVisitedMethod visitedMethod) {
     super(Opcodes.ASM9);
     this.visitedMethod = visitedMethod;
   }
@@ -69,10 +69,10 @@ public class MyMethodVisitor extends MethodVisitor {
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
     var annotation = KnownAnnotations.fromDescriptor(descriptor).orElse(null);
     if (annotation == KnownAnnotations.NULL_MARKED) {
-      visitedMethod.annotations().add(NullScopeAnnotation.NULL_MARKED);
+      visitedMethod.addAnnotation(NullScopeAnnotation.NULL_MARKED);
     }
     if (annotation == KnownAnnotations.NULL_UNMARKED) {
-      visitedMethod.annotations().add(NullScopeAnnotation.NULL_UNMARKED);
+      visitedMethod.addAnnotation(NullScopeAnnotation.NULL_UNMARKED);
     }
     return super.visitAnnotation(descriptor, visible);
   }

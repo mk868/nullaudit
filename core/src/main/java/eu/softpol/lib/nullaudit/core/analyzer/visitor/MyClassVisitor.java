@@ -5,10 +5,10 @@ import static java.util.Objects.requireNonNullElse;
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedClass;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableVisitedClass;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableVisitedMethod;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedComponent;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedField;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedMethod;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.check.Check.AddIssue;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
@@ -41,7 +41,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private final ReportBuilder reportBuilder;
   private final List<Clazz> outerClasses = new ArrayList<>();
   private String sourceFileName;
-  private VisitedClass visitedClass;
+  private MutableVisitedClass visitedClass;
 
   public MyClassVisitor(AnalysisContext context, MessageSolver messageSolver,
       ReportBuilder reportBuilder) {
@@ -54,7 +54,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   @Override
   public void visit(int version, int access, String name, String signature, String superName,
       String[] interfaces) {
-    visitedClass = new VisitedClass(
+    visitedClass = new MutableVisitedClass(
         Clazz.of(name),
         Clazz.of(superName)
     );
@@ -86,7 +86,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           default -> null;
         });
     if (annotationOpt.isPresent()) {
-      visitedClass.annotations().add(annotationOpt.get());
+      visitedClass.addAnnotation(annotationOpt.get());
     }
     return super.visitAnnotation(descriptor, visible);
   }
@@ -97,7 +97,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
     var visitedComponent = new VisitedComponent(name, descriptor, signature, fs);
-    visitedClass.components().add(visitedComponent);
+    visitedClass.addComponent(visitedComponent);
 
     return new MyRecordComponentVisitor(visitedComponent);
   }
@@ -111,7 +111,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
     var visitedField = new VisitedField(name, descriptor, signature, fs);
-    visitedClass.fields().add(visitedField);
+    visitedClass.addField(visitedField);
 
     return new MyFieldVisitor(visitedField);
   }
@@ -156,9 +156,9 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
         .map(Type::getClassName)
         .collect(Collectors.joining(", ", "(", ")"));
 
-    var methodInfo = new VisitedMethod(methodName, descriptiveMethodName, methodDescriptor,
+    var methodInfo = new MutableVisitedMethod(methodName, descriptiveMethodName, methodDescriptor,
         methodSignature, ms);
-    visitedClass.methods().add(methodInfo);
+    visitedClass.addMethod(methodInfo);
 
     return new MyMethodVisitor(methodInfo);
   }

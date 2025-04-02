@@ -102,6 +102,30 @@ class MessageSolverTest {
     assertThat(msg).contains("method");
   }
 
+  @Test
+  void issueIrrelevantAnnotationOnPrimitiveComponentTest() {
+    // GIVEN/WHEN
+    var msg = messageSolver.issueIrrelevantAnnotationOnPrimitiveComponent();
+    // THEN
+    assertThat(msg).containsIgnoringCase("primitive");
+  }
+
+  @Test
+  void issueIrrelevantAnnotationOnPrimitiveFieldTest() {
+    // GIVEN/WHEN
+    var msg = messageSolver.issueIrrelevantAnnotationOnPrimitiveField();
+    // THEN
+    assertThat(msg).containsIgnoringCase("primitive");
+  }
+
+  @Test
+  void issueIrrelevantAnnotationOnPrimitiveMethodTest() {
+    // GIVEN/WHEN
+    var msg = messageSolver.issueIrrelevantAnnotationOnPrimitiveMethod();
+    // THEN
+    assertThat(msg).containsIgnoringCase("primitive");
+  }
+
   static String lineWithContent(String str, String content) {
     return str.lines()
         .filter(a -> a.contains(content))

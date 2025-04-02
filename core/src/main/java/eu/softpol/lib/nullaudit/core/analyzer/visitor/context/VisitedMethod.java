@@ -20,4 +20,8 @@ public record VisitedMethod(
       MethodSignature ms) {
     this(methodName, descriptiveMethodName, methodDescriptor, methodSignature, ms, new HashSet<>());
   }
+
+  public boolean isConstructor() {
+    return methodName.equals("<init>");
+  }
 }

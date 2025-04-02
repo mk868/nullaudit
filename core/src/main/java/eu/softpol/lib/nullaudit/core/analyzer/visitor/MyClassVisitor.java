@@ -65,10 +65,8 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     thisClazz = Clazz.of(name);
     superClazz = Clazz.of(superName);
     visitedClass = new VisitedClass(
-        new ArrayList<>(),
-        new ArrayList<>(),
-        new ArrayList<>(),
-        new HashSet<>()
+        Clazz.of(name),
+        Clazz.of(superName)
     );
     super.visit(version, access, name, signature, superName, interfaces);
   }

@@ -55,4 +55,16 @@ public class MessageSolver {
     return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION.NullUnMarked.method");
   }
 
+  public String issueIrrelevantAnnotationOnPrimitiveField() {
+    return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION_ON_PRIMITIVE.field");
+  }
+
+  public String issueIrrelevantAnnotationOnPrimitiveComponent() {
+    return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION_ON_PRIMITIVE.component");
+  }
+
+  public String issueIrrelevantAnnotationOnPrimitiveMethod() {
+    return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION_ON_PRIMITIVE.method");
+  }
+
 }

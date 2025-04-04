@@ -1,6 +1,8 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import static java.util.Objects.requireNonNullElse;
+import static java.util.function.Predicate.isEqual;
+import static java.util.function.Predicate.not;
 
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
@@ -171,6 +173,13 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     reportBuilder.incSummaryTotalClasses();
     boolean unspecifiedNullnessFound = false;
+
+    visitedClass.setEffectiveNullScope(getEffectiveNullMarkedScope(nullScopes));
+
+    visitedClass.methods().stream()
+        .map(MutableVisitedMethod.class::cast)
+        .forEach(vm -> vm.setEffectiveNullScope(getEffectiveNullMarkedScope(
+            List.of(visitedClass.effectiveNullScope(), NullScope.from(vm.annotations())))));
 
     context.getChecks()
         .forEach(c -> c.checkClass(visitedClass, new AddIssue() {
@@ -346,15 +355,15 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     return List.copyOf(nullScopes);
   }
 
+  /**
+   * @param nullScopes null scopes from inner to outer
+   * @return effective nullness scope
+   */
   private static NullScope getEffectiveNullMarkedScope(List<NullScope> nullScopes) {
-    // from inner to outer
-    for (var i = nullScopes.size() - 1; i >= 0; i--) {
-      var scope = nullScopes.get(i);
-      if (scope != NullScope.NOT_DEFINED) {
-        return scope;
-      }
-    }
-    return NullScope.NULL_UNMARKED;
+    return nullScopes.stream()
+        .filter(not(isEqual(NullScope.NOT_DEFINED)))
+        .reduce((f, s) -> s) // get last
+        .orElse(NullScope.NULL_UNMARKED);
   }
 
 }

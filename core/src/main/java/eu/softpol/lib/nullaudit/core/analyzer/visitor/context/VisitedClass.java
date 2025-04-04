@@ -1,5 +1,6 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
+import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.Clazz;
 import java.util.List;
@@ -22,11 +23,13 @@ public interface VisitedClass {
 
   Clazz superClazz();
 
+  NullScope effectiveNullScope();
+
   List<VisitedComponent> components();
 
   List<VisitedField> fields();
 
-  List<MutableVisitedMethod> methods();
+  List<VisitedMethod> methods();
 
   Set<NullScopeAnnotation> annotations();
 }

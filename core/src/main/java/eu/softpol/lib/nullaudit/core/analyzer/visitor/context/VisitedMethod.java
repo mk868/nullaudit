@@ -1,5 +1,6 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
+import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import java.util.Set;
@@ -18,6 +19,8 @@ public interface VisitedMethod {
   String methodDescriptor();
 
   public @Nullable String methodSignature();
+
+  NullScope effectiveNullScope();
 
   MethodSignature ms();
 

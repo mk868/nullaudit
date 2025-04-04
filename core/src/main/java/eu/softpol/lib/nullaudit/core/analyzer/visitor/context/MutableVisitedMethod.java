@@ -1,5 +1,6 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
+import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import java.util.HashSet;
@@ -14,6 +15,7 @@ public final class MutableVisitedMethod implements VisitedMethod {
   private final @Nullable String methodSignature;
   private final MethodSignature ms;
   private final Set<NullScopeAnnotation> annotations = new HashSet<>();
+  private NullScope effectiveNullScope = NullScope.NOT_DEFINED;
 
   public MutableVisitedMethod(String methodName, String descriptiveMethodName,
       String methodDescriptor, @Nullable String methodSignature,
@@ -43,6 +45,15 @@ public final class MutableVisitedMethod implements VisitedMethod {
   @Override
   public @Nullable String methodSignature() {
     return methodSignature;
+  }
+
+  @Override
+  public NullScope effectiveNullScope() {
+    return effectiveNullScope;
+  }
+
+  public void setEffectiveNullScope(NullScope effectiveNullScope) {
+    this.effectiveNullScope = effectiveNullScope;
   }
 
   @Override

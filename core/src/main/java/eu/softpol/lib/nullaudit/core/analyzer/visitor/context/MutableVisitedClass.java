@@ -1,5 +1,6 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
+import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.Clazz;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public final class MutableVisitedClass implements VisitedClass {
   private final List<VisitedField> fields = new ArrayList<>();
   private final List<MutableVisitedMethod> methods = new ArrayList<>();
   private final Set<NullScopeAnnotation> annotations = new HashSet<>();
+  private NullScope effectiveNullScope = NullScope.NOT_DEFINED;
 
   public MutableVisitedClass(Clazz thisClazz, Clazz superClazz) {
     this.thisClazz = thisClazz;
@@ -29,6 +31,15 @@ public final class MutableVisitedClass implements VisitedClass {
   @Override
   public Clazz superClazz() {
     return superClazz;
+  }
+
+  @Override
+  public NullScope effectiveNullScope() {
+    return effectiveNullScope;
+  }
+
+  public void setEffectiveNullScope(NullScope nullScope) {
+    this.effectiveNullScope = nullScope;
   }
 
   @Override
@@ -50,7 +61,7 @@ public final class MutableVisitedClass implements VisitedClass {
   }
 
   @Override
-  public List<MutableVisitedMethod> methods() {
+  public List<VisitedMethod> methods() {
     return List.copyOf(methods);
   }
 

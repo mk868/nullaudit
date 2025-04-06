@@ -35,7 +35,7 @@ public class ReportMojo extends BaseMojo {
   private String reportFile;
 
   public void execute() throws MojoExecutionException {
-    var analyze = new NullAuditAnalyzer(getInput(), getExcludedPackages());
+    var analyze = new NullAuditAnalyzer(getInput(), createConfig());
     var report = analyze.run();
 
     var reportPath = Path.of(reportFile).toAbsolutePath();

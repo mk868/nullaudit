@@ -21,12 +21,12 @@ import org.apache.maven.plugins.annotations.Parameter;
 @Mojo(name = "check", requiresProject = false)
 public class CheckMojo extends BaseMojo {
 
-
   /**
    * Determines whether the build process should fail if null-audit analysis detects any problems.
    */
   @Parameter(property = "nullaudit.failOnError", defaultValue = "true")
   private boolean failOnError;
+
   /**
    * Limit the number of issues displayed on the console.
    */
@@ -34,7 +34,7 @@ public class CheckMojo extends BaseMojo {
   private int maxErrors;
 
   public void execute() throws MojoExecutionException {
-    var analyze = new NullAuditAnalyzer(getInput(), getExcludedPackages());
+    var analyze = new NullAuditAnalyzer(getInput(), createConfig());
     var report = analyze.run();
 
     var issuesCount = report.issues().size();

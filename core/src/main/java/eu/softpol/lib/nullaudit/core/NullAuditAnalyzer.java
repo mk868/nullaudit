@@ -1,6 +1,6 @@
 package eu.softpol.lib.nullaudit.core;
 
-import eu.softpol.lib.nullaudit.core.NullAuditConfig.CheckJSpecifyUsage;
+import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireSpecifiedNullness;
 import eu.softpol.lib.nullaudit.core.analyzer.ClassFileAnalyzer;
 import eu.softpol.lib.nullaudit.core.check.Check;
@@ -34,7 +34,7 @@ public class NullAuditAnalyzer {
   public NullAuditAnalyzer(Path input, List<String> excludedPackages) {
     this(input, new NullAuditConfig(
         excludedPackages,
-        new CheckJSpecifyUsage(null),
+        new VerifyJSpecifyAnnotations(null),
         null,
         new RequireSpecifiedNullness(null)
     ));
@@ -66,7 +66,7 @@ public class NullAuditAnalyzer {
   private static List<Check> toChecks(NullAuditConfig config) {
     var messageSolver = new MessageSolver();
     var result = new ArrayList<Check>();
-    Optional.ofNullable(config.checkJSpecifyUsage()).ifPresent(c -> {
+    Optional.ofNullable(config.verifyJSpecifyAnnotations()).ifPresent(c -> {
       List<Check> checks = List.of(
           new IrrelevantMarkedCheck(messageSolver),
           new IrrelevantPrimitiveCheck(messageSolver)

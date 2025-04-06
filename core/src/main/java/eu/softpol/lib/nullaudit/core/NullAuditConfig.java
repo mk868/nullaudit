@@ -5,12 +5,12 @@ import org.jspecify.annotations.Nullable;
 
 public record NullAuditConfig(
     List<String> excludedPackages,
-    @Nullable CheckJSpecifyUsage checkJSpecifyUsage,
+    @Nullable VerifyJSpecifyAnnotations verifyJSpecifyAnnotations,
     @Nullable RequireNullMarked requireNullMarked,
     @Nullable RequireSpecifiedNullness requireSpecifiedNullness
 ) {
 
-  public record CheckJSpecifyUsage(
+  public record VerifyJSpecifyAnnotations(
       @Nullable IgnoredClasses ignoredClasses
   ) {
 

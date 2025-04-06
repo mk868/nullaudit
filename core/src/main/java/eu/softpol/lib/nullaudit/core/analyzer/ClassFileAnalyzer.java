@@ -7,6 +7,7 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.MyClassVisitor;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.PackageInfoClassVisitor;
 import eu.softpol.lib.nullaudit.core.check.IrrelevantMarkedCheck;
 import eu.softpol.lib.nullaudit.core.check.IrrelevantPrimitiveCheck;
+import eu.softpol.lib.nullaudit.core.check.UnspecifiedNullnessCheck;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import java.io.IOException;
@@ -34,7 +35,8 @@ public class ClassFileAnalyzer implements FileAnalyzer {
 
     context.getChecks().addAll(List.of(
         new IrrelevantMarkedCheck(messageSolver),
-        new IrrelevantPrimitiveCheck(messageSolver)
+        new IrrelevantPrimitiveCheck(messageSolver),
+        new UnspecifiedNullnessCheck(messageSolver)
     ));
   }
 

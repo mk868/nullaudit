@@ -21,9 +21,9 @@ import eu.softpol.lib.nullaudit.core.signature.FieldSignatureAnalyzer;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignatureAnalyzer;
 import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
-import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
@@ -181,6 +181,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
         .forEach(vm -> vm.setEffectiveNullScope(getEffectiveNullMarkedScope(
             List.of(visitedClass.effectiveNullScope(), NullScope.from(vm.annotations())))));
 
+    var issuesForClass = new HashMap<String, List<Kind>>();
     context.getChecks()
         .forEach(c -> c.checkClass(visitedClass, new AddIssue() {
           @Override
@@ -191,34 +192,25 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           @Override
           public void addIssueForField(String name, List<Kind> kinds, String message) {
             MyClassVisitor.this.appendIssue(name, kinds, message);
+            issuesForClass.computeIfAbsent(name, k -> new ArrayList<>())
+                .addAll(kinds);
           }
 
           @Override
           public void addIssueForMethod(String name, List<Kind> kinds, String message) {
             MyClassVisitor.this.appendIssue(name, kinds, message);
+            issuesForClass.computeIfAbsent(name, k -> new ArrayList<>())
+                .addAll(kinds);
           }
         }));
 
     for (var componentInfo : visitedClass.components()) {
       reportBuilder.incSummaryTotalFields();
-      var effectiveNullMarkedScope = getEffectiveNullMarkedScope(nullScopes);
 
-      if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
-        var s = "%s %s".formatted(
-            new AugmentedStringTranslator(effectiveNullMarkedScope).translate(componentInfo.fs()),
-            componentInfo.componentName()
-        );
-        if (s.contains("*")) {
-          unspecifiedNullnessFound = true;
-          reportBuilder.incSummaryUnspecifiedNullnessFields();
-          appendIssue(
-              componentInfo.componentName(),
-              List.of(Kind.UNSPECIFIED_NULLNESS),
-              messageSolver.issueUnspecifiedNullnessComponent(
-                  s,
-                  s.replaceAll("[^*]", " ").replace("*", "^")
-              ));
-        }
+      if (issuesForClass.getOrDefault(componentInfo.componentName(), List.of())
+          .contains(Kind.UNSPECIFIED_NULLNESS)) {
+        reportBuilder.incSummaryUnspecifiedNullnessFields();
+        unspecifiedNullnessFound = true;
       }
     }
 
@@ -229,88 +221,19 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       }
       reportBuilder.incSummaryTotalFields();
 
-      var effectiveNullMarkedScope = getEffectiveNullMarkedScope(nullScopes);
-
-      if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
-        var s = "%s %s".formatted(
-            new AugmentedStringTranslator(effectiveNullMarkedScope).translate(fieldInfo.fs()),
-            fieldInfo.fieldName()
-        );
-        if (s.contains("*")) {
-          unspecifiedNullnessFound = true;
-          reportBuilder.incSummaryUnspecifiedNullnessFields();
-          appendIssue(
-              fieldInfo.fieldName(),
-              List.of(Kind.UNSPECIFIED_NULLNESS),
-              messageSolver.issueUnspecifiedNullnessField(
-                  s,
-                  s.replaceAll("[^*]", " ").replace("*", "^")
-              ));
-        }
+      if (issuesForClass.getOrDefault(fieldInfo.fieldName(), List.of())
+          .contains(Kind.UNSPECIFIED_NULLNESS)) {
+        reportBuilder.incSummaryUnspecifiedNullnessFields();
+        unspecifiedNullnessFound = true;
       }
     }
 
     for (var methodInfo : visitedClass.methods()) {
       reportBuilder.incSummaryTotalMethods();
-
-      if (visitedClass.isRecord()) {
-        var methodName = methodInfo.methodName();
-        if (methodName.equals("equals")) {
-          continue;
-        }
-        if (methodName.equals("toString")) {
-          continue;
-        }
-
-        var effectiveNullMarkedScope = getEffectiveNullMarkedScope(nullScopes);
-
-        var augmentedStringTranslator = new AugmentedStringTranslator(effectiveNullMarkedScope);
-        if (visitedClass.getComponent(methodName)
-                .filter(c -> augmentedStringTranslator.translate(c.fs())
-                    .equals(augmentedStringTranslator.translate(methodInfo.ms().returnType())))
-                .isPresent()
-            && methodInfo.ms().parameterTypes().isEmpty()
-        ) {
-          // skip default getter
-          continue;
-        }
-        if (methodName.equals("<init>") && methodInfo.ms().parameterTypes().stream()
-            .map(augmentedStringTranslator::translate)
-            .collect(Collectors.joining(",")).equals(visitedClass.components().stream()
-                .map(VisitedComponent::fs)
-                .map(augmentedStringTranslator::translate)
-                .collect(Collectors.joining(",")))
-        ) {
-          // skip default constructor
-          continue;
-        }
-      }
-
-      var methodNullScope = new ArrayList<>(nullScopes);
-      methodNullScope.add(NullScope.from(methodInfo.annotations()));
-      var effectiveNullMarkedScope = getEffectiveNullMarkedScope(methodNullScope);
-
-      if (effectiveNullMarkedScope != NullScope.NULL_MARKED) {
-        var augmentedStringTranslator = new AugmentedStringTranslator(effectiveNullMarkedScope);
-        var s = "%s %s(%s)".formatted(
-            augmentedStringTranslator.translate(methodInfo.ms().returnType()),
-            methodInfo.methodName(),
-            methodInfo.ms()
-                .parameterTypes().stream()
-                .map(augmentedStringTranslator::translate)
-                .collect(Collectors.joining(", "))
-        );
-        if (s.contains("*")) {
-          unspecifiedNullnessFound = true;
-          reportBuilder.incSummaryUnspecifiedNullnessMethods();
-          appendIssue(
-              methodInfo.descriptiveMethodName(),
-              List.of(Kind.UNSPECIFIED_NULLNESS),
-              messageSolver.issueUnspecifiedNullnessMethod(
-                  s,
-                  s.replaceAll("[^*]", " ").replace("*", "^")
-              ));
-        }
+      if (issuesForClass.getOrDefault(methodInfo.descriptiveMethodName(), List.of())
+          .contains(Kind.UNSPECIFIED_NULLNESS)) {
+        reportBuilder.incSummaryUnspecifiedNullnessMethods();
+        unspecifiedNullnessFound = true;
       }
     }
 

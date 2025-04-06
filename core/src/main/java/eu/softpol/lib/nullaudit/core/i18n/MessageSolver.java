@@ -67,4 +67,8 @@ public class MessageSolver {
     return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION_ON_PRIMITIVE.method");
   }
 
+  public String missingNullMarkedClass() {
+    return resourceBundle.getString("issue.MISSING_NULL_MARKED.class");
+  }
+
 }

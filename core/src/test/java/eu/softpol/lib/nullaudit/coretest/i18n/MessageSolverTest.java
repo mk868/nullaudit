@@ -126,6 +126,14 @@ class MessageSolverTest {
     assertThat(msg).containsIgnoringCase("primitive");
   }
 
+  @Test
+  void missingNullMarkedClassTest() {
+    // GIVEN/WHEN
+    var msg = messageSolver.missingNullMarkedClass();
+    // THEN
+    assertThat(msg).containsIgnoringCase("@NullMarked");
+  }
+
   static String lineWithContent(String str, String content) {
     return str.lines()
         .filter(a -> a.contains(content))

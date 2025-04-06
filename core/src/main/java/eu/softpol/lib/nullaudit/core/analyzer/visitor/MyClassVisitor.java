@@ -13,7 +13,6 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedComponent;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedField;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.check.Check.AddIssue;
-import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
@@ -39,17 +38,14 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private static final System.Logger logger = System.getLogger(MyClassVisitor.class.getName());
 
   private final AnalysisContext context;
-  private final MessageSolver messageSolver;
   private final ReportBuilder reportBuilder;
   private final List<Clazz> outerClasses = new ArrayList<>();
   private String sourceFileName;
   private MutableVisitedClass visitedClass;
 
-  public MyClassVisitor(AnalysisContext context, MessageSolver messageSolver,
-      ReportBuilder reportBuilder) {
+  public MyClassVisitor(AnalysisContext context, ReportBuilder reportBuilder) {
     super(Opcodes.ASM9);
     this.context = context;
-    this.messageSolver = messageSolver;
     this.reportBuilder = reportBuilder;
   }
 

@@ -5,10 +5,7 @@ import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getPackag
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.ModuleInfoClassVisitor;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.MyClassVisitor;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.PackageInfoClassVisitor;
-import eu.softpol.lib.nullaudit.core.check.IrrelevantMarkedCheck;
-import eu.softpol.lib.nullaudit.core.check.IrrelevantPrimitiveCheck;
-import eu.softpol.lib.nullaudit.core.check.UnspecifiedNullnessCheck;
-import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
+import eu.softpol.lib.nullaudit.core.check.Check;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -25,19 +22,15 @@ public class ClassFileAnalyzer implements FileAnalyzer {
   private static final System.Logger logger = System.getLogger(ClassFileAnalyzer.class.getName());
 
   private final AnalysisContext context = new AnalysisContext();
-  private final MessageSolver messageSolver = new MessageSolver();
   private final ReportBuilder reportBuilder;
   private final List<String> excludePackages;
 
-  public ClassFileAnalyzer(ReportBuilder reportBuilder, List<String> excludePackages) {
+  public ClassFileAnalyzer(ReportBuilder reportBuilder, List<String> excludePackages,
+      List<Check> checks) {
     this.reportBuilder = reportBuilder;
     this.excludePackages = List.copyOf(excludePackages);
 
-    context.getChecks().addAll(List.of(
-        new IrrelevantMarkedCheck(messageSolver),
-        new IrrelevantPrimitiveCheck(messageSolver),
-        new UnspecifiedNullnessCheck(messageSolver)
-    ));
+    context.getChecks().addAll(checks);
   }
 
   @Override
@@ -52,7 +45,7 @@ public class ClassFileAnalyzer implements FileAnalyzer {
         return true;
       }
       if (fileName.endsWith(".class")) {
-        analyze(iss, new MyClassVisitor(context, messageSolver, reportBuilder));
+        analyze(iss, new MyClassVisitor(context, reportBuilder));
         return true;
       }
     } catch (IOException e) {

@@ -17,16 +17,10 @@ public interface Check {
     void addIssueForMethod(String name, List<Kind> kinds, String message);
   }
 
-  default void checkModule() {
-  }
+  void checkModule();
 
-  default void checkPackage(
-      VisitedPackage visitedPackage,
-      BiConsumer<List<Kind>, String> addIssue
-  ) {
-  }
+  void checkPackage(VisitedPackage visitedPackage, BiConsumer<List<Kind>, String> addIssue);
 
-  default void checkClass(VisitedClass visitedClass, AddIssue addIssue) {
-  }
+  void checkClass(VisitedClass visitedClass, AddIssue addIssue);
 
 }

@@ -1,6 +1,10 @@
 package eu.softpol.lib.nullaudit.core;
 
 import eu.softpol.lib.nullaudit.core.analyzer.ClassFileAnalyzer;
+import eu.softpol.lib.nullaudit.core.check.IrrelevantMarkedCheck;
+import eu.softpol.lib.nullaudit.core.check.IrrelevantPrimitiveCheck;
+import eu.softpol.lib.nullaudit.core.check.UnspecifiedNullnessCheck;
+import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Report;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import eu.softpol.lib.nullaudit.core.source.DirSource;
@@ -24,8 +28,13 @@ public class NullAuditAnalyzer {
       throw new RuntimeException("File %s does not exist.".formatted(input));
     }
 
+    var messageSolver = new MessageSolver();
     var reportBuilder = new ReportBuilder();
-    var fileAnalyzer = new ClassFileAnalyzer(reportBuilder, excludePackages);
+    var fileAnalyzer = new ClassFileAnalyzer(reportBuilder, excludePackages, List.of(
+        new IrrelevantMarkedCheck(messageSolver),
+        new IrrelevantPrimitiveCheck(messageSolver),
+        new UnspecifiedNullnessCheck(messageSolver)
+    ));
     if (Files.isDirectory(input)) {
       new DirSource(input).analyze(fileAnalyzer);
     } else if (input.getFileName().toString().endsWith(".jar")) {

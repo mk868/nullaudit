@@ -21,6 +21,11 @@ public class IrrelevantMarkedCheck implements Check {
   }
 
   @Override
+  public void checkModule() {
+    // NOP
+  }
+
+  @Override
   public void checkPackage(VisitedPackage visitedPackage, BiConsumer<List<Kind>, String> addIssue) {
     if (visitedPackage.annotations().containsAll(IRRELEVANT_ANNOTATIONS)) {
       addIssue.accept(

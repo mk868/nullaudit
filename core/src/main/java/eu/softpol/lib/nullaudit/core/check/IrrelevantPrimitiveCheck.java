@@ -1,12 +1,14 @@
 package eu.softpol.lib.nullaudit.core.check;
 
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedClass;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedPackage;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class IrrelevantPrimitiveCheck implements Check {
 
@@ -14,6 +16,16 @@ public class IrrelevantPrimitiveCheck implements Check {
 
   public IrrelevantPrimitiveCheck(MessageSolver messageSolver) {
     this.messageSolver = messageSolver;
+  }
+
+  @Override
+  public void checkModule() {
+    // NOP
+  }
+
+  @Override
+  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<List<Kind>, String> addIssue) {
+    // NOP
   }
 
   @Override

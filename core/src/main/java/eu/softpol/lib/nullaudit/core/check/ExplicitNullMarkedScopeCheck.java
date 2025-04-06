@@ -2,9 +2,11 @@ package eu.softpol.lib.nullaudit.core.check;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedClass;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedPackage;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class ExplicitNullMarkedScopeCheck implements Check {
 
@@ -12,6 +14,16 @@ public class ExplicitNullMarkedScopeCheck implements Check {
 
   public ExplicitNullMarkedScopeCheck(MessageSolver messageSolver) {
     this.messageSolver = messageSolver;
+  }
+
+  @Override
+  public void checkModule() {
+    // NOP
+  }
+
+  @Override
+  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<List<Kind>, String> addIssue) {
+    // NOP
   }
 
   @Override

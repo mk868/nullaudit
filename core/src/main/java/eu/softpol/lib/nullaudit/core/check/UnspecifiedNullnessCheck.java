@@ -3,10 +3,12 @@ package eu.softpol.lib.nullaudit.core.check;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedComponent;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedPackage;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 public class UnspecifiedNullnessCheck implements Check {
@@ -15,6 +17,16 @@ public class UnspecifiedNullnessCheck implements Check {
 
   public UnspecifiedNullnessCheck(MessageSolver messageSolver) {
     this.messageSolver = messageSolver;
+  }
+
+  @Override
+  public void checkModule() {
+    // NOP
+  }
+
+  @Override
+  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<List<Kind>, String> addIssue) {
+    // NOP
   }
 
   @Override

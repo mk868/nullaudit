@@ -63,6 +63,9 @@
             <goals>
               <goal>helpmojo</goal>
             </goals>
+            <configuration>
+              <helpPackageName>eu.softpol.lib.nullaudit.maven</helpPackageName>
+            </configuration>
           </execution>
         </executions>
       </plugin>

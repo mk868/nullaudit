@@ -3,7 +3,7 @@
 A tool to verify whether JSpecify nullness annotations are applied to your codebase.  
 Check out the [sample projects](examples) for the examples of actual usage.
 
-## Checks
+## Implemented Rules
 
 - Detects unspecified nullness types based on `@Nullable`, `@NonNull`, `@NullMarked`, and
   `@NullUnmarked` annotations.
@@ -20,33 +20,32 @@ Check out the [sample projects](examples) for the examples of actual usage.
   void say(java.lang.String*)
                            ^
   ```
-- Detects the use of both `@NullMarked` and
-  `@NullUnmarked` annotations on the same package/class/method and reports it as an error.
-  ```java
-  @NullMarked
-  @NullUnmarked
-  class SampleClass {
-  }
-  ```
-  Gives:
-  ```
-  SampleClass: Irrelevant annotations, the class should not be annotated with both @NullMarked and @NullUnmarked at the same time!
-  ```
-- Detects unexpected annotations on the primitive types.
+- Detects improper usage of JSpecify annotations.
   ```java
   @NullMarked
   class DataHolder {
-    private @Nullable byte[] data;
+  private @Nullable byte[] data;
+
+    @NullMarked
+    @NullUnmarked
+    void sayHi(String name) {
+      System.out.println("Hi " + name);
+    }
   }
   ```
   Gives:
   ```
-  DataHolder#data: Primitive type cannot be annotated with @Nullable or @NonNull!
+  DataHolder#sayHi(java.lang.String): Irrelevant annotations, the method should not be annotated with both @NullMarked and @NullUnmarked at the same time!
+  DataHolder#data: Primitive types cannot be annotated with @Nullable or @NonNull!
   ```
+- Requires to put `@NullMarked` on classes.
 
 ## Features
 
 - Analyzes `.jar` files or directories containing `.class` files.
+- Analyzes files compiled to Java 8+
+- Allows applying checks only on new classes, which is helpful during the annotation migration
+  process or initial adoption of JSpecify annotations in the project.
 - Generates a JSON report of the analysis results.
 - Maven plugin to simplify integration with CI/CD workflows.
 

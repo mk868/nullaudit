@@ -7,7 +7,6 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedPackage;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
-import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,7 @@ public class UnspecifiedNullnessCheck implements Check {
   }
 
   @Override
-  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<List<Kind>, String> addIssue) {
+  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<Kind, String> addIssue) {
     // NOP
   }
 
@@ -44,7 +43,7 @@ public class UnspecifiedNullnessCheck implements Check {
         if (s.contains("*")) {
           addIssue.addIssueForField(
               componentInfo.componentName(),
-              List.of(Kind.UNSPECIFIED_NULLNESS),
+              Kind.UNSPECIFIED_NULLNESS,
               messageSolver.issueUnspecifiedNullnessComponent(
                   s,
                   s.replaceAll("[^*]", " ").replace("*", "^")
@@ -65,7 +64,7 @@ public class UnspecifiedNullnessCheck implements Check {
         if (s.contains("*")) {
           addIssue.addIssueForField(
               fieldInfo.fieldName(),
-              List.of(Kind.UNSPECIFIED_NULLNESS),
+              Kind.UNSPECIFIED_NULLNESS,
               messageSolver.issueUnspecifiedNullnessField(
                   s,
                   s.replaceAll("[^*]", " ").replace("*", "^")
@@ -120,7 +119,7 @@ public class UnspecifiedNullnessCheck implements Check {
         if (s.contains("*")) {
           addIssue.addIssueForMethod(
               methodInfo.descriptiveMethodName(),
-              List.of(Kind.UNSPECIFIED_NULLNESS),
+              Kind.UNSPECIFIED_NULLNESS,
               messageSolver.issueUnspecifiedNullnessMethod(
                   s,
                   s.replaceAll("[^*]", " ").replace("*", "^")

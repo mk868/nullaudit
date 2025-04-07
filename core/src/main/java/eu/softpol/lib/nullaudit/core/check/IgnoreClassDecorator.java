@@ -4,7 +4,6 @@ import eu.softpol.lib.nullaudit.core.IgnoredClasses;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedPackage;
 import eu.softpol.lib.nullaudit.core.report.Kind;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 public class IgnoreClassDecorator implements Check {
@@ -24,7 +23,7 @@ public class IgnoreClassDecorator implements Check {
   }
 
   @Override
-  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<List<Kind>, String> addIssue) {
+  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<Kind, String> addIssue) {
     delegate.checkPackage(visitedPackage, addIssue);
   }
 

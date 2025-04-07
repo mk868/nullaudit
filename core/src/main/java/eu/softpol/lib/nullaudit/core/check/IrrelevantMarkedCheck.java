@@ -26,10 +26,10 @@ public class IrrelevantMarkedCheck implements Check {
   }
 
   @Override
-  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<List<Kind>, String> addIssue) {
+  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<Kind, String> addIssue) {
     if (visitedPackage.annotations().containsAll(IRRELEVANT_ANNOTATIONS)) {
       addIssue.accept(
-          List.of(Kind.IRRELEVANT_ANNOTATION),
+          Kind.IRRELEVANT_ANNOTATION,
           messageSolver.issueIrrelevantAnnotationNullUnMarkedPackage()
       );
     }
@@ -39,7 +39,7 @@ public class IrrelevantMarkedCheck implements Check {
   public void checkClass(VisitedClass visitedClass, AddIssue addIssue) {
     if (visitedClass.annotations().containsAll(IRRELEVANT_ANNOTATIONS)) {
       addIssue.addIssueForClass(
-          List.of(Kind.IRRELEVANT_ANNOTATION),
+          Kind.IRRELEVANT_ANNOTATION,
           messageSolver.issueIrrelevantAnnotationNullUnMarkedClass()
       );
     }
@@ -48,7 +48,7 @@ public class IrrelevantMarkedCheck implements Check {
       if (visitedMethod.annotations().containsAll(IRRELEVANT_ANNOTATIONS)) {
         addIssue.addIssueForMethod(
             visitedMethod.descriptiveMethodName(),
-            List.of(Kind.IRRELEVANT_ANNOTATION),
+            Kind.IRRELEVANT_ANNOTATION,
             messageSolver.issueIrrelevantAnnotationNullUnMarkedMethod()
         );
       }

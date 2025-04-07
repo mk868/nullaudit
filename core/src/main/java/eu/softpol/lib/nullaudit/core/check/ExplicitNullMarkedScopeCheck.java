@@ -5,7 +5,6 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedPackage;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 public class ExplicitNullMarkedScopeCheck implements Check {
@@ -22,7 +21,7 @@ public class ExplicitNullMarkedScopeCheck implements Check {
   }
 
   @Override
-  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<List<Kind>, String> addIssue) {
+  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<Kind, String> addIssue) {
     // NOP
   }
 
@@ -30,7 +29,7 @@ public class ExplicitNullMarkedScopeCheck implements Check {
   public void checkClass(VisitedClass visitedClass, AddIssue addIssue) {
     if (!visitedClass.annotations().contains(NullScopeAnnotation.NULL_MARKED)) {
       addIssue.addIssueForClass(
-          List.of(Kind.MISSING_NULL_MARKED),
+          Kind.MISSING_NULL_MARKED,
           messageSolver.missingNullMarkedClass()
       );
     }

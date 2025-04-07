@@ -9,8 +9,6 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableVisitedPack
 import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
-import java.util.HashSet;
-import java.util.List;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
@@ -56,7 +54,7 @@ public class PackageInfoClassVisitor extends ClassVisitor {
     super.visitEnd();
   }
 
-  private void appendIssue(List<Kind> kinds, String message) {
+  private void appendIssue(Kind kind, String message) {
     var location = "";
     if (context.getModuleName() != null) {
       location = context.getModuleName() + "/";
@@ -65,7 +63,7 @@ public class PackageInfoClassVisitor extends ClassVisitor {
 
     reportBuilder.addIssue(new Issue(
         location,
-        kinds,
+        kind,
         message
     ));
   }

@@ -181,22 +181,22 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     context.getChecks()
         .forEach(c -> c.checkClass(visitedClass, new AddIssue() {
           @Override
-          public void addIssueForClass(List<Kind> kinds, String message) {
-            MyClassVisitor.this.appendIssue(kinds, message);
+          public void addIssueForClass(Kind kind, String message) {
+            MyClassVisitor.this.appendIssue(kind, message);
           }
 
           @Override
-          public void addIssueForField(String name, List<Kind> kinds, String message) {
-            MyClassVisitor.this.appendIssue(name, kinds, message);
+          public void addIssueForField(String name, Kind kind, String message) {
+            MyClassVisitor.this.appendIssue(name, kind, message);
             issuesForClass.computeIfAbsent(name, k -> new ArrayList<>())
-                .addAll(kinds);
+                .add(kind);
           }
 
           @Override
-          public void addIssueForMethod(String name, List<Kind> kinds, String message) {
-            MyClassVisitor.this.appendIssue(name, kinds, message);
+          public void addIssueForMethod(String name, Kind kind, String message) {
+            MyClassVisitor.this.appendIssue(name, kind, message);
             issuesForClass.computeIfAbsent(name, k -> new ArrayList<>())
-                .addAll(kinds);
+                .add(kind);
           }
         }));
 
@@ -240,7 +240,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     super.visitEnd();
   }
 
-  private void appendIssue(@Nullable String name, List<Kind> kinds, String message) {
+  private void appendIssue(@Nullable String name, Kind kind, String message) {
     var location = "";
     if (context.getModuleName() != null) {
       location = context.getModuleName() + "/";
@@ -252,13 +252,13 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     reportBuilder.addIssue(new Issue(
         location,
-        kinds,
+        kind,
         message
     ));
   }
 
-  private void appendIssue(List<Kind> kinds, String message) {
-    appendIssue(null, kinds, message);
+  private void appendIssue(Kind kind, String message) {
+    appendIssue(null, kind, message);
   }
 
   private List<NullScope> getNullScopesForClass() {

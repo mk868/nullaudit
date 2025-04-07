@@ -7,7 +7,6 @@ import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 public class IrrelevantPrimitiveCheck implements Check {
@@ -24,7 +23,7 @@ public class IrrelevantPrimitiveCheck implements Check {
   }
 
   @Override
-  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<List<Kind>, String> addIssue) {
+  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<Kind, String> addIssue) {
     // NOP
   }
 
@@ -33,7 +32,7 @@ public class IrrelevantPrimitiveCheck implements Check {
     for (var componentInfo : visitedClass.components()) {
       if (isPrimitiveAnnotated(componentInfo.fs())) {
         addIssue.addIssueForField(componentInfo.componentName(),
-            List.of(Kind.IRRELEVANT_ANNOTATION_ON_PRIMITIVE),
+            Kind.IRRELEVANT_ANNOTATION_ON_PRIMITIVE,
             messageSolver.issueIrrelevantAnnotationOnPrimitiveComponent()
         );
       }
@@ -43,7 +42,7 @@ public class IrrelevantPrimitiveCheck implements Check {
       for (var fieldInfo : visitedClass.fields()) {
         if (isPrimitiveAnnotated(fieldInfo.fs())) {
           addIssue.addIssueForField(fieldInfo.fieldName(),
-              List.of(Kind.IRRELEVANT_ANNOTATION_ON_PRIMITIVE),
+              Kind.IRRELEVANT_ANNOTATION_ON_PRIMITIVE,
               messageSolver.issueIrrelevantAnnotationOnPrimitiveField()
           );
         }
@@ -64,7 +63,7 @@ public class IrrelevantPrimitiveCheck implements Check {
                   .anyMatch(IrrelevantPrimitiveCheck::isPrimitiveAnnotated)) {
 
             addIssue.addIssueForMethod(visitedMethod.descriptiveMethodName(),
-                List.of(Kind.IRRELEVANT_ANNOTATION_ON_PRIMITIVE),
+                Kind.IRRELEVANT_ANNOTATION_ON_PRIMITIVE,
                 messageSolver.issueIrrelevantAnnotationOnPrimitiveMethod()
             );
           }

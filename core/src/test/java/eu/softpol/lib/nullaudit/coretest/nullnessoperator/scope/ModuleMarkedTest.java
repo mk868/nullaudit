@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.coretest.nullnessoperator.scope;
 
+import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import io.github.ascopes.jct.compilers.JctCompiler;
@@ -54,7 +54,7 @@ class ModuleMarkedTest {
   void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
     var analyzer = new NullAuditAnalyzer(dir, List.of());
     var report = analyzer.run();
-    assertThat(report.issues()).isEmpty();
+    assertThat(report).issues().isEmpty();
   }
 
 }

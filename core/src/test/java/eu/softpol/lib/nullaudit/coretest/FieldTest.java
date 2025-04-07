@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.coretest;
 
+import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import io.github.ascopes.jct.compilers.JctCompiler;
@@ -54,12 +54,13 @@ class FieldTest {
     assertThat(summary.totalFields()).isEqualTo(3);
     assertThat(summary.unspecifiedNullness().classes()).isEqualTo(1);
     assertThat(summary.unspecifiedNullness().fields()).isEqualTo(2);
-    var issues = report.issues();
-    assertThat(issues).hasSize(2);
-    assertThat(issues.get(0).location()).isEqualTo("com.example.SimpleClass#a");
-    assertThat(issues.get(0).message()).contains("java.util.List*<java.lang.String*> a");
-    assertThat(issues.get(1).location()).isEqualTo("com.example.SimpleClass#b");
-    assertThat(issues.get(1).message()).contains("String* b");
+    assertThat(report).totalNumberOfIssues(2);
+    assertThat(report).issuesForField("com.example", "SimpleClass", "a")
+        .singleElement()
+        .messageContains("java.util.List*<java.lang.String*> a");
+    assertThat(report).issuesForField("com.example", "SimpleClass", "b")
+        .singleElement()
+        .messageContains("String* b");
   }
 
 }

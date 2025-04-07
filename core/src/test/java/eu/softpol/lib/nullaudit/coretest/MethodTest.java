@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.coretest;
 
+import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import io.github.ascopes.jct.compilers.JctCompiler;
@@ -97,10 +97,10 @@ class MethodTest {
     //TODO assertThat(summary.totalMethods()).isEqualTo(5);
     assertThat(summary.unspecifiedNullness().classes()).isEqualTo(1);
     assertThat(summary.unspecifiedNullness().methods()).isEqualTo(1);
-    var issues = report.issues();
-    assertThat(issues).hasSize(1);
-    assertThat(issues.get(0).location()).contains("com.example.Invalid#addPrefix(java.lang.String)");
-    assertThat(issues.get(0).message()).contains("java.lang.String* addPrefix(java.lang.String*)");
+    assertThat(report).totalNumberOfIssues(1);
+    assertThat(report).issuesForMethod("com.example", "Invalid", "addPrefix(java.lang.String)")
+        .singleElement()
+        .messageContains("java.lang.String* addPrefix(java.lang.String*)");
   }
 
 }

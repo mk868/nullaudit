@@ -36,4 +36,19 @@ public record NullAuditConfig(
     return new NullAuditConfig(excludedPackages, null, null, null);
   }
 
+  public NullAuditConfig withVerifyJSpecifyAnnotations(@Nullable VerifyJSpecifyAnnotations value) {
+    return new NullAuditConfig(this.excludedPackages, value, this.requireNullMarked,
+        this.requireSpecifiedNullness);
+  }
+
+  public NullAuditConfig withRequireNullMarked(@Nullable RequireNullMarked value) {
+    return new NullAuditConfig(this.excludedPackages, this.verifyJSpecifyAnnotations, value,
+        this.requireSpecifiedNullness);
+  }
+
+  public NullAuditConfig withRequireSpecifiedNullness(@Nullable RequireSpecifiedNullness value) {
+    return new NullAuditConfig(this.excludedPackages, this.verifyJSpecifyAnnotations,
+        this.requireNullMarked, value);
+  }
+
 }

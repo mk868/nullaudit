@@ -8,7 +8,6 @@ import io.github.ascopes.jct.compilers.JctCompiler;
 import io.github.ascopes.jct.compilers.JctCompilers;
 import io.github.ascopes.jct.workspaces.Workspaces;
 import java.nio.file.Path;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -52,7 +51,7 @@ class InnerClassMarkedTest {
 
   @Test
   void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
-    var analyzer = new NullAuditAnalyzer(dir, List.of());
+    var analyzer = new NullAuditAnalyzer(dir, RequireSpecifiedNullnessConfig.CONFIG);
     var report = analyzer.run();
     assertThat(report).issues().isEmpty();
   }

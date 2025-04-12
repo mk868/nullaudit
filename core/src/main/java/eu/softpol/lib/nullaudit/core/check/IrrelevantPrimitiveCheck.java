@@ -32,8 +32,8 @@ public class IrrelevantPrimitiveCheck implements Check {
     for (var componentInfo : visitedClass.components()) {
       if (isPrimitiveAnnotated(componentInfo.fs())) {
         addIssue.addIssueForField(componentInfo.componentName(),
-            Kind.IRRELEVANT_ANNOTATION_ON_PRIMITIVE,
-            messageSolver.issueIrrelevantAnnotationOnPrimitiveComponent()
+            Kind.INVALID_NULLNESS_ON_PRIMITIVE,
+            messageSolver.invalidNullnessOnPrimitiveComponent()
         );
       }
     }
@@ -42,8 +42,8 @@ public class IrrelevantPrimitiveCheck implements Check {
       for (var fieldInfo : visitedClass.fields()) {
         if (isPrimitiveAnnotated(fieldInfo.fs())) {
           addIssue.addIssueForField(fieldInfo.fieldName(),
-              Kind.IRRELEVANT_ANNOTATION_ON_PRIMITIVE,
-              messageSolver.issueIrrelevantAnnotationOnPrimitiveField()
+              Kind.INVALID_NULLNESS_ON_PRIMITIVE,
+              messageSolver.invalidNullnessOnPrimitiveField()
           );
         }
       }
@@ -63,8 +63,8 @@ public class IrrelevantPrimitiveCheck implements Check {
                   .anyMatch(IrrelevantPrimitiveCheck::isPrimitiveAnnotated)) {
 
             addIssue.addIssueForMethod(visitedMethod.descriptiveMethodName(),
-                Kind.IRRELEVANT_ANNOTATION_ON_PRIMITIVE,
-                messageSolver.issueIrrelevantAnnotationOnPrimitiveMethod()
+                Kind.INVALID_NULLNESS_ON_PRIMITIVE,
+                messageSolver.invalidNullnessOnPrimitiveMethod()
             );
           }
         });

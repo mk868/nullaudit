@@ -29,8 +29,8 @@ public class ExplicitNullMarkedScopeCheck implements Check {
   public void checkClass(VisitedClass visitedClass, AddIssue addIssue) {
     if (!visitedClass.annotations().contains(NullScopeAnnotation.NULL_MARKED)) {
       addIssue.addIssueForClass(
-          Kind.MISSING_NULL_MARKED,
-          messageSolver.missingNullMarkedClass()
+          Kind.MISSING_NULL_MARKED_ANNOTATION,
+          messageSolver.missingNullMarkedAnnotationClass()
       );
     }
   }

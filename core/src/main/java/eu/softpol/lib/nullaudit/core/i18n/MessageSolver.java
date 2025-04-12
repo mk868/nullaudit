@@ -43,32 +43,32 @@ public class MessageSolver {
     );
   }
 
-  public String issueIrrelevantAnnotationNullUnMarkedPackage() {
-    return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION.NullUnMarked.package");
+  public String invalidNullMarkCombinationPackage() {
+    return resourceBundle.getString("issue.INVALID_NULL_MARK_COMBINATION.package");
   }
 
-  public String issueIrrelevantAnnotationNullUnMarkedClass() {
-    return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION.NullUnMarked.class");
+  public String invalidNullMarkCombinationClass() {
+    return resourceBundle.getString("issue.INVALID_NULL_MARK_COMBINATION.class");
   }
 
-  public String issueIrrelevantAnnotationNullUnMarkedMethod() {
-    return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION.NullUnMarked.method");
+  public String invalidNullMarkCombinationMethod() {
+    return resourceBundle.getString("issue.INVALID_NULL_MARK_COMBINATION.method");
   }
 
-  public String issueIrrelevantAnnotationOnPrimitiveField() {
-    return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION_ON_PRIMITIVE.field");
+  public String invalidNullnessOnPrimitiveField() {
+    return resourceBundle.getString("issue.INVALID_NULLNESS_ON_PRIMITIVE.field");
   }
 
-  public String issueIrrelevantAnnotationOnPrimitiveComponent() {
-    return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION_ON_PRIMITIVE.component");
+  public String invalidNullnessOnPrimitiveComponent() {
+    return resourceBundle.getString("issue.INVALID_NULLNESS_ON_PRIMITIVE.component");
   }
 
-  public String issueIrrelevantAnnotationOnPrimitiveMethod() {
-    return resourceBundle.getString("issue.IRRELEVANT_ANNOTATION_ON_PRIMITIVE.method");
+  public String invalidNullnessOnPrimitiveMethod() {
+    return resourceBundle.getString("issue.INVALID_NULLNESS_ON_PRIMITIVE.method");
   }
 
-  public String missingNullMarkedClass() {
-    return resourceBundle.getString("issue.MISSING_NULL_MARKED.class");
+  public String missingNullMarkedAnnotationClass() {
+    return resourceBundle.getString("issue.MISSING_NULL_MARKED_ANNOTATION.class");
   }
 
 }

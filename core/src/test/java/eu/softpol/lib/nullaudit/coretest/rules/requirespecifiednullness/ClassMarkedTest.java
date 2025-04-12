@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.coretest.nullnessoperator.scope;
+package eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness;
 
 import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class ClassUnmarkedTest {
+class ClassMarkedTest {
 
   @TempDir
   Path dir;
@@ -24,21 +24,13 @@ class ClassUnmarkedTest {
     try (var workspace = Workspaces.newWorkspace()) {
       workspace.addClassOutputPackage(dir);
       workspace
-          .createSourcePathModule("org.example.sample")
-          .createFile("module-info.java").withContents("""
+          .createSourcePathPackage()
+          .createFile("root/scope/classmarked/Prefix1.java").withContents("""
+              package root.scope.classmarked;
+              
               import org.jspecify.annotations.NullMarked;
               
               @NullMarked
-              module org.example.sample {
-                requires org.jspecify;
-              }
-              """)
-          .createFile("root/scope/classunmarked/Prefix1.java").withContents("""
-              package root.scope.classunmarked;
-              
-              import org.jspecify.annotations.NullUnmarked;
-              
-              @NullUnmarked
               public class Prefix1 {
               
                 public String addPrefix(String str) {
@@ -57,7 +49,7 @@ class ClassUnmarkedTest {
   void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
     var analyzer = new NullAuditAnalyzer(dir, List.of());
     var report = analyzer.run();
-    assertThat(report).issues().isNotEmpty();
+    assertThat(report).issues().isEmpty();
   }
 
 }

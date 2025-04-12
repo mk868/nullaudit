@@ -1,7 +1,7 @@
-package eu.softpol.lib.nullaudit.coretest.irrelevant.marked;
+package eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness;
 
+import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import io.github.ascopes.jct.compilers.JctCompiler;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class IrrelevantMarkedPackageTest {
+class MethodMarkedTest {
 
   @TempDir
   Path dir;
@@ -25,13 +25,20 @@ class IrrelevantMarkedPackageTest {
       workspace.addClassOutputPackage(dir);
       workspace
           .createSourcePathPackage()
-          .createFile("irrelevant/marked/package-info.java").withContents("""
-              @NullMarked
-              @NullUnmarked
-              package irrelevant.marked;
+          .createFile("root/scope/methodmarked/Prefix1.java").withContents("""
+              package root.scope.methodmarked;
               
               import org.jspecify.annotations.NullMarked;
               import org.jspecify.annotations.NullUnmarked;
+              
+              @NullUnmarked
+              public class Prefix1 {
+              
+                @NullMarked
+                public String addPrefix(String str) {
+                  return "prefix:" + str;
+                }
+              }
               """);
       var compilation = compiler.compile(workspace);
 
@@ -41,10 +48,10 @@ class IrrelevantMarkedPackageTest {
   }
 
   @Test
-  void test() {
+  void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
     var analyzer = new NullAuditAnalyzer(dir, List.of());
     var report = analyzer.run();
-    assertThat(report.issues()).hasSize(1);
+    assertThat(report).issues().isEmpty();
   }
 
 }

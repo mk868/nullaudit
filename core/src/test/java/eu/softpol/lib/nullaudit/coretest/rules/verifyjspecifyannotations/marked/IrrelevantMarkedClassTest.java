@@ -1,7 +1,7 @@
-package eu.softpol.lib.nullaudit.coretest.nullnessoperator.scope;
+package eu.softpol.lib.nullaudit.coretest.rules.verifyjspecifyannotations.marked;
 
-import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import io.github.ascopes.jct.compilers.JctCompiler;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class PackageUnmarkedTest {
+class IrrelevantMarkedClassTest {
 
   @TempDir
   Path dir;
@@ -24,28 +24,18 @@ class PackageUnmarkedTest {
     try (var workspace = Workspaces.newWorkspace()) {
       workspace.addClassOutputPackage(dir);
       workspace
-          .createSourcePathModule("org.example.sample")
-          .createFile("module-info.java").withContents("""
+          .createSourcePathPackage()
+          .createFile("irrelevant/marked/SayHello.java").withContents("""
+              package irrelevant.marked;
+              
               import org.jspecify.annotations.NullMarked;
+              import org.jspecify.annotations.NullUnmarked;
               
               @NullMarked
-              module org.example.sample {
-                requires org.jspecify;
-              }
-              """)
-          .createFile("root/scope/packageunmarked/package-info.java").withContents("""
               @NullUnmarked
-              package root.scope.packageunmarked;
+              public class SayHello {
               
-              import org.jspecify.annotations.NullUnmarked;
-              """)
-          .createFile("root/scope/packageunmarked/Prefix1.java").withContents("""
-              package root.scope.packageunmarked;
-              
-              public class Prefix1 {
-              
-                public String addPrefix(String str) {
-                  return "prefix:" + str;
+                public void hello() {
                 }
               }
               """);
@@ -57,10 +47,10 @@ class PackageUnmarkedTest {
   }
 
   @Test
-  void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
+  void test() {
     var analyzer = new NullAuditAnalyzer(dir, List.of());
     var report = analyzer.run();
-    assertThat(report).issues().isNotEmpty();
+    assertThat(report.issues()).hasSize(1);
   }
 
 }

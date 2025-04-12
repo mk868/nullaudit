@@ -1,7 +1,7 @@
-package eu.softpol.lib.nullaudit.coretest.nullnessoperator.scope;
+package eu.softpol.lib.nullaudit.coretest.rules.verifyjspecifyannotations.marked;
 
-import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import io.github.ascopes.jct.compilers.JctCompiler;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class InnerClassMarkedTest {
+class IrrelevantMarkedMethodTest {
 
   @TempDir
   Path dir;
@@ -25,21 +25,17 @@ class InnerClassMarkedTest {
       workspace.addClassOutputPackage(dir);
       workspace
           .createSourcePathPackage()
-          .createFile("root/scope/innerclassmarked/Prefix1.java").withContents("""
-              package root.scope.innerclassmarked;
+          .createFile("irrelevant/marked/SayHello.java").withContents("""
+              package irrelevant.marked;
               
               import org.jspecify.annotations.NullMarked;
               import org.jspecify.annotations.NullUnmarked;
               
-              @NullUnmarked
-              public class Prefix1 {
+              public class SayHello {
               
                 @NullMarked
-                public class Inner {
-              
-                  public String addPrefix(String str) {
-                    return "prefix:" + str;
-                  }
+                @NullUnmarked
+                public void hello() {
                 }
               }
               """);
@@ -51,10 +47,10 @@ class InnerClassMarkedTest {
   }
 
   @Test
-  void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
+  void test() {
     var analyzer = new NullAuditAnalyzer(dir, List.of());
     var report = analyzer.run();
-    assertThat(report).issues().isEmpty();
+    assertThat(report.issues()).hasSize(1);
   }
 
 }

@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.coretest.nullnessoperator.scope;
+package eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness;
 
 import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class ModuleMarkedTest {
+class ClassUnmarkedTest {
 
   @TempDir
   Path dir;
@@ -33,9 +33,12 @@ class ModuleMarkedTest {
                 requires org.jspecify;
               }
               """)
-          .createFile("root/scope/packageunmarked/Prefix1.java").withContents("""
-              package root.scope.packageunmarked;
+          .createFile("root/scope/classunmarked/Prefix1.java").withContents("""
+              package root.scope.classunmarked;
               
+              import org.jspecify.annotations.NullUnmarked;
+              
+              @NullUnmarked
               public class Prefix1 {
               
                 public String addPrefix(String str) {
@@ -54,7 +57,7 @@ class ModuleMarkedTest {
   void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
     var analyzer = new NullAuditAnalyzer(dir, List.of());
     var report = analyzer.run();
-    assertThat(report).issues().isEmpty();
+    assertThat(report).issues().isNotEmpty();
   }
 
 }

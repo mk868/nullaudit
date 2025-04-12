@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.coretest.irrelevant.primitive;
+package eu.softpol.lib.nullaudit.coretest.rules.verifyjspecifyannotations.primitive;
 
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
 import static org.assertj.core.api.Assertions.assertThat;

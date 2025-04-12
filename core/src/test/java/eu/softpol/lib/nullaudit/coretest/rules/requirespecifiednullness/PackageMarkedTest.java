@@ -1,7 +1,7 @@
-package eu.softpol.lib.nullaudit.coretest.irrelevant.marked;
+package eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness;
 
+import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import io.github.ascopes.jct.compilers.JctCompiler;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class IrrelevantMarkedMethodTest {
+class PackageMarkedTest {
 
   @TempDir
   Path dir;
@@ -24,18 +24,28 @@ class IrrelevantMarkedMethodTest {
     try (var workspace = Workspaces.newWorkspace()) {
       workspace.addClassOutputPackage(dir);
       workspace
-          .createSourcePathPackage()
-          .createFile("irrelevant/marked/SayHello.java").withContents("""
-              package irrelevant.marked;
+          .createSourcePathModule("org.example.sample")
+          .createFile("module-info.java").withContents("""
+              import org.jspecify.annotations.NullMarked;
+              
+              @NullMarked
+              module org.example.sample {
+                requires org.jspecify;
+              }
+              """)
+          .createFile("root/scope/packagemarked/package-info.java").withContents("""
+              @NullMarked
+              package root.scope.packageunmarked;
               
               import org.jspecify.annotations.NullMarked;
-              import org.jspecify.annotations.NullUnmarked;
+              """)
+          .createFile("root/scope/packagemarked/Prefix1.java").withContents("""
+              package root.scope.packageunmarked;
               
-              public class SayHello {
+              public class Prefix1 {
               
-                @NullMarked
-                @NullUnmarked
-                public void hello() {
+                public String addPrefix(String str) {
+                  return "prefix:" + str;
                 }
               }
               """);
@@ -47,10 +57,10 @@ class IrrelevantMarkedMethodTest {
   }
 
   @Test
-  void test() {
+  void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
     var analyzer = new NullAuditAnalyzer(dir, List.of());
     var report = analyzer.run();
-    assertThat(report.issues()).hasSize(1);
+    assertThat(report).issues().isEmpty();
   }
 
 }

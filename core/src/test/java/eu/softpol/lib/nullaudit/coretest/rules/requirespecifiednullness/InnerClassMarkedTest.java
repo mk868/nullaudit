@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.coretest.nullnessoperator.scope;
+package eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness;
 
 import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class ClassMarkedTest {
+class InnerClassMarkedTest {
 
   @TempDir
   Path dir;
@@ -25,16 +25,21 @@ class ClassMarkedTest {
       workspace.addClassOutputPackage(dir);
       workspace
           .createSourcePathPackage()
-          .createFile("root/scope/classmarked/Prefix1.java").withContents("""
-              package root.scope.classmarked;
+          .createFile("root/scope/innerclassmarked/Prefix1.java").withContents("""
+              package root.scope.innerclassmarked;
               
               import org.jspecify.annotations.NullMarked;
+              import org.jspecify.annotations.NullUnmarked;
               
-              @NullMarked
+              @NullUnmarked
               public class Prefix1 {
               
-                public String addPrefix(String str) {
-                  return "prefix:" + str;
+                @NullMarked
+                public class Inner {
+              
+                  public String addPrefix(String str) {
+                    return "prefix:" + str;
+                  }
                 }
               }
               """);

@@ -1,7 +1,7 @@
-package eu.softpol.lib.nullaudit.coretest.irrelevant.marked;
+package eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness;
 
+import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import io.github.ascopes.jct.compilers.JctCompiler;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class IrrelevantMarkedClassTest {
+class InnerClassUnmarkedTest {
 
   @TempDir
   Path dir;
@@ -25,17 +25,21 @@ class IrrelevantMarkedClassTest {
       workspace.addClassOutputPackage(dir);
       workspace
           .createSourcePathPackage()
-          .createFile("irrelevant/marked/SayHello.java").withContents("""
-              package irrelevant.marked;
+          .createFile("root/scope/innerclassunmarked/Prefix1.java").withContents("""
+              package root.scope.innerclassunmarked;
               
               import org.jspecify.annotations.NullMarked;
               import org.jspecify.annotations.NullUnmarked;
               
               @NullMarked
-              @NullUnmarked
-              public class SayHello {
+              public class Prefix1 {
               
-                public void hello() {
+                @NullUnmarked
+                public class Inner {
+              
+                  public String addPrefix(String str) {
+                    return "prefix:" + str;
+                  }
                 }
               }
               """);
@@ -47,10 +51,10 @@ class IrrelevantMarkedClassTest {
   }
 
   @Test
-  void test() {
+  void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
     var analyzer = new NullAuditAnalyzer(dir, List.of());
     var report = analyzer.run();
-    assertThat(report.issues()).hasSize(1);
+    assertThat(report).issues().isNotEmpty();
   }
 
 }

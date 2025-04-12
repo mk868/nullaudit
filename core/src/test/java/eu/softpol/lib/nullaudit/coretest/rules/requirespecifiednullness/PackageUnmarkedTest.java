@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.coretest.nullnessoperator.scope;
+package eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness;
 
 import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class MethodMarkedTest {
+class PackageUnmarkedTest {
 
   @TempDir
   Path dir;
@@ -24,17 +24,26 @@ class MethodMarkedTest {
     try (var workspace = Workspaces.newWorkspace()) {
       workspace.addClassOutputPackage(dir);
       workspace
-          .createSourcePathPackage()
-          .createFile("root/scope/methodmarked/Prefix1.java").withContents("""
-              package root.scope.methodmarked;
-              
+          .createSourcePathModule("org.example.sample")
+          .createFile("module-info.java").withContents("""
               import org.jspecify.annotations.NullMarked;
-              import org.jspecify.annotations.NullUnmarked;
               
+              @NullMarked
+              module org.example.sample {
+                requires org.jspecify;
+              }
+              """)
+          .createFile("root/scope/packageunmarked/package-info.java").withContents("""
               @NullUnmarked
+              package root.scope.packageunmarked;
+              
+              import org.jspecify.annotations.NullUnmarked;
+              """)
+          .createFile("root/scope/packageunmarked/Prefix1.java").withContents("""
+              package root.scope.packageunmarked;
+              
               public class Prefix1 {
               
-                @NullMarked
                 public String addPrefix(String str) {
                   return "prefix:" + str;
                 }
@@ -51,7 +60,7 @@ class MethodMarkedTest {
   void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
     var analyzer = new NullAuditAnalyzer(dir, List.of());
     var report = analyzer.run();
-    assertThat(report).issues().isEmpty();
+    assertThat(report).issues().isNotEmpty();
   }
 
 }

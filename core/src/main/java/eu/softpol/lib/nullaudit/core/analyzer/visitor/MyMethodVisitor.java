@@ -59,6 +59,8 @@ public class MyMethodVisitor extends MethodVisitor {
       }
     } else if (sort == TypeReference.METHOD_TYPE_PARAMETER_BOUND) {
       logger.log(Level.DEBUG, "METHOD_TYPE_PARAMETER_BOUND not supported yet");
+    } else if (sort == TypeReference.METHOD_TYPE_PARAMETER) {
+      logger.log(Level.DEBUG, "METHOD_TYPE_PARAMETER not supported yet");
     } else {
       throw new UnsupportedOperationException("Unsupported sort: " + sort);
     }

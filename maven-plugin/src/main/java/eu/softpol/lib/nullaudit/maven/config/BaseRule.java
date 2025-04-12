@@ -16,7 +16,7 @@ public abstract class BaseRule {
    * A file listing classes (or patterns) to ignore for this rule.
    */
   @Parameter
-  private @Nullable String ignoredClassesFile;
+  private @Nullable String exclusionsFile;
 
   public boolean isActive() {
     return active;
@@ -26,11 +26,11 @@ public abstract class BaseRule {
     this.active = active;
   }
 
-  public @Nullable String getIgnoredClassesFile() {
-    return ignoredClassesFile;
+  public @Nullable String getExclusionsFile() {
+    return exclusionsFile;
   }
 
-  public void setIgnoredClassesFile(String ignoredClassesFile) {
-    this.ignoredClassesFile = ignoredClassesFile;
+  public void setExclusionsFile(String exclusionsFile) {
+    this.exclusionsFile = exclusionsFile;
   }
 }

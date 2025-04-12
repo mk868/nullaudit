@@ -3,7 +3,7 @@ package eu.softpol.lib.nullaudit.core;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.Clazz;
 import java.util.Set;
 
-public record IgnoredClasses(
+public record Exclusions(
     Set<String> classes
 ) {
 

@@ -7,19 +7,19 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-public class IgnoredClassesFileParser {
+public class ExclusionsFileParser {
 
-  private IgnoredClassesFileParser() {
+  private ExclusionsFileParser() {
   }
 
   /**
    * Reads patterns from the given file path, ignoring blank lines and comments (#).
    *
-   * @param filePath Path to the file listing ignored classes (or patterns).
-   * @return ignored classes object
+   * @param filePath Path to the file listing excluded classes (or patterns).
+   * @return exclusions object
    * @throws IOException in case of IO problems.
    */
-  public static IgnoredClasses parseIgnoredClassesFile(Path filePath) throws IOException {
+  public static Exclusions parse(Path filePath) throws IOException {
     Set<String> patterns = new HashSet<>();
 
     for (String line : Files.readAllLines(filePath, StandardCharsets.UTF_8)) {
@@ -31,7 +31,7 @@ public class IgnoredClassesFileParser {
       patterns.add(trimmed);
     }
 
-    return new IgnoredClasses(Set.copyOf(patterns));
+    return new Exclusions(Set.copyOf(patterns));
   }
 
 

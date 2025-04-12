@@ -71,24 +71,24 @@ public class NullAuditAnalyzer {
           new IrrelevantMarkedCheck(messageSolver),
           new IrrelevantPrimitiveCheck(messageSolver)
       );
-      if (c.ignoredClasses() != null) {
+      if (c.exclusions() != null) {
         checks = checks.stream()
-            .map(x -> (Check) new IgnoreClassDecorator(x, c.ignoredClasses()))
+            .map(x -> (Check) new IgnoreClassDecorator(x, c.exclusions()))
             .toList();
       }
       result.addAll(checks);
     });
     Optional.ofNullable(config.requireNullMarked()).ifPresent(c -> {
       Check check = new ExplicitNullMarkedScopeCheck(messageSolver);
-      if (c.ignoredClasses() != null) {
-        check = new IgnoreClassDecorator(check, c.ignoredClasses());
+      if (c.exclusions() != null) {
+        check = new IgnoreClassDecorator(check, c.exclusions());
       }
       result.add(check);
     });
     Optional.ofNullable(config.requireSpecifiedNullness()).ifPresent(c -> {
       Check check = new UnspecifiedNullnessCheck(messageSolver);
-      if (c.ignoredClasses() != null) {
-        check = new IgnoreClassDecorator(check, c.ignoredClasses());
+      if (c.exclusions() != null) {
+        check = new IgnoreClassDecorator(check, c.exclusions());
       }
       result.add(check);
     });

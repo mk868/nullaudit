@@ -2,16 +2,16 @@ package eu.softpol.lib.nullaudit.maven;
 
 import static java.util.function.Predicate.not;
 
-import eu.softpol.lib.nullaudit.core.IgnoredClasses;
-import eu.softpol.lib.nullaudit.core.IgnoredClassesFileParser;
+import eu.softpol.lib.nullaudit.core.Exclusions;
+import eu.softpol.lib.nullaudit.core.ExclusionsFileParser;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig;
-import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireNullMarked;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireSpecifiedNullness;
+import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
 import eu.softpol.lib.nullaudit.maven.config.BaseRule;
-import eu.softpol.lib.nullaudit.maven.config.VerifyJSpecifyAnnotationsRule;
 import eu.softpol.lib.nullaudit.maven.config.RequireSpecifiedNullnessRule;
 import eu.softpol.lib.nullaudit.maven.config.RulesConfig;
+import eu.softpol.lib.nullaudit.maven.config.VerifyJSpecifyAnnotationsRule;
 import eu.softpol.lib.nullaudit.maven.i18n.MessageSolver;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -85,7 +85,7 @@ public abstract class BaseMojo extends AbstractMojo {
         Optional.ofNullable(rules.getVerifyJSpecifyAnnotations())
             .filter(BaseRule::isActive)
             .map(r -> new VerifyJSpecifyAnnotations(
-                Optional.ofNullable(r.getIgnoredClassesFile())
+                Optional.ofNullable(r.getExclusionsFile())
                     .map(BaseMojo::toIgnoredClasses)
                     .orElse(null)
             ))
@@ -93,7 +93,7 @@ public abstract class BaseMojo extends AbstractMojo {
         Optional.ofNullable(rules.getRequireNullMarked())
             .filter(BaseRule::isActive)
             .map(r -> new RequireNullMarked(
-                Optional.ofNullable(r.getIgnoredClassesFile())
+                Optional.ofNullable(r.getExclusionsFile())
                     .map(BaseMojo::toIgnoredClasses)
                     .orElse(null)
             ))
@@ -101,7 +101,7 @@ public abstract class BaseMojo extends AbstractMojo {
         Optional.ofNullable(rules.getRequireSpecifiedNullness())
             .filter(BaseRule::isActive)
             .map(r -> new RequireSpecifiedNullness(
-                Optional.ofNullable(r.getIgnoredClassesFile())
+                Optional.ofNullable(r.getExclusionsFile())
                     .map(BaseMojo::toIgnoredClasses)
                     .orElse(null)
             ))
@@ -109,12 +109,12 @@ public abstract class BaseMojo extends AbstractMojo {
     );
   }
 
-  private static @Nullable IgnoredClasses toIgnoredClasses(@Nullable String ignoredClassesFile) {
-    if (ignoredClassesFile == null || ignoredClassesFile.isBlank()) {
+  private static @Nullable Exclusions toIgnoredClasses(@Nullable String exclusionsFile) {
+    if (exclusionsFile == null || exclusionsFile.isBlank()) {
       return null;
     }
     try {
-      return IgnoredClassesFileParser.parseIgnoredClassesFile(Path.of(ignoredClassesFile));
+      return ExclusionsFileParser.parse(Path.of(exclusionsFile));
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

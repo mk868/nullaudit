@@ -11,19 +11,19 @@ public record NullAuditConfig(
 ) {
 
   public record VerifyJSpecifyAnnotations(
-      @Nullable IgnoredClasses ignoredClasses
+      @Nullable Exclusions exclusions
   ) {
 
   }
 
   public record RequireNullMarked(
-      @Nullable IgnoredClasses ignoredClasses
+      @Nullable Exclusions exclusions
   ) {
 
   }
 
   public record RequireSpecifiedNullness(
-      @Nullable IgnoredClasses ignoredClasses
+      @Nullable Exclusions exclusions
   ) {
 
   }

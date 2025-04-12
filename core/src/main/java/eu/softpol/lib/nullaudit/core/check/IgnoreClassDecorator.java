@@ -1,6 +1,6 @@
 package eu.softpol.lib.nullaudit.core.check;
 
-import eu.softpol.lib.nullaudit.core.IgnoredClasses;
+import eu.softpol.lib.nullaudit.core.Exclusions;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedPackage;
 import eu.softpol.lib.nullaudit.core.report.Kind;
@@ -9,11 +9,11 @@ import java.util.function.BiConsumer;
 public class IgnoreClassDecorator implements Check {
 
   private final Check delegate;
-  private final IgnoredClasses ignoredClasses;
+  private final Exclusions exclusions;
 
-  public IgnoreClassDecorator(Check delegate, IgnoredClasses ignoredClasses) {
+  public IgnoreClassDecorator(Check delegate, Exclusions exclusions) {
     this.delegate = delegate;
-    this.ignoredClasses = ignoredClasses;
+    this.exclusions = exclusions;
   }
 
 
@@ -29,7 +29,7 @@ public class IgnoreClassDecorator implements Check {
 
   @Override
   public void checkClass(VisitedClass visitedClass, AddIssue addIssue) {
-    if (ignoredClasses.isIgnored(visitedClass.thisClazz())) {
+    if (exclusions.isIgnored(visitedClass.thisClazz())) {
       return;
     }
     delegate.checkClass(visitedClass, addIssue);

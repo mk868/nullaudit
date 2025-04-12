@@ -79,57 +79,57 @@ class MessageSolverTest {
   }
 
   @Test
-  void issueIrrelevantAnnotationNullUnMarkedPackageTest() {
+  void invalidNullMarkCombinationPackageTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.issueIrrelevantAnnotationNullUnMarkedPackage();
+    var msg = messageSolver.invalidNullMarkCombinationPackage();
     // THEN
     assertThat(msg).contains("package");
   }
 
   @Test
-  void issueIrrelevantAnnotationNullUnMarkedClassTest() {
+  void invalidNullMarkCombinationClassTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.issueIrrelevantAnnotationNullUnMarkedClass();
+    var msg = messageSolver.invalidNullMarkCombinationClass();
     // THEN
     assertThat(msg).contains("class");
   }
 
   @Test
-  void issueIrrelevantAnnotationNullUnMarkedMethodTest() {
+  void invalidNullMarkCombinationMethodTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.issueIrrelevantAnnotationNullUnMarkedMethod();
+    var msg = messageSolver.invalidNullMarkCombinationMethod();
     // THEN
     assertThat(msg).contains("method");
   }
 
   @Test
-  void issueIrrelevantAnnotationOnPrimitiveComponentTest() {
+  void invalidNullnessOnPrimitiveComponentTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.issueIrrelevantAnnotationOnPrimitiveComponent();
+    var msg = messageSolver.invalidNullnessOnPrimitiveComponent();
     // THEN
     assertThat(msg).containsIgnoringCase("primitive");
   }
 
   @Test
-  void issueIrrelevantAnnotationOnPrimitiveFieldTest() {
+  void invalidNullnessOnPrimitiveFieldTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.issueIrrelevantAnnotationOnPrimitiveField();
+    var msg = messageSolver.invalidNullnessOnPrimitiveField();
     // THEN
     assertThat(msg).containsIgnoringCase("primitive");
   }
 
   @Test
-  void issueIrrelevantAnnotationOnPrimitiveMethodTest() {
+  void invalidNullnessOnPrimitiveMethodTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.issueIrrelevantAnnotationOnPrimitiveMethod();
+    var msg = messageSolver.invalidNullnessOnPrimitiveMethod();
     // THEN
     assertThat(msg).containsIgnoringCase("primitive");
   }
 
   @Test
-  void missingNullMarkedClassTest() {
+  void missingNullMarkedAnnotationClassTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.missingNullMarkedClass();
+    var msg = messageSolver.missingNullMarkedAnnotationClass();
     // THEN
     assertThat(msg).containsIgnoringCase("@NullMarked");
   }

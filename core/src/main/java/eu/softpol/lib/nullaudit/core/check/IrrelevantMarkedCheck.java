@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 
 public class IrrelevantMarkedCheck implements Check {
 
-  private static final List<NullScopeAnnotation> IRRELEVANT_ANNOTATIONS = List.of(
+  private static final List<NullScopeAnnotation> INVALID_ANNOTATION_COMBINATION = List.of(
       NullScopeAnnotation.NULL_MARKED,
       NullScopeAnnotation.NULL_UNMARKED
   );
@@ -27,29 +27,29 @@ public class IrrelevantMarkedCheck implements Check {
 
   @Override
   public void checkPackage(VisitedPackage visitedPackage, BiConsumer<Kind, String> addIssue) {
-    if (visitedPackage.annotations().containsAll(IRRELEVANT_ANNOTATIONS)) {
+    if (visitedPackage.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
       addIssue.accept(
-          Kind.IRRELEVANT_ANNOTATION,
-          messageSolver.issueIrrelevantAnnotationNullUnMarkedPackage()
+          Kind.INVALID_NULL_MARK_COMBINATION,
+          messageSolver.invalidNullMarkCombinationPackage()
       );
     }
   }
 
   @Override
   public void checkClass(VisitedClass visitedClass, AddIssue addIssue) {
-    if (visitedClass.annotations().containsAll(IRRELEVANT_ANNOTATIONS)) {
+    if (visitedClass.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
       addIssue.addIssueForClass(
-          Kind.IRRELEVANT_ANNOTATION,
-          messageSolver.issueIrrelevantAnnotationNullUnMarkedClass()
+          Kind.INVALID_NULL_MARK_COMBINATION,
+          messageSolver.invalidNullMarkCombinationClass()
       );
     }
 
     visitedClass.methods().forEach(visitedMethod -> {
-      if (visitedMethod.annotations().containsAll(IRRELEVANT_ANNOTATIONS)) {
+      if (visitedMethod.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
         addIssue.addIssueForMethod(
             visitedMethod.descriptiveMethodName(),
-            Kind.IRRELEVANT_ANNOTATION,
-            messageSolver.issueIrrelevantAnnotationNullUnMarkedMethod()
+            Kind.INVALID_NULL_MARK_COMBINATION,
+            messageSolver.invalidNullMarkCombinationMethod()
         );
       }
     });

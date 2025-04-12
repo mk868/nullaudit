@@ -50,7 +50,7 @@ public class ReportAssert extends AbstractAssert<ReportAssert, Report> {
   public ReportIssuesAssert issuesForField(String packageName, String className, String fieldName) {
     isNotNull();
     var filteredIssues = actual.issues().stream()
-        .filter(issue -> issue.location().equals(packageName + "." + className + "#" + fieldName))
+        .filter(issue -> issue.location().endsWith(packageName + "." + className + "#" + fieldName))
         .toList();
     return new ReportIssuesAssert(filteredIssues);
   }
@@ -59,7 +59,7 @@ public class ReportAssert extends AbstractAssert<ReportAssert, Report> {
       String methodDesc) {
     isNotNull();
     var filteredIssues = actual.issues().stream()
-        .filter(issue -> issue.location().equals(packageName + "." + className + "#" + methodDesc))
+        .filter(issue -> issue.location().endsWith(packageName + "." + className + "#" + methodDesc))
         .toList();
     return new ReportIssuesAssert(filteredIssues);
   }

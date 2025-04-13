@@ -24,5 +24,7 @@ jobs:
     - name: Build with Maven on JDK ${{ matrix.java-version }}
       run: |
         mvn -B -ntp -f pom.xml package
-        mvn -B -ntp -f examples/unspecified-nullness/pom.xml compiler:compile
-        mvn -B -ntp -f examples/misuse/pom.xml compiler:compile
+        for dir in examples/*/; do
+          echo "Building $dir"
+          mvn -B -ntp -f "$dir/pom.xml" compiler:compile
+        done

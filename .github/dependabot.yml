@@ -3,8 +3,7 @@ updates:
   - package-ecosystem: "maven"
     directories:
       - "/"
-      - "/examples/unspecified-nullness"
-      - "/examples/misuse"
+      - "/examples/*"
     schedule:
       interval: "daily"
     groups:

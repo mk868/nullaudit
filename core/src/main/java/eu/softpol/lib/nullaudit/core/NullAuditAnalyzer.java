@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core;
 
-import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireSpecifiedNullness;
+import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
 import eu.softpol.lib.nullaudit.core.analyzer.ClassFileAnalyzer;
 import eu.softpol.lib.nullaudit.core.check.Check;
 import eu.softpol.lib.nullaudit.core.check.ExplicitNullMarkedScopeCheck;
@@ -34,9 +34,9 @@ public class NullAuditAnalyzer {
   public NullAuditAnalyzer(Path input, List<String> excludedPackages) {
     this(input, new NullAuditConfig(
         excludedPackages,
-        new VerifyJSpecifyAnnotations(null),
+        new VerifyJSpecifyAnnotations(Exclusions.empty()),
         null,
-        new RequireSpecifiedNullness(null)
+        new RequireSpecifiedNullness(Exclusions.empty())
     ));
   }
 
@@ -71,7 +71,7 @@ public class NullAuditAnalyzer {
           new IrrelevantMarkedCheck(messageSolver),
           new IrrelevantPrimitiveCheck(messageSolver)
       );
-      if (c.exclusions() != null) {
+      if (!c.exclusions().isEmpty()) {
         checks = checks.stream()
             .map(x -> (Check) new IgnoreClassDecorator(x, c.exclusions()))
             .toList();
@@ -80,14 +80,14 @@ public class NullAuditAnalyzer {
     });
     Optional.ofNullable(config.requireNullMarked()).ifPresent(c -> {
       Check check = new ExplicitNullMarkedScopeCheck(messageSolver);
-      if (c.exclusions() != null) {
+      if (!c.exclusions().isEmpty()) {
         check = new IgnoreClassDecorator(check, c.exclusions());
       }
       result.add(check);
     });
     Optional.ofNullable(config.requireSpecifiedNullness()).ifPresent(c -> {
       Check check = new UnspecifiedNullnessCheck(messageSolver);
-      if (c.exclusions() != null) {
+      if (!c.exclusions().isEmpty()) {
         check = new IgnoreClassDecorator(check, c.exclusions());
       }
       result.add(check);

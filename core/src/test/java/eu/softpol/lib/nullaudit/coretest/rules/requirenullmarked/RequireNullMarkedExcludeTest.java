@@ -48,11 +48,11 @@ class RequireNullMarkedExcludeTest {
   @Test
   void shouldNotReportExcludedClasses() {
     var config = NullAuditConfig.of()
-        .withRequireNullMarked(new RequireNullMarked(new Exclusions(Set.of(
+        .withRequireNullMarked(new RequireNullMarked(Exclusions.of(
             "demo.Prefix1",
             "demo.Prefix2",
             "demo.foo.Prefix4"
-        ))));
+        )));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report).issues().hasSize(2);
@@ -61,9 +61,9 @@ class RequireNullMarkedExcludeTest {
   @Test
   void shouldNotReportExcludedWildcardClasses() {
     var config = NullAuditConfig.of()
-        .withRequireNullMarked(new RequireNullMarked(new Exclusions(Set.of(
+        .withRequireNullMarked(new RequireNullMarked(Exclusions.of(
             "demo.foo.*"
-        ))));
+        )));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report.issues()).hasSize(3);
@@ -72,9 +72,9 @@ class RequireNullMarkedExcludeTest {
   @Test
   void shouldNotReportExcludedWildcardClassesAndSubpackages() {
     var config = NullAuditConfig.of()
-        .withRequireNullMarked(new RequireNullMarked(new Exclusions(Set.of(
+        .withRequireNullMarked(new RequireNullMarked(Exclusions.of(
             "demo.*"
-        ))));
+        )));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report.issues()).isEmpty();

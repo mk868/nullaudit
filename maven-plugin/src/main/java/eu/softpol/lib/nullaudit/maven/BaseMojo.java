@@ -49,7 +49,7 @@ public abstract class BaseMojo extends AbstractMojo {
    * settings that define different validation behaviors during the analysis process.
    */
   @Parameter
-  private RulesConfig rules;
+  private @Nullable RulesConfig rules;
 
   protected Path getInput() {
     return input;
@@ -87,7 +87,7 @@ public abstract class BaseMojo extends AbstractMojo {
             .map(r -> new VerifyJSpecifyAnnotations(
                 Optional.ofNullable(r.getExclusionsFile())
                     .map(BaseMojo::toIgnoredClasses)
-                    .orElse(null)
+                    .orElse(Exclusions.empty())
             ))
             .orElse(null),
         Optional.ofNullable(rules.getRequireNullMarked())
@@ -95,7 +95,7 @@ public abstract class BaseMojo extends AbstractMojo {
             .map(r -> new RequireNullMarked(
                 Optional.ofNullable(r.getExclusionsFile())
                     .map(BaseMojo::toIgnoredClasses)
-                    .orElse(null)
+                    .orElse(Exclusions.empty())
             ))
             .orElse(null),
         Optional.ofNullable(rules.getRequireSpecifiedNullness())
@@ -103,7 +103,7 @@ public abstract class BaseMojo extends AbstractMojo {
             .map(r -> new RequireSpecifiedNullness(
                 Optional.ofNullable(r.getExclusionsFile())
                     .map(BaseMojo::toIgnoredClasses)
-                    .orElse(null)
+                    .orElse(Exclusions.empty())
             ))
             .orElse(null)
     );

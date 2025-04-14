@@ -49,11 +49,11 @@ class VerifyJSpecifyAnnotationsExcludeTest {
   @Test
   void shouldNotReportExcludedClasses() {
     var config = NullAuditConfig.of()
-        .withVerifyJSpecifyAnnotations(new VerifyJSpecifyAnnotations(new Exclusions(Set.of(
+        .withVerifyJSpecifyAnnotations(new VerifyJSpecifyAnnotations(Exclusions.of(
             "demo.Prefix1",
             "demo.Prefix2",
             "demo.foo.Prefix4"
-        ))));
+        )));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     CustomAssertions.assertThat(report).issues().hasSize(2);
@@ -62,9 +62,9 @@ class VerifyJSpecifyAnnotationsExcludeTest {
   @Test
   void shouldNotReportExcludedWildcardClasses() {
     var config = NullAuditConfig.of()
-        .withVerifyJSpecifyAnnotations(new VerifyJSpecifyAnnotations(new Exclusions(Set.of(
+        .withVerifyJSpecifyAnnotations(new VerifyJSpecifyAnnotations(Exclusions.of(
             "demo.foo.*"
-        ))));
+        )));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report.issues()).hasSize(3);
@@ -73,9 +73,9 @@ class VerifyJSpecifyAnnotationsExcludeTest {
   @Test
   void shouldNotReportExcludedWildcardClassesAndSubpackages() {
     var config = NullAuditConfig.of()
-        .withVerifyJSpecifyAnnotations(new VerifyJSpecifyAnnotations(new Exclusions(Set.of(
+        .withVerifyJSpecifyAnnotations(new VerifyJSpecifyAnnotations(Exclusions.of(
             "demo.*"
-        ))));
+        )));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report.issues()).isEmpty();

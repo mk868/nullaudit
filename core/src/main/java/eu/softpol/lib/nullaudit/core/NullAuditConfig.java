@@ -10,21 +10,25 @@ public record NullAuditConfig(
     @Nullable RequireSpecifiedNullness requireSpecifiedNullness
 ) {
 
+  public sealed interface Rule {
+
+  }
+
   public record VerifyJSpecifyAnnotations(
-      @Nullable Exclusions exclusions
-  ) {
+      Exclusions exclusions
+  ) implements Rule {
 
   }
 
   public record RequireNullMarked(
-      @Nullable Exclusions exclusions
-  ) {
+      Exclusions exclusions
+  ) implements Rule {
 
   }
 
   public record RequireSpecifiedNullness(
-      @Nullable Exclusions exclusions
-  ) {
+      Exclusions exclusions
+  ) implements Rule {
 
   }
 

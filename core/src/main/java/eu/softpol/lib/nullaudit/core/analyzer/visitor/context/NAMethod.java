@@ -6,7 +6,7 @@ import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
-public interface VisitedMethod {
+public interface NAMethod {
 
   default boolean isConstructor() {
     return methodName().equals("<init>");

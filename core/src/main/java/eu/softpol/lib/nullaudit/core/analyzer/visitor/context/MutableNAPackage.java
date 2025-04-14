@@ -4,12 +4,12 @@ import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class MutableVisitedPackage implements VisitedPackage {
+public final class MutableNAPackage implements NAPackage {
 
   private final String packageName;
   private final Set<NullScopeAnnotation> annotations = new HashSet<>();
 
-  public MutableVisitedPackage(
+  public MutableNAPackage(
       String packageName
   ) {
     this.packageName = packageName;

@@ -9,18 +9,18 @@ import java.util.List;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
-public final class MutableVisitedClass implements VisitedClass {
+public final class MutableNAClass implements NAClass {
 
   private final Clazz thisClazz;
   private final Clazz superClazz;
-  private final List<VisitedComponent> components = new ArrayList<>();
-  private final List<VisitedField> fields = new ArrayList<>();
-  private final List<MutableVisitedMethod> methods = new ArrayList<>();
+  private final List<NAComponent> components = new ArrayList<>();
+  private final List<NAField> fields = new ArrayList<>();
+  private final List<MutableNAMethod> methods = new ArrayList<>();
   private final Set<NullScopeAnnotation> annotations = new HashSet<>();
   private @Nullable Clazz outerClass;
   private NullScope effectiveNullScope = NullScope.NOT_DEFINED;
 
-  public MutableVisitedClass(Clazz thisClazz, Clazz superClazz) {
+  public MutableNAClass(Clazz thisClazz, Clazz superClazz) {
     this.thisClazz = thisClazz;
     this.superClazz = superClazz;
   }
@@ -54,29 +54,29 @@ public final class MutableVisitedClass implements VisitedClass {
   }
 
   @Override
-  public List<VisitedComponent> components() {
+  public List<NAComponent> components() {
     return List.copyOf(components);
   }
 
-  public void addComponent(VisitedComponent component) {
+  public void addComponent(NAComponent component) {
     components.add(component);
   }
 
   @Override
-  public List<VisitedField> fields() {
+  public List<NAField> fields() {
     return List.copyOf(fields);
   }
 
-  public void addField(VisitedField field) {
+  public void addField(NAField field) {
     fields.add(field);
   }
 
   @Override
-  public List<VisitedMethod> methods() {
+  public List<NAMethod> methods() {
     return List.copyOf(methods);
   }
 
-  public void addMethod(MutableVisitedMethod method) {
+  public void addMethod(MutableNAMethod method) {
     methods.add(method);
   }
 

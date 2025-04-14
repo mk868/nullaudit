@@ -7,10 +7,10 @@ import static java.util.function.Predicate.not;
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableVisitedClass;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableVisitedMethod;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedComponent;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedField;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAClass;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAMethod;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAComponent;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAField;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.check.Check.AddIssue;
 import eu.softpol.lib.nullaudit.core.report.Issue;
@@ -41,7 +41,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private final ReportBuilder reportBuilder;
   private final List<Clazz> outerClasses = new ArrayList<>();
   private String sourceFileName;
-  private MutableVisitedClass visitedClass;
+  private MutableNAClass naClass;
 
   public MyClassVisitor(AnalysisContext context, ReportBuilder reportBuilder) {
     super(Opcodes.ASM9);
@@ -52,7 +52,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   @Override
   public void visit(int version, int access, String name, String signature, String superName,
       String[] interfaces) {
-    visitedClass = new MutableVisitedClass(
+    naClass = new MutableNAClass(
         Clazz.of(name),
         Clazz.of(superName)
     );
@@ -62,18 +62,18 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   @Override
   public void visitInnerClass(String name, @Nullable String outerName, @Nullable String innerName,
       int access) {
-    if (outerName != null && visitedClass.thisClazz().internalName().startsWith(name)) {
+    if (outerName != null && naClass.thisClazz().internalName().startsWith(name)) {
       outerClasses.add(Clazz.of(outerName));
     }
-    if (name.equals(visitedClass.thisClazz().internalName()) && outerName != null) {
-      visitedClass.setOuterClass(Clazz.of(outerName));
+    if (name.equals(naClass.thisClazz().internalName()) && outerName != null) {
+      naClass.setOuterClass(Clazz.of(outerName));
     }
     super.visitInnerClass(name, outerName, innerName, access);
   }
 
   @Override
   public void visitOuterClass(String owner, String name, String descriptor) {
-    visitedClass.setOuterClass(Clazz.of(owner));
+    naClass.setOuterClass(Clazz.of(owner));
     super.visitOuterClass(owner, name, descriptor);
   }
 
@@ -93,7 +93,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           default -> null;
         });
     if (annotationOpt.isPresent()) {
-      visitedClass.addAnnotation(annotationOpt.get());
+      naClass.addAnnotation(annotationOpt.get());
     }
     return super.visitAnnotation(descriptor, visible);
   }
@@ -103,10 +103,10 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       @Nullable String signature) {
 
     var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
-    var visitedComponent = new VisitedComponent(name, descriptor, signature, fs);
-    visitedClass.addComponent(visitedComponent);
+    var naComponent = new NAComponent(name, descriptor, signature, fs);
+    naClass.addComponent(naComponent);
 
-    return new MyRecordComponentVisitor(visitedComponent);
+    return new MyRecordComponentVisitor(naComponent);
   }
 
   @Override
@@ -117,10 +117,10 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     }
 
     var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
-    var visitedField = new VisitedField(name, descriptor, signature, fs);
-    visitedClass.addField(visitedField);
+    var naField = new NAField(name, descriptor, signature, fs);
+    naClass.addField(naField);
 
-    return new MyFieldVisitor(visitedField);
+    return new MyFieldVisitor(naField);
   }
 
   @Override
@@ -155,7 +155,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     String descriptiveMethodName;
     if (methodName.equals("<init>")) {
-      descriptiveMethodName = visitedClass.thisClazz().simpleName();
+      descriptiveMethodName = naClass.thisClazz().simpleName();
     } else {
       descriptiveMethodName = methodName;
     }
@@ -163,32 +163,32 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
         .map(Type::getClassName)
         .collect(Collectors.joining(", ", "(", ")"));
 
-    var methodInfo = new MutableVisitedMethod(methodName, descriptiveMethodName, methodDescriptor,
+    var methodInfo = new MutableNAMethod(methodName, descriptiveMethodName, methodDescriptor,
         methodSignature, ms);
-    visitedClass.addMethod(methodInfo);
+    naClass.addMethod(methodInfo);
 
     return new MyMethodVisitor(methodInfo);
   }
 
   @Override
   public void visitEnd() {
-    context.setClassNullScope(visitedClass.thisClazz().name(),
-        NullScope.from(visitedClass.annotations()));
+    context.setClassNullScope(naClass.thisClazz().name(),
+        NullScope.from(naClass.annotations()));
     var nullScopes = getNullScopesForClass();
 
     reportBuilder.incSummaryTotalClasses();
     boolean unspecifiedNullnessFound = false;
 
-    visitedClass.setEffectiveNullScope(getEffectiveNullMarkedScope(nullScopes));
+    naClass.setEffectiveNullScope(getEffectiveNullMarkedScope(nullScopes));
 
-    visitedClass.methods().stream()
-        .map(MutableVisitedMethod.class::cast)
+    naClass.methods().stream()
+        .map(MutableNAMethod.class::cast)
         .forEach(vm -> vm.setEffectiveNullScope(getEffectiveNullMarkedScope(
-            List.of(visitedClass.effectiveNullScope(), NullScope.from(vm.annotations())))));
+            List.of(naClass.effectiveNullScope(), NullScope.from(vm.annotations())))));
 
     var issuesForClass = new HashMap<String, List<Kind>>();
     context.getChecks()
-        .forEach(c -> c.checkClass(visitedClass, new AddIssue() {
+        .forEach(c -> c.checkClass(naClass, new AddIssue() {
           @Override
           public void addIssueForClass(Kind kind, String message) {
             MyClassVisitor.this.appendIssue(kind, message);
@@ -209,7 +209,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           }
         }));
 
-    for (var componentInfo : visitedClass.components()) {
+    for (var componentInfo : naClass.components()) {
       reportBuilder.incSummaryTotalFields();
 
       if (issuesForClass.getOrDefault(componentInfo.componentName(), List.of())
@@ -219,8 +219,8 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       }
     }
 
-    for (var fieldInfo : visitedClass.fields()) {
-      if (visitedClass.isRecord()) {
+    for (var fieldInfo : naClass.fields()) {
+      if (naClass.isRecord()) {
         // generated by compiler - ignore
         continue;
       }
@@ -233,7 +233,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       }
     }
 
-    for (var methodInfo : visitedClass.methods()) {
+    for (var methodInfo : naClass.methods()) {
       reportBuilder.incSummaryTotalMethods();
       if (issuesForClass.getOrDefault(methodInfo.descriptiveMethodName(), List.of())
           .contains(Kind.UNSPECIFIED_NULLNESS)) {
@@ -254,7 +254,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     if (context.getModuleName() != null) {
       location = context.getModuleName() + "/";
     }
-    location += visitedClass.thisClazz().name();
+    location += naClass.thisClazz().name();
     if (name != null) {
       location += "#" + name;
     }
@@ -275,11 +275,11 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     if (context.isModuleInfoNullMarked()) {
       nullScopes.add(NullScope.NULL_MARKED);
     }
-    nullScopes.add(context.getPackageNullScope(visitedClass.thisClazz().packageName()));
+    nullScopes.add(context.getPackageNullScope(naClass.thisClazz().packageName()));
     for (var outerClass : outerClasses) {
       nullScopes.add(context.getClassNullScope(outerClass.name()));
     }
-    nullScopes.add(context.getClassNullScope(visitedClass.thisClazz().name()));
+    nullScopes.add(context.getClassNullScope(naClass.thisClazz().name()));
     return List.copyOf(nullScopes);
   }
 

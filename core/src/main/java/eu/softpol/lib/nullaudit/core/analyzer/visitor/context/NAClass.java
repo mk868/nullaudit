@@ -8,9 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
-public interface VisitedClass {
+public interface NAClass {
 
-  default Optional<VisitedComponent> getComponent(String componentName) {
+  default Optional<NAComponent> getComponent(String componentName) {
     return components().stream()
         .filter(c -> c.componentName().equals(componentName))
         .findFirst();
@@ -28,11 +28,11 @@ public interface VisitedClass {
 
   NullScope effectiveNullScope();
 
-  List<VisitedComponent> components();
+  List<NAComponent> components();
 
-  List<VisitedField> fields();
+  List<NAField> fields();
 
-  List<VisitedMethod> methods();
+  List<NAMethod> methods();
 
   Set<NullScopeAnnotation> annotations();
 }

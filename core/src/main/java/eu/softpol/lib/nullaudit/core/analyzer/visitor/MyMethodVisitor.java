@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableVisitedMethod;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAMethod;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.type.QueryNode;
 import java.lang.System.Logger.Level;
@@ -20,11 +20,11 @@ public class MyMethodVisitor extends MethodVisitor {
 
   private static final System.Logger logger = System.getLogger(MyMethodVisitor.class.getName());
 
-  private final MutableVisitedMethod visitedMethod;
+  private final MutableNAMethod naMethod;
 
-  protected MyMethodVisitor(MutableVisitedMethod visitedMethod) {
+  protected MyMethodVisitor(MutableNAMethod naMethod) {
     super(Opcodes.ASM9);
-    this.visitedMethod = visitedMethod;
+    this.naMethod = naMethod;
   }
 
   @Override
@@ -45,7 +45,7 @@ public class MyMethodVisitor extends MethodVisitor {
       } else if (typePathStr.contains(".")) {
         // TODO how to handle this case...
       } else {
-        QueryNode.find(visitedMethod.ms().returnType(), typePath).addAnnotation(annotation);
+        QueryNode.find(naMethod.ms().returnType(), typePath).addAnnotation(annotation);
       }
     } else if (sort == TypeReference.METHOD_FORMAL_PARAMETER) {
       var index = typeReference.getFormalParameterIndex();
@@ -54,7 +54,7 @@ public class MyMethodVisitor extends MethodVisitor {
       } else if (typePathStr.contains(".")) {
         // TODO how to handle this case...
       } else {
-        QueryNode.find(visitedMethod.ms().parameterTypes().get(index), typePath)
+        QueryNode.find(naMethod.ms().parameterTypes().get(index), typePath)
             .addAnnotation(annotation);
       }
     } else if (sort == TypeReference.METHOD_TYPE_PARAMETER_BOUND) {
@@ -71,10 +71,10 @@ public class MyMethodVisitor extends MethodVisitor {
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
     var annotation = KnownAnnotations.fromDescriptor(descriptor).orElse(null);
     if (annotation == KnownAnnotations.NULL_MARKED) {
-      visitedMethod.addAnnotation(NullScopeAnnotation.NULL_MARKED);
+      naMethod.addAnnotation(NullScopeAnnotation.NULL_MARKED);
     }
     if (annotation == KnownAnnotations.NULL_UNMARKED) {
-      visitedMethod.addAnnotation(NullScopeAnnotation.NULL_UNMARKED);
+      naMethod.addAnnotation(NullScopeAnnotation.NULL_UNMARKED);
     }
     return super.visitAnnotation(descriptor, visible);
   }

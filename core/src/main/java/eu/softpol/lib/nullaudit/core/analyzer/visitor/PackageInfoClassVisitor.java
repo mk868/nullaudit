@@ -5,7 +5,7 @@ import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getPackag
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableVisitedPackage;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAPackage;
 import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
@@ -17,7 +17,7 @@ public class PackageInfoClassVisitor extends ClassVisitor {
 
   private final AnalysisContext context;
   private final ReportBuilder reportBuilder;
-  private MutableVisitedPackage visitedPackage;
+  private MutableNAPackage naPackage;
 
   public PackageInfoClassVisitor(AnalysisContext context, ReportBuilder reportBuilder) {
     super(Opcodes.ASM9);
@@ -28,7 +28,7 @@ public class PackageInfoClassVisitor extends ClassVisitor {
   @Override
   public void visit(int version, int access, String name, String signature, String superName,
       String[] interfaces) {
-    visitedPackage = new MutableVisitedPackage(
+    naPackage = new MutableNAPackage(
         getPackageName(name)
     );
     super.visit(version, access, name, signature, superName, interfaces);
@@ -38,19 +38,19 @@ public class PackageInfoClassVisitor extends ClassVisitor {
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
     var annotation = KnownAnnotations.fromDescriptor(descriptor).orElse(null);
     if (annotation == KnownAnnotations.NULL_MARKED) {
-      visitedPackage.addAnnotation(NullScopeAnnotation.NULL_MARKED);
+      naPackage.addAnnotation(NullScopeAnnotation.NULL_MARKED);
     }
     if (annotation == KnownAnnotations.NULL_UNMARKED) {
-      visitedPackage.addAnnotation(NullScopeAnnotation.NULL_UNMARKED);
+      naPackage.addAnnotation(NullScopeAnnotation.NULL_UNMARKED);
     }
     return super.visitAnnotation(descriptor, visible);
   }
 
   @Override
   public void visitEnd() {
-    var nullScope = NullScope.from(visitedPackage.annotations());
-    context.setPackageNullScope(visitedPackage.packageName(), nullScope);
-    context.getChecks().forEach(c -> c.checkPackage(visitedPackage, this::appendIssue));
+    var nullScope = NullScope.from(naPackage.annotations());
+    context.setPackageNullScope(naPackage.packageName(), nullScope);
+    context.getChecks().forEach(c -> c.checkPackage(naPackage, this::appendIssue));
     super.visitEnd();
   }
 
@@ -59,7 +59,7 @@ public class PackageInfoClassVisitor extends ClassVisitor {
     if (context.getModuleName() != null) {
       location = context.getModuleName() + "/";
     }
-    location += visitedPackage.packageName() + ".package-info";
+    location += naPackage.packageName() + ".package-info";
 
     reportBuilder.addIssue(new Issue(
         location,

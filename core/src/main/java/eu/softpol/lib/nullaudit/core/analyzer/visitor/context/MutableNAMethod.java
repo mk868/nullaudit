@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
-public final class MutableVisitedMethod implements VisitedMethod {
+public final class MutableNAMethod implements NAMethod {
 
   private final String methodName;
   private final String descriptiveMethodName;
@@ -17,7 +17,7 @@ public final class MutableVisitedMethod implements VisitedMethod {
   private final Set<NullScopeAnnotation> annotations = new HashSet<>();
   private NullScope effectiveNullScope = NullScope.NOT_DEFINED;
 
-  public MutableVisitedMethod(String methodName, String descriptiveMethodName,
+  public MutableNAMethod(String methodName, String descriptiveMethodName,
       String methodDescriptor, @Nullable String methodSignature,
       MethodSignature ms) {
     this.methodName = methodName;

@@ -1,8 +1,8 @@
 package eu.softpol.lib.nullaudit.core.check;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedClass;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedPackage;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import java.util.List;
@@ -26,8 +26,8 @@ public class IrrelevantMarkedCheck implements Check {
   }
 
   @Override
-  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<Kind, String> addIssue) {
-    if (visitedPackage.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
+  public void checkPackage(NAPackage naPackage, BiConsumer<Kind, String> addIssue) {
+    if (naPackage.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
       addIssue.accept(
           Kind.INVALID_NULL_MARK_COMBINATION,
           messageSolver.invalidNullMarkCombinationPackage()
@@ -36,18 +36,18 @@ public class IrrelevantMarkedCheck implements Check {
   }
 
   @Override
-  public void checkClass(VisitedClass visitedClass, AddIssue addIssue) {
-    if (visitedClass.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
+  public void checkClass(NAClass naClass, AddIssue addIssue) {
+    if (naClass.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
       addIssue.addIssueForClass(
           Kind.INVALID_NULL_MARK_COMBINATION,
           messageSolver.invalidNullMarkCombinationClass()
       );
     }
 
-    visitedClass.methods().forEach(visitedMethod -> {
-      if (visitedMethod.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
+    naClass.methods().forEach(naMethod -> {
+      if (naMethod.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
         addIssue.addIssueForMethod(
-            visitedMethod.descriptiveMethodName(),
+            naMethod.descriptiveMethodName(),
             Kind.INVALID_NULL_MARK_COMBINATION,
             messageSolver.invalidNullMarkCombinationMethod()
         );

@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.check;
 
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedClass;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.VisitedPackage;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
@@ -23,13 +23,13 @@ public class IrrelevantPrimitiveCheck implements Check {
   }
 
   @Override
-  public void checkPackage(VisitedPackage visitedPackage, BiConsumer<Kind, String> addIssue) {
+  public void checkPackage(NAPackage naPackage, BiConsumer<Kind, String> addIssue) {
     // NOP
   }
 
   @Override
-  public void checkClass(VisitedClass visitedClass, AddIssue addIssue) {
-    for (var componentInfo : visitedClass.components()) {
+  public void checkClass(NAClass naClass, AddIssue addIssue) {
+    for (var componentInfo : naClass.components()) {
       if (isPrimitiveAnnotated(componentInfo.fs())) {
         addIssue.addIssueForField(componentInfo.componentName(),
             Kind.INVALID_NULLNESS_ON_PRIMITIVE,
@@ -38,8 +38,8 @@ public class IrrelevantPrimitiveCheck implements Check {
       }
     }
 
-    if (!visitedClass.isRecord()) {
-      for (var fieldInfo : visitedClass.fields()) {
+    if (!naClass.isRecord()) {
+      for (var fieldInfo : naClass.fields()) {
         if (isPrimitiveAnnotated(fieldInfo.fs())) {
           addIssue.addIssueForField(fieldInfo.fieldName(),
               Kind.INVALID_NULLNESS_ON_PRIMITIVE,
@@ -49,20 +49,20 @@ public class IrrelevantPrimitiveCheck implements Check {
       }
     }
 
-    visitedClass.methods().stream()
-        .filter(visitedMethod ->
+    naClass.methods().stream()
+        .filter(naMethod ->
             // not default component getter
-            !visitedClass.isRecord() || !visitedMethod.isConstructor())
-        .filter(visitedMethod ->
+            !naClass.isRecord() || !naMethod.isConstructor())
+        .filter(naMethod ->
             // not default constructor
-            !visitedClass.isRecord() || visitedClass.getComponent(visitedMethod.methodName())
+            !naClass.isRecord() || naClass.getComponent(naMethod.methodName())
                 .isEmpty())
-        .forEach(visitedMethod -> {
-          if (isPrimitiveAnnotated(visitedMethod.ms().returnType()) ||
-              visitedMethod.ms().parameterTypes().stream()
+        .forEach(naMethod -> {
+          if (isPrimitiveAnnotated(naMethod.ms().returnType()) ||
+              naMethod.ms().parameterTypes().stream()
                   .anyMatch(IrrelevantPrimitiveCheck::isPrimitiveAnnotated)) {
 
-            addIssue.addIssueForMethod(visitedMethod.descriptiveMethodName(),
+            addIssue.addIssueForMethod(naMethod.descriptiveMethodName(),
                 Kind.INVALID_NULLNESS_ON_PRIMITIVE,
                 messageSolver.invalidNullnessOnPrimitiveMethod()
             );

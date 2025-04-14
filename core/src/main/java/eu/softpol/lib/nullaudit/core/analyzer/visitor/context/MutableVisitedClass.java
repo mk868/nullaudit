@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 public final class MutableVisitedClass implements VisitedClass {
 
@@ -16,6 +17,7 @@ public final class MutableVisitedClass implements VisitedClass {
   private final List<VisitedField> fields = new ArrayList<>();
   private final List<MutableVisitedMethod> methods = new ArrayList<>();
   private final Set<NullScopeAnnotation> annotations = new HashSet<>();
+  private @Nullable Clazz outerClass;
   private NullScope effectiveNullScope = NullScope.NOT_DEFINED;
 
   public MutableVisitedClass(Clazz thisClazz, Clazz superClazz) {
@@ -31,6 +33,15 @@ public final class MutableVisitedClass implements VisitedClass {
   @Override
   public Clazz superClazz() {
     return superClazz;
+  }
+
+  @Override
+  public @Nullable Clazz outerClass() {
+    return outerClass;
+  }
+
+  public void setOuterClass(@Nullable Clazz outerClass) {
+    this.outerClass = outerClass;
   }
 
   @Override

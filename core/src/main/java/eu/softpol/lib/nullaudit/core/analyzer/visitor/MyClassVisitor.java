@@ -65,7 +65,16 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     if (outerName != null && visitedClass.thisClazz().internalName().startsWith(name)) {
       outerClasses.add(Clazz.of(outerName));
     }
+    if (name.equals(visitedClass.thisClazz().internalName()) && outerName != null) {
+      visitedClass.setOuterClass(Clazz.of(outerName));
+    }
     super.visitInnerClass(name, outerName, innerName, access);
+  }
+
+  @Override
+  public void visitOuterClass(String owner, String name, String descriptor) {
+    visitedClass.setOuterClass(Clazz.of(owner));
+    super.visitOuterClass(owner, name, descriptor);
   }
 
   @Override

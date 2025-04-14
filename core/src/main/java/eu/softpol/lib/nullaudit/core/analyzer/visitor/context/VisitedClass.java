@@ -6,6 +6,7 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.Clazz;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 public interface VisitedClass {
 
@@ -22,6 +23,8 @@ public interface VisitedClass {
   Clazz thisClazz();
 
   Clazz superClazz();
+
+  @Nullable Clazz outerClass();
 
   NullScope effectiveNullScope();
 

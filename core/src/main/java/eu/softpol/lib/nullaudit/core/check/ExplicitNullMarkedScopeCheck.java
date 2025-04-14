@@ -27,6 +27,9 @@ public class ExplicitNullMarkedScopeCheck implements Check {
 
   @Override
   public void checkClass(VisitedClass visitedClass, AddIssue addIssue) {
+    if (visitedClass.outerClass() != null) {
+      return;
+    }
     if (!visitedClass.annotations().contains(NullScopeAnnotation.NULL_MARKED)) {
       addIssue.addIssueForClass(
           Kind.MISSING_NULL_MARKED_ANNOTATION,

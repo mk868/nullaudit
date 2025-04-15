@@ -31,13 +31,13 @@ class RequireSpecifiedNullnessExcludeTest {
           .createFile("demo/Prefix1.java")
           .withContents(createClass("demo", "Prefix1"))
           .createFile("demo/Prefix2.java")
-          .withContents(createClass("demo", "Prefix2"))
+          .withContents(createClassWithInnerClass("demo", "Prefix2"))
           .createFile("demo/Prefix3.java")
           .withContents(createClass("demo", "Prefix3"))
           .createFile("demo/foo/Prefix4.java")
           .withContents(createClass("demo.foo", "Prefix4"))
           .createFile("demo/foo/Prefix5.java")
-          .withContents(createClass("demo.foo", "Prefix5"))
+          .withContents(createClassWithInnerClass("demo.foo", "Prefix5"))
       ;
       var compilation = compiler.compile(workspace);
 
@@ -49,33 +49,51 @@ class RequireSpecifiedNullnessExcludeTest {
   @Test
   void shouldNotReportExcludedClasses() {
     var config = NullAuditConfig.of()
-        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(Exclusions.of(
+        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(new Exclusions(Set.of(
             "demo.Prefix1",
             "demo.Prefix2",
             "demo.foo.Prefix4"
-        )));
+        ))));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
-    assertThat(report).issues().hasSize(2);
+    assertThat(report)
+        .hasOnlyIssuesForClasses(
+            "demo.Prefix3",
+            "demo.foo.Prefix5",
+            "demo.foo.Prefix5$1",
+            "demo.foo.Prefix5$Inner",
+            "demo.foo.Prefix5$Inner$1",
+            "demo.foo.Prefix5$StaticNested",
+            "demo.foo.Prefix5$StaticNested$1"
+        );
   }
 
   @Test
   void shouldNotReportExcludedWildcardClasses() {
     var config = NullAuditConfig.of()
-        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(Exclusions.of(
-            "demo.foo.*"
-        )));
+        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(new Exclusions(Set.of(
+            "demo.*"
+        ))));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
-    assertThat(report.issues()).hasSize(3);
+    assertThat(report)
+        .hasOnlyIssuesForClasses(
+            "demo.foo.Prefix4",
+            "demo.foo.Prefix5",
+            "demo.foo.Prefix5$1",
+            "demo.foo.Prefix5$Inner",
+            "demo.foo.Prefix5$Inner$1",
+            "demo.foo.Prefix5$StaticNested",
+            "demo.foo.Prefix5$StaticNested$1"
+        );
   }
 
   @Test
   void shouldNotReportExcludedWildcardClassesAndSubpackages() {
     var config = NullAuditConfig.of()
-        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(Exclusions.of(
-            "demo.*"
-        )));
+        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(new Exclusions(Set.of(
+            "demo.**"
+        ))));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report.issues()).isEmpty();
@@ -88,6 +106,51 @@ class RequireSpecifiedNullnessExcludeTest {
         public class %s {
           public String addPrefix(String str) {
             return "> " + str;
+          }
+        }
+        """.formatted(
+        packageName,
+        className
+    );
+  }
+
+  private static String createClassWithInnerClass(String packageName, String className) {
+    return """
+        package %s;
+        
+        public class %s {
+          Object o = new Object(){
+            public String addPrefix(String str) {
+              return "> " + str;
+            }
+          };
+        
+          public String addPrefix(String str) {
+            return "> " + str;
+          }
+        
+          public class Inner {
+            Object o = new Object(){
+              public String addPrefix(String str) {
+                return "> " + str;
+              }
+            };
+        
+            public String addPrefix(String str) {
+              return "> " + str;
+            }
+          }
+        
+          public static class StaticNested {
+            Object o = new Object(){
+              public String addPrefix(String str) {
+                return "> " + str;
+              }
+            };
+        
+            public String addPrefix(String str) {
+              return "> " + str;
+            }
           }
         }
         """.formatted(

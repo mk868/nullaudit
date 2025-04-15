@@ -24,7 +24,9 @@ public interface NAClass {
 
   Clazz superClazz();
 
-  @Nullable Clazz outerClass();
+  Clazz topClass();
+
+  public @Nullable Clazz outerClass();
 
   NullScope effectiveNullScope();
 

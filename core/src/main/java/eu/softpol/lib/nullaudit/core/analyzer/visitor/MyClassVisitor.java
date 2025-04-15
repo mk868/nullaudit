@@ -39,7 +39,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
   private final AnalysisContext context;
   private final ReportBuilder reportBuilder;
-  private final List<Clazz> outerClasses = new ArrayList<>();
+  private final List<Clazz> classChain = new ArrayList<>();
   private String sourceFileName;
   private MutableNAClass naClass;
 
@@ -60,21 +60,21 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   }
 
   @Override
+  public void visitOuterClass(String owner, String name, String descriptor) {
+    naClass.setOuterClass(Clazz.of(owner));
+    super.visitOuterClass(owner, name, descriptor);
+  }
+
+  @Override
   public void visitInnerClass(String name, @Nullable String outerName, @Nullable String innerName,
       int access) {
     if (outerName != null && naClass.thisClazz().internalName().startsWith(name)) {
-      outerClasses.add(Clazz.of(outerName));
+      classChain.add(Clazz.of(outerName));
     }
     if (name.equals(naClass.thisClazz().internalName()) && outerName != null) {
       naClass.setOuterClass(Clazz.of(outerName));
     }
     super.visitInnerClass(name, outerName, innerName, access);
-  }
-
-  @Override
-  public void visitOuterClass(String owner, String name, String descriptor) {
-    naClass.setOuterClass(Clazz.of(owner));
-    super.visitOuterClass(owner, name, descriptor);
   }
 
   @Override
@@ -140,9 +140,9 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     }
     var parameterTypes = ms.parameterTypes();
 
-    if (!outerClasses.isEmpty()) {
+    if (!classChain.isEmpty()) {
       // it's probably inner class
-      var outerClassName = outerClasses.get(outerClasses.size() - 1).name();
+      var outerClassName = classChain.get(classChain.size() - 1).name();
       // check if the first constructor's argument has outer class type
       if (methodName.equals("<init>") &&
           !parameterTypes.isEmpty() &&
@@ -172,6 +172,15 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
   @Override
   public void visitEnd() {
+    if (classChain.isEmpty()) {
+      if (naClass.outerClass() != null) {
+        naClass.setTopClazz(naClass.outerClass());
+      } else {
+        naClass.setTopClazz(naClass.thisClazz());
+      }
+    } else {
+      naClass.setTopClazz(classChain.get(0));
+    }
     context.setClassNullScope(naClass.thisClazz().name(),
         NullScope.from(naClass.annotations()));
     var nullScopes = getNullScopesForClass();
@@ -276,7 +285,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       nullScopes.add(NullScope.NULL_MARKED);
     }
     nullScopes.add(context.getPackageNullScope(naClass.thisClazz().packageName()));
-    for (var outerClass : outerClasses) {
+    for (var outerClass : classChain) {
       nullScopes.add(context.getClassNullScope(outerClass.name()));
     }
     nullScopes.add(context.getClassNullScope(naClass.thisClazz().name()));

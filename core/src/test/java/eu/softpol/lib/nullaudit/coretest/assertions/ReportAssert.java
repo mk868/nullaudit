@@ -1,6 +1,9 @@
 package eu.softpol.lib.nullaudit.coretest.assertions;
 
+import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.Report;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.assertj.core.api.AbstractAssert;
 
 public class ReportAssert extends AbstractAssert<ReportAssert, Report> {
@@ -62,5 +65,23 @@ public class ReportAssert extends AbstractAssert<ReportAssert, Report> {
         .filter(issue -> issue.location().endsWith(packageName + "." + className + "#" + methodDesc))
         .toList();
     return new ReportIssuesAssert(filteredIssues);
+  }
+
+  public ReportAssert hasOnlyIssuesForClasses(String... classes) {
+    isNotNull();
+    var actualClasses = actual.issues().stream()
+        .map(Issue::location)
+        .map(location -> location.contains("#") ? location.substring(0, location.indexOf("#"))
+            : location)
+        .collect(Collectors.toUnmodifiableSet());
+
+    var expectedClasses = Set.of(classes);
+    if (!actualClasses.containsAll(expectedClasses)
+        || actualClasses.size() != expectedClasses.size()) {
+      failWithMessage("Expected issues only for classes <%s> but found <%s>", expectedClasses,
+          actualClasses);
+    }
+
+    return this;
   }
 }

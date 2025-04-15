@@ -17,6 +17,7 @@ public final class MutableNAClass implements NAClass {
   private final List<NAField> fields = new ArrayList<>();
   private final List<MutableNAMethod> methods = new ArrayList<>();
   private final Set<NullScopeAnnotation> annotations = new HashSet<>();
+  private @Nullable Clazz topClazz;
   private @Nullable Clazz outerClass;
   private NullScope effectiveNullScope = NullScope.NOT_DEFINED;
 
@@ -33,6 +34,15 @@ public final class MutableNAClass implements NAClass {
   @Override
   public Clazz superClazz() {
     return superClazz;
+  }
+
+  @Override
+  public Clazz topClass() {
+    return topClazz;
+  }
+
+  public void setTopClazz(Clazz topClazz) {
+    this.topClazz = topClazz;
   }
 
   @Override

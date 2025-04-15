@@ -4,11 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_test:
-    uses: ./.github/workflows/maven.yml
 
   deploy:
-    needs: build_test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

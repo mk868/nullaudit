@@ -23,7 +23,7 @@ jobs:
         cache: maven
     - name: Build with Maven on JDK ${{ matrix.java-version }}
       run: |
-        mvn -B -ntp -f pom.xml package
+        mvn -B -ntp -f pom.xml package javadoc:javadoc
         for dir in examples/*/; do
           echo "Building $dir"
           mvn -B -ntp -f "$dir/pom.xml" compiler:compile

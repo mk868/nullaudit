@@ -23,7 +23,12 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.jspecify.annotations.Nullable;
 
-@SuppressWarnings("unused")
+/**
+ * An abstract Mojo that provides shared functionality for Maven plugin goals.
+ * <p>
+ * Subclasses of this class define specific behavior for goals like analyzing for errors or
+ * generating reports.
+ */
 public abstract class BaseMojo extends AbstractMojo {
 
   protected final MessageSolver messageSolver = new MessageSolver();

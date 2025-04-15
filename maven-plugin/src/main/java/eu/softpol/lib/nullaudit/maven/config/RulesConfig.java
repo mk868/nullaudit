@@ -4,8 +4,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Represents the <rules> block in the configuration. It holds each specific rule as an object
- * field.
+ * Configuration for the rules used in the NullAudit analysis.
+ * <p>
+ * The class provides configurable options for rules that enforce specific checks.
  */
 public class RulesConfig {
 

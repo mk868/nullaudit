@@ -5,40 +5,57 @@ Check out the [sample projects](examples) for the examples of actual usage.
 
 ## Implemented Rules
 
-- Detects unspecified nullness types based on `@Nullable`, `@NonNull`, `@NullMarked`, and
-  `@NullUnmarked` annotations.
-  ```java
-  public class SayHello {
-    public void say(String message) {
-      System.out.println(message);
-    }
-  }
-  ```
-  Gives:
-  ```
-  SayHello#say(java.lang.String): Unspecified nullness found:
-  void say(java.lang.String*)
-                           ^
-  ```
-- Detects improper usage of JSpecify annotations.
-  ```java
-  @NullMarked
-  class DataHolder {
-    private @Nullable byte[] data;
+### :star: `<requireSpecifiedNullness>`
 
-    @NullMarked
-    @NullUnmarked
-    void sayHi(String name) {
-      System.out.println("Hi " + name);
-    }
+Detects unspecified nullness types based on `@Nullable`, `@NonNull`, `@NullMarked`, and
+`@NullUnmarked` annotations.
+
+```java
+public class SayHello {
+
+  public void say(String message) {
+    System.out.println(message);
   }
-  ```
-  Gives:
-  ```
-  DataHolder#sayHi(java.lang.String): Irrelevant annotations, the method should not be annotated with both @NullMarked and @NullUnmarked at the same time!
-  DataHolder#data: Primitive types cannot be annotated with @Nullable or @NonNull!
-  ```
-- Requires to put `@NullMarked` on classes.
+}
+```
+
+Gives:
+
+```
+SayHello#say(java.lang.String): Unspecified nullness found:
+void say(java.lang.String*)
+                         ^
+```
+
+### :star: `<verifyJSpecifyAnnotations>`
+
+Detects improper usage of JSpecify annotations.
+
+```java
+
+@NullMarked
+class DataHolder {
+
+  private @Nullable byte[] data;
+
+  @NullMarked
+  @NullUnmarked
+  void sayHi(String name) {
+    System.out.println("Hi " + name);
+  }
+}
+```
+
+Gives:
+
+```
+DataHolder#sayHi(java.lang.String): Irrelevant annotations, the method should not be annotated with both @NullMarked and @NullUnmarked at the same time!
+DataHolder#data: Primitive types cannot be annotated with @Nullable or @NonNull!
+```
+
+### :star: `<requireNullMarked>`
+
+Requires to put `@NullMarked` on classes.
 
 ## Features
 
@@ -79,7 +96,17 @@ configuration to your `pom.xml`:
       <artifactId>nullaudit-maven-plugin</artifactId>
       <version>0.4.0</version>
       <configuration>
-        <!-- Limit the number of issues displayed on the console -->
+        <rules>
+          <requireNullMarked>
+            <!-- Optional: file that contains a list of FQCNs to exclude -->
+            <!-- <exclusionsFile>legacy-classes.txt</exclusionsFile> -->
+          </requireNullMarked>
+          <requireSpecifiedNullness>
+            <!-- <exclusionsFile>legacy-classes.txt</exclusionsFile> -->
+          </requireSpecifiedNullness>
+          <verifyJSpecifyAnnotations/>
+        </rules>
+        <!-- Optional: limit the number of issues displayed on the console -->
         <maxErrors>100</maxErrors>
       </configuration>
       <executions>

@@ -26,8 +26,6 @@ jobs:
       - name: Set release version
         run: |
           mvn -B -ntp -f pom.xml versions:set -DnewVersion=${{ github.event.inputs.version }} -DgenerateBackupPoms=false
-          mvn -B -ntp -f core/pom.xml versions:set -DnewVersion=${{ github.event.inputs.version }} -DgenerateBackupPoms=false
-          mvn -B -ntp -f maven-plugin/pom.xml versions:set -DnewVersion=${{ github.event.inputs.version }} -DgenerateBackupPoms=false
           for dir in examples/*/; do
             echo "Updating $dir"
             mvn -B -ntp -f "$dir/pom.xml" versions:set-property -Dproperty=nullaudit.version -DnewVersion=${{ github.event.inputs.version }} -DgenerateBackupPoms=false

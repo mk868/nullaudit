@@ -26,8 +26,6 @@ jobs:
       - name: Set release version
         run: |
           mvn -B -ntp -f pom.xml versions:set -DnewVersion=${{ github.event.inputs.version }}-SNAPSHOT -DgenerateBackupPoms=false
-          mvn -B -ntp -f core/pom.xml versions:set -DnewVersion=${{ github.event.inputs.version }}-SNAPSHOT -DgenerateBackupPoms=false
-          mvn -B -ntp -f maven-plugin/pom.xml versions:set -DnewVersion=${{ github.event.inputs.version }}-SNAPSHOT -DgenerateBackupPoms=false
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

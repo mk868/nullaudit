@@ -1,7 +1,8 @@
-package abc;
+package org.example.unspecified;
 
 import java.util.List;
 
+// Let's assume that someone forgot to apply nullness annotations.
 public class Joiner {
 
   private final String delimiter;

@@ -9,7 +9,7 @@
   <version>1.0.0-SNAPSHOT</version>
 
   <properties>
-    <nullaudit.version>0.3.0</nullaudit.version>
+    <nullaudit.version>0.4.0</nullaudit.version>
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

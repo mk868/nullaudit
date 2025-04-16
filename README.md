@@ -77,7 +77,7 @@ configuration to your `pom.xml`:
     <plugin>
       <groupId>eu.soft-pol.lib.nullaudit</groupId>
       <artifactId>nullaudit-maven-plugin</artifactId>
-      <version>0.3.0</version>
+      <version>0.4.0</version>
       <configuration>
         <!-- Limit the number of issues displayed on the console -->
         <maxErrors>100</maxErrors>

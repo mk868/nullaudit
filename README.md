@@ -24,7 +24,7 @@ Check out the [sample projects](examples) for the examples of actual usage.
   ```java
   @NullMarked
   class DataHolder {
-  private @Nullable byte[] data;
+    private @Nullable byte[] data;
 
     @NullMarked
     @NullUnmarked
@@ -98,15 +98,15 @@ configuration to your `pom.xml`:
 
 #### Usage as a standalone tool
 
-You can also use NullAudit outside of a Maven project.  
+You can also use NullAudit outside a Maven project.  
 For example, to find unspecified nullness in a `.jar` file, run:
 
 ```bash
-mvn eu.soft-pol.lib.nullaudit:nullaudit-maven-plugin:0.3.0:check -Dnullaudit.input=log4j-core-2.24.3.jar
+mvn eu.soft-pol.lib.nullaudit:nullaudit-maven-plugin:0.4.0:check -Dnullaudit.input=log4j-core-2.24.3.jar
 ```
 
 To generate a JSON report for a `.jar` file, run:
 
 ```bash
-mvn eu.soft-pol.lib.nullaudit:nullaudit-maven-plugin:0.3.0:report -Dnullaudit.input=log4j-core-2.24.3.jar -Dnullaudit.reportFile=report.json
+mvn eu.soft-pol.lib.nullaudit:nullaudit-maven-plugin:0.4.0:report -Dnullaudit.input=log4j-core-2.24.3.jar -Dnullaudit.reportFile=report.json
 ```

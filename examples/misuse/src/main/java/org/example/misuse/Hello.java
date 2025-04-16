@@ -1,4 +1,4 @@
-package abc;
+package org.example.misuse;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.NullUnmarked;
@@ -7,8 +7,6 @@ import org.jspecify.annotations.NullUnmarked;
 @NullUnmarked
 public class Hello {
 
-  @NullMarked
-  @NullUnmarked
   public void printHello() {
     System.out.println("Hello");
   }

@@ -33,6 +33,11 @@
         <groupId>eu.soft-pol.lib.nullaudit</groupId>
         <artifactId>nullaudit-maven-plugin</artifactId>
         <version>${nullaudit.version}</version>
+        <configuration>
+          <rules>
+            <requireSpecifiedNullness/>
+          </rules>
+        </configuration>
         <executions>
           <execution>
             <phase>compile</phase>

@@ -41,8 +41,8 @@ public class UnspecifiedNullnessCheck implements Check {
             componentInfo.componentName()
         );
         if (s.contains("*")) {
-          addIssue.addIssueForField(
-              componentInfo.componentName(),
+          addIssue.addIssueForComponent(
+              componentInfo,
               Kind.UNSPECIFIED_NULLNESS,
               messageSolver.issueUnspecifiedNullnessComponent(
                   s,
@@ -63,7 +63,7 @@ public class UnspecifiedNullnessCheck implements Check {
         );
         if (s.contains("*")) {
           addIssue.addIssueForField(
-              fieldInfo.fieldName(),
+              fieldInfo,
               Kind.UNSPECIFIED_NULLNESS,
               messageSolver.issueUnspecifiedNullnessField(
                   s,
@@ -118,7 +118,7 @@ public class UnspecifiedNullnessCheck implements Check {
         );
         if (s.contains("*")) {
           addIssue.addIssueForMethod(
-              methodInfo.descriptiveMethodName(),
+              methodInfo,
               Kind.UNSPECIFIED_NULLNESS,
               messageSolver.issueUnspecifiedNullnessMethod(
                   s,

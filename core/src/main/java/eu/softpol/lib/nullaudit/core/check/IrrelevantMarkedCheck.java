@@ -47,7 +47,7 @@ public class IrrelevantMarkedCheck implements Check {
     naClass.methods().forEach(naMethod -> {
       if (naMethod.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
         addIssue.addIssueForMethod(
-            naMethod.descriptiveMethodName(),
+            naMethod,
             Kind.INVALID_NULL_MARK_COMBINATION,
             messageSolver.invalidNullMarkCombinationMethod()
         );

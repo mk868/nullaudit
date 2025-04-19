@@ -31,7 +31,7 @@ public class IrrelevantPrimitiveCheck implements Check {
   public void checkClass(NAClass naClass, AddIssue addIssue) {
     for (var componentInfo : naClass.components()) {
       if (isPrimitiveAnnotated(componentInfo.fs())) {
-        addIssue.addIssueForField(componentInfo.componentName(),
+        addIssue.addIssueForComponent(componentInfo,
             Kind.INVALID_NULLNESS_ON_PRIMITIVE,
             messageSolver.invalidNullnessOnPrimitiveComponent()
         );
@@ -41,7 +41,7 @@ public class IrrelevantPrimitiveCheck implements Check {
     if (!naClass.isRecord()) {
       for (var fieldInfo : naClass.fields()) {
         if (isPrimitiveAnnotated(fieldInfo.fs())) {
-          addIssue.addIssueForField(fieldInfo.fieldName(),
+          addIssue.addIssueForField(fieldInfo,
               Kind.INVALID_NULLNESS_ON_PRIMITIVE,
               messageSolver.invalidNullnessOnPrimitiveField()
           );
@@ -62,7 +62,7 @@ public class IrrelevantPrimitiveCheck implements Check {
               naMethod.ms().parameterTypes().stream()
                   .anyMatch(IrrelevantPrimitiveCheck::isPrimitiveAnnotated)) {
 
-            addIssue.addIssueForMethod(naMethod.descriptiveMethodName(),
+            addIssue.addIssueForMethod(naMethod,
                 Kind.INVALID_NULLNESS_ON_PRIMITIVE,
                 messageSolver.invalidNullnessOnPrimitiveMethod()
             );

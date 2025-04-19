@@ -11,6 +11,7 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAMethod;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAComponent;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAField;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAMethod;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.check.Check.AddIssue;
 import eu.softpol.lib.nullaudit.core.report.Issue;
@@ -204,16 +205,23 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           }
 
           @Override
-          public void addIssueForField(String name, Kind kind, String message) {
-            MyClassVisitor.this.appendIssue(name, kind, message);
-            issuesForClass.computeIfAbsent(name, k -> new ArrayList<>())
+          public void addIssueForField(NAField field, Kind kind, String message) {
+            MyClassVisitor.this.appendIssue(field.fieldName(), kind, message);
+            issuesForClass.computeIfAbsent(field.fieldName(), k -> new ArrayList<>())
                 .add(kind);
           }
 
           @Override
-          public void addIssueForMethod(String name, Kind kind, String message) {
-            MyClassVisitor.this.appendIssue(name, kind, message);
-            issuesForClass.computeIfAbsent(name, k -> new ArrayList<>())
+          public void addIssueForComponent(NAComponent component, Kind kind, String message) {
+            MyClassVisitor.this.appendIssue(component.componentName(), kind, message);
+            issuesForClass.computeIfAbsent(component.componentName(), k -> new ArrayList<>())
+                .add(kind);
+          }
+
+          @Override
+          public void addIssueForMethod(NAMethod method, Kind kind, String message) {
+            MyClassVisitor.this.appendIssue(method.descriptiveMethodName(), kind, message);
+            issuesForClass.computeIfAbsent(method.descriptiveMethodName(), k -> new ArrayList<>())
                 .add(kind);
           }
         }));

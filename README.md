@@ -5,7 +5,7 @@ Check out the [sample projects](examples) for the examples of actual usage.
 
 ## Implemented Rules
 
-### :star: `<requireSpecifiedNullness>`
+### :star: `requireSpecifiedNullness`
 
 Detects unspecified nullness types based on `@Nullable`, `@NonNull`, `@NullMarked`, and
 `@NullUnmarked` annotations.
@@ -27,7 +27,7 @@ void say(java.lang.String*)
                          ^
 ```
 
-### :star: `<verifyJSpecifyAnnotations>`
+### :star: `verifyJSpecifyAnnotations`
 
 Detects improper usage of JSpecify annotations.
 
@@ -49,11 +49,11 @@ class DataHolder {
 Gives:
 
 ```
-DataHolder#sayHi(java.lang.String): Irrelevant annotations, the method should not be annotated with both @NullMarked and @NullUnmarked at the same time!
 DataHolder#data: Primitive types cannot be annotated with @Nullable or @NonNull!
+DataHolder#sayHi(java.lang.String): Irrelevant annotations, the method should not be annotated with both @NullMarked and @NullUnmarked at the same time!
 ```
 
-### :star: `<requireNullMarked>`
+### :star: `requireNullMarked`
 
 Requires to put `@NullMarked` on classes.
 

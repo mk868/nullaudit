@@ -45,4 +45,8 @@ public class MessageSolver {
         path
     );
   }
+
+  public String skippingPomPackaging() {
+    return resourceBundle.getString("plugin.common.skippingPomPackaging");
+  }
 }

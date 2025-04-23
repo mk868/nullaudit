@@ -37,6 +37,11 @@ public class ReportMojo extends BaseMojo {
   private String reportFile;
 
   public void execute() throws MojoExecutionException {
+    if (isSkipPomPackaging() && hasPackagingPom()) {
+      getLog().info(messageSolver.skippingPomPackaging());
+      return;
+    }
+
     var analyze = new NullAuditAnalyzer(getInput(), createConfig());
     var report = analyze.run();
 

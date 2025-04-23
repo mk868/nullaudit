@@ -1,8 +1,10 @@
 package eu.softpol.lib.nullaudit.maven.config;
 
 import org.apache.maven.plugins.annotations.Parameter;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public abstract class BaseRule {
 
   /**

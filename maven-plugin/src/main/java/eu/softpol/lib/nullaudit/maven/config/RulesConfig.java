@@ -1,6 +1,7 @@
 package eu.softpol.lib.nullaudit.maven.config;
 
 import org.apache.maven.plugins.annotations.Parameter;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -8,6 +9,7 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * The class provides configurable options for rules that enforce specific checks.
  */
+@NullMarked
 public class RulesConfig {
 
   /**

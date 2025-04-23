@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The `check` goal performing null-audit checks on a specified input, such as a directory or JAR
@@ -17,6 +18,7 @@ import org.apache.maven.plugins.annotations.Parameter;
  * <p>
  * This goal can be used without the Maven pom.xml project file.
  */
+@NullMarked
 @SuppressWarnings("unused")
 @Mojo(name = "check", requiresProject = false)
 public class CheckMojo extends BaseMojo {

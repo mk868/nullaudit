@@ -2,7 +2,9 @@ package eu.softpol.lib.nullaudit.maven.i18n;
 
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class MessageSolver {
 
   private final ResourceBundle resourceBundle;

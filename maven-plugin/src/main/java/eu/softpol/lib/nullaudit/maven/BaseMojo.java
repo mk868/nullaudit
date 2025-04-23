@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -29,6 +30,7 @@ import org.jspecify.annotations.Nullable;
  * Subclasses of this class define specific behavior for goals like analyzing for errors or
  * generating reports.
  */
+@NullMarked
 public abstract class BaseMojo extends AbstractMojo {
 
   protected final MessageSolver messageSolver = new MessageSolver();

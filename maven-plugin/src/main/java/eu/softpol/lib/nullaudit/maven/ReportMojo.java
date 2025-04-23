@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The `report` goal generates a null-audit analysis report for a specified input, such as a
@@ -24,6 +25,7 @@ import org.apache.maven.plugins.annotations.Parameter;
  * <p>
  * This goal can be used without the Maven pom.xml project file.
  */
+@NullMarked
 @SuppressWarnings("unused")
 @Mojo(name = "report", requiresProject = false)
 public class ReportMojo extends BaseMojo {

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -34,6 +35,27 @@ import org.jspecify.annotations.Nullable;
 public abstract class BaseMojo extends AbstractMojo {
 
   protected final MessageSolver messageSolver = new MessageSolver();
+
+  @Parameter(defaultValue = "${project}", readonly = true)
+  private @Nullable MavenProject project;
+
+
+  /**
+   * Indicates whether to skip processing and execution of the goal when the Maven project packaging
+   * type is "pom".
+   *
+   * <ul>
+   *   <li>If true, the tasks will be skipped when the project packaging type is "pom".</li>
+   *   <li>If false, the tasks will proceed even if the project packaging type is "pom".</li>
+   * </ul>
+   * <p>
+   * This parameter is particularly useful for Maven builds that do not require operations to be
+   * performed on aggregation projects or parent POMs.
+   * <p>
+   * Default value is "true".
+   */
+  @Parameter(defaultValue = "true")
+  private boolean skipPomPackaging;
 
   /**
    * Represents the input path for analysis. This variable specifies the location of the directory
@@ -57,6 +79,18 @@ public abstract class BaseMojo extends AbstractMojo {
    */
   @Parameter
   private @Nullable RulesConfig rules;
+
+  public boolean isSkipPomPackaging() {
+    return skipPomPackaging;
+  }
+
+  protected boolean hasPackagingPom() {
+    if (project == null || project.getFile() == null) {
+      // run without pom.xml
+      return false;
+    }
+    return project.getPackaging().equals("pom");
+  }
 
   protected Path getInput() {
     return input;

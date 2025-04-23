@@ -94,7 +94,7 @@ configuration to your `pom.xml`:
     <plugin>
       <groupId>eu.soft-pol.lib.nullaudit</groupId>
       <artifactId>nullaudit-maven-plugin</artifactId>
-      <version>0.4.0</version>
+      <version>0.5.0</version>
       <configuration>
         <rules>
           <requireNullMarked>
@@ -129,11 +129,11 @@ You can also use NullAudit outside a Maven project.
 For example, to find unspecified nullness in a `.jar` file, run:
 
 ```bash
-mvn eu.soft-pol.lib.nullaudit:nullaudit-maven-plugin:0.4.0:check -Dnullaudit.input=log4j-core-2.24.3.jar
+mvn eu.soft-pol.lib.nullaudit:nullaudit-maven-plugin:0.5.0:check -Dnullaudit.input=log4j-core-2.24.3.jar
 ```
 
 To generate a JSON report for a `.jar` file, run:
 
 ```bash
-mvn eu.soft-pol.lib.nullaudit:nullaudit-maven-plugin:0.4.0:report -Dnullaudit.input=log4j-core-2.24.3.jar -Dnullaudit.reportFile=report.json
+mvn eu.soft-pol.lib.nullaudit:nullaudit-maven-plugin:0.5.0:report -Dnullaudit.input=log4j-core-2.24.3.jar -Dnullaudit.reportFile=report.json
 ```

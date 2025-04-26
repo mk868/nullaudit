@@ -46,7 +46,9 @@
         <artifactId>nullaudit-maven-plugin</artifactId>
         <configuration>
           <rules>
-            <requireSpecifiedNullness/>
+            <requireSpecifiedNullness>
+              <exclusionsFile>nullaudit-ignored.txt</exclusionsFile>
+            </requireSpecifiedNullness>
             <verifyJSpecifyAnnotations/>
           </rules>
         </configuration>

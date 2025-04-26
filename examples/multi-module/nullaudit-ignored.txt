@@ -1,0 +1,2 @@
+# skip checking JPA entities in the `org.example.multimodule.service1.entity` package
+org.example.multimodule.service1.entity.*

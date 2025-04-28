@@ -102,6 +102,8 @@ Recommended for:
 * New codebases starting from scratch with null-safety first principles.
 * CI/CD pipelines to block unspecified nullness in pull requests.
 
+---
+
 ## Limitations
 
 * Does not validate runtime behavior — only checks for presence of annotations.

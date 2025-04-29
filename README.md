@@ -1,7 +1,8 @@
 # NullAudit
 
 A tool to verify whether JSpecify nullness annotations are applied to your codebase.  
-Check out the [sample projects](examples) for the examples of actual usage.
+Check out the [sample projects](examples) for practical usage demonstrations.  
+For more detailed information, visit [documentation](https://nullaudit.soft-pol.eu) page.
 
 ## Implemented Rules
 

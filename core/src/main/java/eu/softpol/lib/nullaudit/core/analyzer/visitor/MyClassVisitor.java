@@ -182,7 +182,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     } else {
       naClass.setTopClazz(classChain.get(0));
     }
-    context.setClassNullScope(naClass.thisClazz().name(),
+    context.setClassNullScope(naClass.thisClazz(),
         NullScope.from(naClass.annotations()));
     var nullScopes = getNullScopesForClass();
 
@@ -294,9 +294,9 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     }
     nullScopes.add(context.getPackageNullScope(naClass.thisClazz().packageName()));
     for (var outerClass : classChain) {
-      nullScopes.add(context.getClassNullScope(outerClass.name()));
+      nullScopes.add(context.getClassNullScope(outerClass));
     }
-    nullScopes.add(context.getClassNullScope(naClass.thisClazz().name()));
+    nullScopes.add(context.getClassNullScope(naClass.thisClazz()));
     return List.copyOf(nullScopes);
   }
 

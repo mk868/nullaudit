@@ -1,5 +1,6 @@
 package eu.softpol.lib.nullaudit.core.analyzer;
 
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.Clazz;
 import eu.softpol.lib.nullaudit.core.check.Check;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ public class AnalysisContext {
   private @Nullable String moduleName;
   private boolean moduleInfoNullMarked;
   private final Map<String, NullScope> packageNullScope = new HashMap<>();
-  private final Map<String, NullScope> classNullScope = new HashMap<>();
+  private final Map<Clazz, NullScope> classNullScope = new HashMap<>();
   private final List<Check> checks = new ArrayList<>();
 
   public @Nullable String getModuleName() {
@@ -39,12 +40,12 @@ public class AnalysisContext {
     this.packageNullScope.put(packageName, nullScope);
   }
 
-  public NullScope getClassNullScope(String className) {
-    return classNullScope.getOrDefault(className, NullScope.NOT_DEFINED);
+  public NullScope getClassNullScope(Clazz clazz) {
+    return classNullScope.getOrDefault(clazz, NullScope.NOT_DEFINED);
   }
 
-  public void setClassNullScope(String className, NullScope nullScope) {
-    this.classNullScope.put(className, nullScope);
+  public void setClassNullScope(Clazz clazz, NullScope nullScope) {
+    this.classNullScope.put(clazz, nullScope);
   }
 
   public List<Check> getChecks() {

@@ -24,13 +24,13 @@ public class ClassFileAnalyzer implements FileAnalyzer {
   private final AnalysisContext context = new AnalysisContext();
   private final ReportBuilder reportBuilder;
   private final List<String> excludePackages;
+  private final CheckInvoker checkInvoker;
 
   public ClassFileAnalyzer(ReportBuilder reportBuilder, List<String> excludePackages,
       List<Check> checks) {
     this.reportBuilder = reportBuilder;
     this.excludePackages = List.copyOf(excludePackages);
-
-    context.getChecks().addAll(checks);
+    this.checkInvoker = new CheckInvoker(context, reportBuilder, checks);
   }
 
   @Override
@@ -41,11 +41,11 @@ public class ClassFileAnalyzer implements FileAnalyzer {
         return true;
       }
       if (fileName.equals("package-info.class")) {
-        analyze(iss, new PackageInfoClassVisitor(context, reportBuilder));
+        analyze(iss, new PackageInfoClassVisitor(context));
         return true;
       }
       if (fileName.endsWith(".class")) {
-        analyze(iss, new MyClassVisitor(context, reportBuilder));
+        analyze(iss, new MyClassVisitor(context));
         return true;
       }
     } catch (IOException e) {
@@ -67,6 +67,12 @@ public class ClassFileAnalyzer implements FileAnalyzer {
         return;
       }
       reader.accept(classVisitor, 0);
+
+      if (classVisitor instanceof MyClassVisitor cv) {
+        checkInvoker.checkClass(cv.getNaClass());
+      } else if (classVisitor instanceof PackageInfoClassVisitor picv) {
+        checkInvoker.checkPackage(picv.getNaPackage());
+      }
     }
   }
 }

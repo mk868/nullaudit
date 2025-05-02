@@ -6,9 +6,7 @@ import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAPackage;
-import eu.softpol.lib.nullaudit.core.report.Issue;
-import eu.softpol.lib.nullaudit.core.report.Kind;
-import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
@@ -16,13 +14,11 @@ import org.objectweb.asm.Opcodes;
 public class PackageInfoClassVisitor extends ClassVisitor {
 
   private final AnalysisContext context;
-  private final ReportBuilder reportBuilder;
   private MutableNAPackage naPackage;
 
-  public PackageInfoClassVisitor(AnalysisContext context, ReportBuilder reportBuilder) {
+  public PackageInfoClassVisitor(AnalysisContext context) {
     super(Opcodes.ASM9);
     this.context = context;
-    this.reportBuilder = reportBuilder;
   }
 
   @Override
@@ -50,21 +46,10 @@ public class PackageInfoClassVisitor extends ClassVisitor {
   public void visitEnd() {
     var nullScope = NullScope.from(naPackage.annotations());
     context.setPackageNullScope(naPackage.packageName(), nullScope);
-    context.getChecks().forEach(c -> c.checkPackage(naPackage, this::appendIssue));
     super.visitEnd();
   }
 
-  private void appendIssue(Kind kind, String message) {
-    var location = "";
-    if (context.getModuleName() != null) {
-      location = context.getModuleName() + "/";
-    }
-    location += naPackage.packageName() + ".package-info";
-
-    reportBuilder.addIssue(new Issue(
-        location,
-        kind,
-        message
-    ));
+  public NAPackage getNaPackage() {
+    return naPackage;
   }
 }

@@ -18,11 +18,6 @@ public class IrrelevantPrimitiveCheck implements Check {
   }
 
   @Override
-  public void checkModule() {
-    // NOP
-  }
-
-  @Override
   public void checkPackage(NAPackage naPackage, BiConsumer<Kind, String> addIssue) {
     // NOP
   }
@@ -79,6 +74,6 @@ public class IrrelevantPrimitiveCheck implements Check {
 
   private static boolean isAnnotated(PrimitiveTypeNode type) {
     return type.getAnnotations().contains(TypeUseAnnotation.JSPECIFY_NULLABLE) ||
-           type.getAnnotations().contains(TypeUseAnnotation.JSPECIFY_NON_NULL);
+        type.getAnnotations().contains(TypeUseAnnotation.JSPECIFY_NON_NULL);
   }
 }

@@ -21,11 +21,6 @@ public class IrrelevantMarkedCheck implements Check {
   }
 
   @Override
-  public void checkModule() {
-    // NOP
-  }
-
-  @Override
   public void checkPackage(NAPackage naPackage, BiConsumer<Kind, String> addIssue) {
     if (naPackage.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
       addIssue.accept(

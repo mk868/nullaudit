@@ -24,11 +24,6 @@ public class IgnoreClassDecorator implements Check {
   }
 
   @Override
-  public void checkModule() {
-    delegate.checkModule();
-  }
-
-  @Override
   public void checkPackage(NAPackage naPackage, BiConsumer<Kind, String> addIssue) {
     delegate.checkPackage(naPackage, addIssue);
   }

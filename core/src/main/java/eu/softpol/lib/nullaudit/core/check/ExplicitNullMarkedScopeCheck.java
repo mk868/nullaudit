@@ -16,11 +16,6 @@ public class ExplicitNullMarkedScopeCheck implements Check {
   }
 
   @Override
-  public void checkModule() {
-    // NOP
-  }
-
-  @Override
   public void checkPackage(NAPackage naPackage, BiConsumer<Kind, String> addIssue) {
     // NOP
   }

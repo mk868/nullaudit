@@ -21,8 +21,6 @@ public interface Check {
     void addIssueForMethod(NAMethod method, Kind kind, String message);
   }
 
-  void checkModule();
-
   void checkPackage(NAPackage naPackage, BiConsumer<Kind, String> addIssue);
 
   void checkClass(NAClass naClass, AddIssue addIssue);

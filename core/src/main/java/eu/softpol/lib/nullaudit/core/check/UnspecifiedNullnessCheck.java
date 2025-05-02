@@ -19,11 +19,6 @@ public class UnspecifiedNullnessCheck implements Check {
   }
 
   @Override
-  public void checkModule() {
-    // NOP
-  }
-
-  @Override
   public void checkPackage(NAPackage naPackage, BiConsumer<Kind, String> addIssue) {
     // NOP
   }
@@ -85,9 +80,9 @@ public class UnspecifiedNullnessCheck implements Check {
         }
 
         if (naClass.getComponent(methodName)
-                .filter(c -> classAugmentedStringTranslator.translate(c.fs())
-                    .equals(classAugmentedStringTranslator.translate(methodInfo.ms().returnType())))
-                .isPresent()
+            .filter(c -> classAugmentedStringTranslator.translate(c.fs())
+                .equals(classAugmentedStringTranslator.translate(methodInfo.ms().returnType())))
+            .isPresent()
             && methodInfo.ms().parameterTypes().isEmpty()
         ) {
           // skip default getter

@@ -41,6 +41,11 @@ public class CheckMojo extends BaseMojo {
       return;
     }
 
+    if (isSkipTilePackaging() && hasPackagingTile()) {
+      getLog().info(messageSolver.skippingTilePackaging());
+      return;
+    }
+
     var analyze = new NullAuditAnalyzer(getInput(), createConfig());
     var report = analyze.run();
 

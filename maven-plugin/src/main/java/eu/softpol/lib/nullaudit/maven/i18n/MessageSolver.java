@@ -49,4 +49,7 @@ public class MessageSolver {
   public String skippingPomPackaging() {
     return resourceBundle.getString("plugin.common.skippingPomPackaging");
   }
+  public String skippingTilePackaging() {
+    return resourceBundle.getString("plugin.common.skippingTilePackaging");
+  }
 }

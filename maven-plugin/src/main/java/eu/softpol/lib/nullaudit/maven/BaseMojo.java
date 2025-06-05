@@ -58,6 +58,20 @@ public abstract class BaseMojo extends AbstractMojo {
   private boolean skipPomPackaging;
 
   /**
+   * Indicates whether to skip processing and execution of the goal when the Maven project packaging
+   * type is "tile".
+   *
+   * <ul>
+   *   <li>If true, the tasks will be skipped when the project packaging type is "tile".</li>
+   *   <li>If false, the tasks will proceed even if the project packaging type is "tile".</li>
+   * </ul>
+   * <p>
+   * Default value is "true".
+   */
+  @Parameter(defaultValue = "true")
+  private boolean skipTilePackaging;
+
+  /**
    * Represents the input path for analysis. This variable specifies the location of the directory
    * or file (e.g., a .jar file) to be analyzed.
    */
@@ -90,6 +104,18 @@ public abstract class BaseMojo extends AbstractMojo {
       return false;
     }
     return project.getPackaging().equals("pom");
+  }
+
+  public boolean isSkipTilePackaging() {
+    return skipTilePackaging;
+  }
+
+  protected boolean hasPackagingTile() {
+    if (project == null || project.getFile() == null) {
+      // run without pom.xml
+      return false;
+    }
+    return project.getPackaging().equals("tile");
   }
 
   protected Path getInput() {

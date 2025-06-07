@@ -95,7 +95,7 @@ configuration to your `pom.xml`:
     <plugin>
       <groupId>eu.soft-pol.lib.nullaudit</groupId>
       <artifactId>nullaudit-maven-plugin</artifactId>
-      <version>0.5.0</version>
+      <version>0.6.0</version>
       <configuration>
         <rules>
           <requireNullMarked>

@@ -8,6 +8,7 @@
   <artifactId>nullaudit-parent</artifactId>
   <version>0.6.0</version>
   <packaging>pom</packaging>
+  <name>NullAudit Parent</name>
 
   <modules>
     <module>core</module>

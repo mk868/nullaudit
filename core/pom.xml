@@ -10,6 +10,7 @@
   </parent>
 
   <artifactId>nullaudit-core</artifactId>
+  <name>NullAudit Core</name>
 
   <dependencies>
     <dependency>

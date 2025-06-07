@@ -9,6 +9,7 @@ import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireNullMarked;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireSpecifiedNullness;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
 import eu.softpol.lib.nullaudit.maven.config.BaseRule;
+import eu.softpol.lib.nullaudit.maven.config.RequireNullMarkedRule;
 import eu.softpol.lib.nullaudit.maven.config.RequireSpecifiedNullnessRule;
 import eu.softpol.lib.nullaudit.maven.config.RulesConfig;
 import eu.softpol.lib.nullaudit.maven.config.VerifyJSpecifyAnnotationsRule;
@@ -125,6 +126,19 @@ public abstract class BaseMojo extends AbstractMojo {
   protected RulesConfig getRulesOrDefault() {
     if (rules != null) {
       return rules;
+    }
+    var rulesProp = Arrays.stream(System.getProperty("nullaudit.rules", "")
+            .split(","))
+        .filter(not(String::isEmpty))
+        .toList();
+    if (!rulesProp.isEmpty()) {
+      return new RulesConfig(
+          rulesProp.contains("requireNullMarked") ? new RequireNullMarkedRule() : null,
+          rulesProp.contains("requireSpecifiedNullness") ? new RequireSpecifiedNullnessRule()
+              : null,
+          rulesProp.contains("verifyJSpecifyAnnotations") ? new VerifyJSpecifyAnnotationsRule()
+              : null
+      );
     }
     return new RulesConfig(
         null,

@@ -35,7 +35,7 @@ jobs:
           while IFS= read -r file; do
             sed -i "s/$OLD_VERSION/$NEW_VERSION/g" "$file"
           done < .github/FILES_WITH_VERSIONS.txt
-          echo "$NEW_VERSION" > RELEASE_VERSION
+          echo -n "$NEW_VERSION" > RELEASE_VERSION
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

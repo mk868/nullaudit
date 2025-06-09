@@ -1,0 +1,2 @@
+README.md
+docs/docs/getting-started.md

@@ -131,8 +131,8 @@ For example, to find unspecified nullness in a `.jar` file, run:
 
 ```bash
 mvn eu.soft-pol.lib.nullaudit:nullaudit-maven-plugin:0.6.0:check \
-    -Dnullaudit.rules=verifyJSpecifyAnnotations,requireNullMarked \
-    -Dnullaudit.input=log4j-core-2.24.3.jar
+    -Dnullaudit.input=log4j-core-2.24.3.jar \
+    -Dnullaudit.rules=verifyJSpecifyAnnotations,requireNullMarked
 ```
 
 To generate a JSON report for a `.jar` file, run:

@@ -4,7 +4,6 @@ import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getPackag
 
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAPackage;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import org.objectweb.asm.AnnotationVisitor;
@@ -32,13 +31,8 @@ public class PackageInfoClassVisitor extends ClassVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    var annotation = KnownAnnotations.fromDescriptor(descriptor).orElse(null);
-    if (annotation == KnownAnnotations.NULL_MARKED) {
-      naPackage.addAnnotation(NullScopeAnnotation.NULL_MARKED);
-    }
-    if (annotation == KnownAnnotations.NULL_UNMARKED) {
-      naPackage.addAnnotation(NullScopeAnnotation.NULL_UNMARKED);
-    }
+    KnownAnnotations.fromDescriptor(descriptor)
+        .ifPresent(naPackage::addAnnotation);
     return super.visitAnnotation(descriptor, visible);
   }
 

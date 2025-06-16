@@ -6,7 +6,6 @@ import static java.util.function.Predicate.not;
 
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAMethod;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
@@ -79,16 +78,8 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    var annotationOpt = KnownAnnotations.fromDescriptor(descriptor)
-        .map(x -> switch (x) {
-          case NULL_MARKED -> NullScopeAnnotation.NULL_MARKED;
-          case NULL_UNMARKED -> NullScopeAnnotation.NULL_UNMARKED;
-          case KOTLIN_METADATA -> NullScopeAnnotation.KOTLIN_METADATA;
-          default -> null;
-        });
-    if (annotationOpt.isPresent()) {
-      naClass.addAnnotation(annotationOpt.get());
-    }
+    KnownAnnotations.fromDescriptor(descriptor)
+        .ifPresent(naClass::addAnnotation);
     return super.visitAnnotation(descriptor, visible);
   }
 

@@ -1,6 +1,6 @@
 package eu.softpol.lib.nullaudit.core.check.verify_jspecify_annotations;
 
-import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.KnownAnnotations;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
@@ -12,9 +12,9 @@ import java.util.function.BiConsumer;
 
 public class IrrelevantMarkedCheck implements ClassChecker, PackageInfoChecker {
 
-  private static final List<NullScopeAnnotation> INVALID_ANNOTATION_COMBINATION = List.of(
-      NullScopeAnnotation.NULL_MARKED,
-      NullScopeAnnotation.NULL_UNMARKED
+  private static final List<KnownAnnotations> INVALID_ANNOTATION_COMBINATION = List.of(
+      KnownAnnotations.NULL_MARKED,
+      KnownAnnotations.NULL_UNMARKED
   );
   private final MessageSolver messageSolver;
 

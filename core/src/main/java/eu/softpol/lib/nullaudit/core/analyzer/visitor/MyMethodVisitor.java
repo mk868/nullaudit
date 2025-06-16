@@ -1,6 +1,5 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
-import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAMethod;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.type.QueryNode;
@@ -69,13 +68,8 @@ public class MyMethodVisitor extends MethodVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    var annotation = KnownAnnotations.fromDescriptor(descriptor).orElse(null);
-    if (annotation == KnownAnnotations.NULL_MARKED) {
-      naMethod.addAnnotation(NullScopeAnnotation.NULL_MARKED);
-    }
-    if (annotation == KnownAnnotations.NULL_UNMARKED) {
-      naMethod.addAnnotation(NullScopeAnnotation.NULL_UNMARKED);
-    }
+    KnownAnnotations.fromDescriptor(descriptor)
+        .ifPresent(naMethod::addAnnotation);
     return super.visitAnnotation(descriptor, visible);
   }
 }

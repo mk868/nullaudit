@@ -1,13 +1,13 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
-import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.KnownAnnotations;
 import java.util.HashSet;
 import java.util.Set;
 
 public final class MutableNAPackage implements NAPackage {
 
   private final String packageName;
-  private final Set<NullScopeAnnotation> annotations = new HashSet<>();
+  private final Set<KnownAnnotations> annotations = new HashSet<>();
 
   public MutableNAPackage(
       String packageName
@@ -21,11 +21,11 @@ public final class MutableNAPackage implements NAPackage {
   }
 
   @Override
-  public Set<NullScopeAnnotation> annotations() {
+  public Set<KnownAnnotations> annotations() {
     return Set.copyOf(annotations);
   }
 
-  public void addAnnotation(NullScopeAnnotation annotation) {
+  public void addAnnotation(KnownAnnotations annotation) {
     annotations.add(annotation);
   }
 }

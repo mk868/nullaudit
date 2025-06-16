@@ -1,8 +1,8 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.Clazz;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.KnownAnnotations;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,5 +36,5 @@ public interface NAClass {
 
   List<NAMethod> methods();
 
-  Set<NullScopeAnnotation> annotations();
+  Set<KnownAnnotations> annotations();
 }

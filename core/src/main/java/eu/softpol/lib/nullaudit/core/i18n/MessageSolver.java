@@ -71,4 +71,12 @@ public class MessageSolver {
     return resourceBundle.getString("issue.MISSING_NULL_MARKED_ANNOTATION.class");
   }
 
+  public String invalidNullableOnClass() {
+    return resourceBundle.getString("issue.INVALID_NULLABLE_ON_CLASS.class");
+  }
+
+  public String invalidNonNullOnClass() {
+    return resourceBundle.getString("issue.INVALID_NONNULL_ON_CLASS.class");
+  }
+
 }

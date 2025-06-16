@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.coretest.rules.verifyjspecifyannotations;
+package eu.softpol.lib.nullaudit.coretest.rules.require_specified_nullness;
 
 import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
@@ -6,7 +6,7 @@ import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilati
 import eu.softpol.lib.nullaudit.core.Exclusions;
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig;
-import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
+import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireSpecifiedNullness;
 import io.github.ascopes.jct.compilers.JctCompiler;
 import io.github.ascopes.jct.compilers.JctCompilers;
 import io.github.ascopes.jct.workspaces.Workspaces;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class VerifyJSpecifyAnnotationsExcludeTest {
+class RequireSpecifiedNullnessExcludeTest {
 
   @TempDir
   Path dir;
@@ -37,7 +37,8 @@ class VerifyJSpecifyAnnotationsExcludeTest {
           .createFile("demo/foo/Prefix4.java")
           .withContents(createClass("demo.foo", "Prefix4"))
           .createFile("demo/foo/Prefix5.java")
-          .withContents(createClassWithInnerClass("demo.foo", "Prefix5"));
+          .withContents(createClassWithInnerClass("demo.foo", "Prefix5"))
+      ;
       var compilation = compiler.compile(workspace);
 
       assertThatCompilation(compilation)
@@ -48,7 +49,7 @@ class VerifyJSpecifyAnnotationsExcludeTest {
   @Test
   void shouldNotReportExcludedClasses() {
     var config = NullAuditConfig.of()
-        .withVerifyJSpecifyAnnotations(new VerifyJSpecifyAnnotations(new Exclusions(Set.of(
+        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(new Exclusions(Set.of(
             "demo.Prefix1",
             "demo.Prefix2",
             "demo.foo.Prefix4"
@@ -70,7 +71,7 @@ class VerifyJSpecifyAnnotationsExcludeTest {
   @Test
   void shouldNotReportExcludedWildcardClasses() {
     var config = NullAuditConfig.of()
-        .withVerifyJSpecifyAnnotations(new VerifyJSpecifyAnnotations(new Exclusions(Set.of(
+        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(new Exclusions(Set.of(
             "demo.*"
         ))));
     var analyzer = new NullAuditAnalyzer(dir, config);
@@ -90,7 +91,7 @@ class VerifyJSpecifyAnnotationsExcludeTest {
   @Test
   void shouldNotReportExcludedWildcardClassesAndSubpackages() {
     var config = NullAuditConfig.of()
-        .withVerifyJSpecifyAnnotations(new VerifyJSpecifyAnnotations(new Exclusions(Set.of(
+        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(new Exclusions(Set.of(
             "demo.**"
         ))));
     var analyzer = new NullAuditAnalyzer(dir, config);
@@ -102,10 +103,10 @@ class VerifyJSpecifyAnnotationsExcludeTest {
     return """
         package %s;
         
-        import org.jspecify.annotations.Nullable;
-        
         public class %s {
-          @Nullable int[] arr;
+          public String addPrefix(String str) {
+            return "> " + str;
+          }
         }
         """.formatted(
         packageName,
@@ -117,26 +118,39 @@ class VerifyJSpecifyAnnotationsExcludeTest {
     return """
         package %s;
         
-        import org.jspecify.annotations.Nullable;
-        
         public class %s {
-          @Nullable int[] arr;
           Object o = new Object(){
-             @Nullable int[] arr;
+            public String addPrefix(String str) {
+              return "> " + str;
+            }
           };
         
+          public String addPrefix(String str) {
+            return "> " + str;
+          }
+        
           public class Inner {
-            @Nullable int[] arr;
             Object o = new Object(){
-              @Nullable int[] arr;
+              public String addPrefix(String str) {
+                return "> " + str;
+              }
             };
+        
+            public String addPrefix(String str) {
+              return "> " + str;
+            }
           }
         
           public static class StaticNested {
-            @Nullable int[] arr;
             Object o = new Object(){
-              @Nullable int[] arr;
+              public String addPrefix(String str) {
+                return "> " + str;
+              }
             };
+        
+            public String addPrefix(String str) {
+              return "> " + str;
+            }
           }
         }
         """.formatted(
@@ -144,4 +158,5 @@ class VerifyJSpecifyAnnotationsExcludeTest {
         className
     );
   }
+
 }

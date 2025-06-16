@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.coretest.rules.requirenullmarked;
+package eu.softpol.lib.nullaudit.coretest.rules.verify_jspecify_annotations;
 
 import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
@@ -6,16 +6,17 @@ import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilati
 import eu.softpol.lib.nullaudit.core.Exclusions;
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig;
-import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireNullMarked;
+import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
 import io.github.ascopes.jct.compilers.JctCompiler;
 import io.github.ascopes.jct.compilers.JctCompilers;
 import io.github.ascopes.jct.workspaces.Workspaces;
 import java.nio.file.Path;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class RequireNullMarkedExcludeTest {
+class VerifyJSpecifyAnnotationsExcludeTest {
 
   @TempDir
   Path dir;
@@ -47,37 +48,51 @@ class RequireNullMarkedExcludeTest {
   @Test
   void shouldNotReportExcludedClasses() {
     var config = NullAuditConfig.of()
-        .withRequireNullMarked(new RequireNullMarked(Exclusions.of(
+        .withVerifyJSpecifyAnnotations(new VerifyJSpecifyAnnotations(new Exclusions(Set.of(
             "demo.Prefix1",
             "demo.Prefix2",
             "demo.foo.Prefix4"
-        )));
+        ))));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
-    assertThat(report).issues().hasSize(2);
+    assertThat(report)
+        .hasOnlyIssuesForClasses(
+            "demo.Prefix3",
+            "demo.foo.Prefix5",
+            "demo.foo.Prefix5$1",
+            "demo.foo.Prefix5$Inner",
+            "demo.foo.Prefix5$Inner$1",
+            "demo.foo.Prefix5$StaticNested",
+            "demo.foo.Prefix5$StaticNested$1"
+        );
   }
 
   @Test
   void shouldNotReportExcludedWildcardClasses() {
     var config = NullAuditConfig.of()
-        .withRequireNullMarked(new RequireNullMarked(Exclusions.of(
+        .withVerifyJSpecifyAnnotations(new VerifyJSpecifyAnnotations(new Exclusions(Set.of(
             "demo.*"
-        )));
+        ))));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report)
         .hasOnlyIssuesForClasses(
             "demo.foo.Prefix4",
-            "demo.foo.Prefix5"
+            "demo.foo.Prefix5",
+            "demo.foo.Prefix5$1",
+            "demo.foo.Prefix5$Inner",
+            "demo.foo.Prefix5$Inner$1",
+            "demo.foo.Prefix5$StaticNested",
+            "demo.foo.Prefix5$StaticNested$1"
         );
   }
 
   @Test
   void shouldNotReportExcludedWildcardClassesAndSubpackages() {
     var config = NullAuditConfig.of()
-        .withRequireNullMarked(new RequireNullMarked(Exclusions.of(
+        .withVerifyJSpecifyAnnotations(new VerifyJSpecifyAnnotations(new Exclusions(Set.of(
             "demo.**"
-        )));
+        ))));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report.issues()).isEmpty();
@@ -87,10 +102,10 @@ class RequireNullMarkedExcludeTest {
     return """
         package %s;
         
+        import org.jspecify.annotations.Nullable;
+        
         public class %s {
-          public String addPrefix(String str) {
-            return "> " + str;
-          }
+          @Nullable int[] arr;
         }
         """.formatted(
         packageName,
@@ -102,39 +117,26 @@ class RequireNullMarkedExcludeTest {
     return """
         package %s;
         
+        import org.jspecify.annotations.Nullable;
+        
         public class %s {
+          @Nullable int[] arr;
           Object o = new Object(){
-            public String addPrefix(String str) {
-              return "> " + str;
-            }
+             @Nullable int[] arr;
           };
         
-          public String addPrefix(String str) {
-            return "> " + str;
-          }
-        
           public class Inner {
+            @Nullable int[] arr;
             Object o = new Object(){
-              public String addPrefix(String str) {
-                return "> " + str;
-              }
+              @Nullable int[] arr;
             };
-        
-            public String addPrefix(String str) {
-              return "> " + str;
-            }
           }
         
           public static class StaticNested {
+            @Nullable int[] arr;
             Object o = new Object(){
-              public String addPrefix(String str) {
-                return "> " + str;
-              }
+              @Nullable int[] arr;
             };
-        
-            public String addPrefix(String str) {
-              return "> " + str;
-            }
           }
         }
         """.formatted(
@@ -142,5 +144,4 @@ class RequireNullMarkedExcludeTest {
         className
     );
   }
-
 }

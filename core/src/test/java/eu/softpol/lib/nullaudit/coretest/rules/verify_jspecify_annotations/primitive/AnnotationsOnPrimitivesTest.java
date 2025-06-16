@@ -1,11 +1,10 @@
-package eu.softpol.lib.nullaudit.coretest.rules.verifyjspecifyannotations.primitive;
+package eu.softpol.lib.nullaudit.coretest.rules.verify_jspecify_annotations.primitive;
 
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
-import eu.softpol.lib.nullaudit.core.NullAuditConfig;
-import eu.softpol.lib.nullaudit.coretest.rules.verifyjspecifyannotations.RequireSpecifiedNullnessConfig;
+import eu.softpol.lib.nullaudit.coretest.rules.RulesConfig;
 import io.github.ascopes.jct.compilers.JctCompiler;
 import io.github.ascopes.jct.compilers.JctCompilers;
 import io.github.ascopes.jct.workspaces.Workspaces;
@@ -79,7 +78,7 @@ class AnnotationsOnPrimitivesTest {
 
   @Test
   void shouldReportNullableAnnotationsOnPrimitives() {
-    var analyzer = new NullAuditAnalyzer(dir, RequireSpecifiedNullnessConfig.CONFIG);
+    var analyzer = new NullAuditAnalyzer(dir, RulesConfig.VERIFY_JSPECIFY_ANNOTATIONS);
     var report = analyzer.run();
     assertThat(report.issues())
         .hasSize(13);

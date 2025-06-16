@@ -1,10 +1,10 @@
-package eu.softpol.lib.nullaudit.coretest.rules.verifyjspecifyannotations.marked;
+package eu.softpol.lib.nullaudit.coretest.rules.require_specified_nullness;
 
+import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
-import eu.softpol.lib.nullaudit.coretest.rules.verifyjspecifyannotations.RequireSpecifiedNullnessConfig;
+import eu.softpol.lib.nullaudit.coretest.rules.RulesConfig;
 import io.github.ascopes.jct.compilers.JctCompiler;
 import io.github.ascopes.jct.compilers.JctCompilers;
 import io.github.ascopes.jct.workspaces.Workspaces;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class IrrelevantMarkedMethodTest {
+class InnerClassMarkedTest {
 
   @TempDir
   Path dir;
@@ -25,17 +25,21 @@ class IrrelevantMarkedMethodTest {
       workspace.addClassOutputPackage(dir);
       workspace
           .createSourcePathPackage()
-          .createFile("irrelevant/marked/SayHello.java").withContents("""
-              package irrelevant.marked;
+          .createFile("root/scope/innerclassmarked/Prefix1.java").withContents("""
+              package root.scope.innerclassmarked;
               
               import org.jspecify.annotations.NullMarked;
               import org.jspecify.annotations.NullUnmarked;
               
-              public class SayHello {
+              @NullUnmarked
+              public class Prefix1 {
               
                 @NullMarked
-                @NullUnmarked
-                public void hello() {
+                public class Inner {
+              
+                  public String addPrefix(String str) {
+                    return "prefix:" + str;
+                  }
                 }
               }
               """);
@@ -47,10 +51,10 @@ class IrrelevantMarkedMethodTest {
   }
 
   @Test
-  void test() {
-    var analyzer = new NullAuditAnalyzer(dir, RequireSpecifiedNullnessConfig.CONFIG);
+  void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
+    var analyzer = new NullAuditAnalyzer(dir, RulesConfig.REQUIRE_SPECIFIED_NULLNESS);
     var report = analyzer.run();
-    assertThat(report.issues()).hasSize(1);
+    assertThat(report).issues().isEmpty();
   }
 
 }

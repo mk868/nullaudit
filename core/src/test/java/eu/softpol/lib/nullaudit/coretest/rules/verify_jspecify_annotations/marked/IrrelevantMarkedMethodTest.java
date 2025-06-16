@@ -1,9 +1,10 @@
-package eu.softpol.lib.nullaudit.coretest.rules.requirenullmarked;
+package eu.softpol.lib.nullaudit.coretest.rules.verify_jspecify_annotations.marked;
 
-import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
+import eu.softpol.lib.nullaudit.coretest.rules.RulesConfig;
 import io.github.ascopes.jct.compilers.JctCompiler;
 import io.github.ascopes.jct.compilers.JctCompilers;
 import io.github.ascopes.jct.workspaces.Workspaces;
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class RequireNullMarkedTest {
+class IrrelevantMarkedMethodTest {
 
   @TempDir
   Path dir;
@@ -24,23 +25,16 @@ class RequireNullMarkedTest {
       workspace.addClassOutputPackage(dir);
       workspace
           .createSourcePathPackage()
-          .createFile("marked/SayHello.java").withContents("""
-              package marked;
+          .createFile("irrelevant/marked/SayHello.java").withContents("""
+              package irrelevant.marked;
               
               import org.jspecify.annotations.NullMarked;
-              
-              @NullMarked
-              public class SayHello {
-              
-                public void hello() {
-                }
-              }
-              """)
-          .createFile("unmarked/SayHello.java").withContents("""
-              package unmarked;
+              import org.jspecify.annotations.NullUnmarked;
               
               public class SayHello {
               
+                @NullMarked
+                @NullUnmarked
                 public void hello() {
                 }
               }
@@ -54,10 +48,9 @@ class RequireNullMarkedTest {
 
   @Test
   void test() {
-    var analyzer = new NullAuditAnalyzer(dir, RequireNullMarkedConfig.CONFIG);
+    var analyzer = new NullAuditAnalyzer(dir, RulesConfig.VERIFY_JSPECIFY_ANNOTATIONS);
     var report = analyzer.run();
-    assertThat(report).issues().hasSize(1);
-    assertThat(report).issuesForClass("unmarked", "SayHello").hasSize(1);
+    assertThat(report.issues()).hasSize(1);
   }
 
 }

@@ -1,12 +1,13 @@
-package eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness;
+package eu.softpol.lib.nullaudit.coretest.rules.require_specified_nullness;
 
 import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
-import static eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness.TestData.TestAnnotation.NONE;
-import static eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness.TestData.TestAnnotation.NULL_MARKED;
-import static eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness.TestData.TestAnnotation.NULL_UNMARKED;
+import static eu.softpol.lib.nullaudit.coretest.rules.require_specified_nullness.TestData.TestAnnotation.NONE;
+import static eu.softpol.lib.nullaudit.coretest.rules.require_specified_nullness.TestData.TestAnnotation.NULL_MARKED;
+import static eu.softpol.lib.nullaudit.coretest.rules.require_specified_nullness.TestData.TestAnnotation.NULL_UNMARKED;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
+import eu.softpol.lib.nullaudit.coretest.rules.RulesConfig;
 import io.github.ascopes.jct.compilers.JctCompiler;
 import io.github.ascopes.jct.compilers.JctCompilers;
 import io.github.ascopes.jct.workspaces.Workspaces;
@@ -15,7 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class ModuleInfoMarkedTest {
+class NoModuleInfoTest {
 
   @TempDir
   Path dir;
@@ -26,15 +27,7 @@ class ModuleInfoMarkedTest {
     try (var workspace = Workspaces.newWorkspace()) {
       workspace.addClassOutputPackage(dir);
       workspace
-          .createSourcePathModule("org.example.sample")
-          .createFile("module-info.java").withContents("""
-              import org.jspecify.annotations.NullMarked;
-              
-              @NullMarked
-              module org.example.sample {
-                requires org.jspecify;
-              }
-              """)
+          .createSourcePathPackage()
           // unmarked package
           .createFile("packageunmarked/package-info.java")
           .withContents(TestData.createPackage("packageunmarked", NULL_UNMARKED))
@@ -78,22 +71,25 @@ class ModuleInfoMarkedTest {
 
   @Test
   void shouldListMethodsInNullUnmarkedScope() {
-    var analyzer = new NullAuditAnalyzer(dir, RequireSpecifiedNullnessConfig.CONFIG);
+    var analyzer = new NullAuditAnalyzer(dir, RulesConfig.REQUIRE_SPECIFIED_NULLNESS);
     var report = analyzer.run();
     assertThat(report).issues()
-        .hasSize(12);
+        .hasSize(15);
+    assertThat(report).issuesForMethod("packageunmarked", "Prefix1", "addPrefix(java.lang.String)").hasSize(1);
+    assertThat(report).issuesForMethod("packageunmarked", "UnmarkedPrefix1", "addPrefix(java.lang.String)").hasSize(1);
+    assertThat(report).issuesForMethod("packageunmarked", "MarkedPrefixUnmarkedMethod1", "addPrefix(java.lang.String)").hasSize(1);
+    assertThat(report).issuesForMethod("packagemarked", "UnmarkedPrefix1", "addPrefix(java.lang.String)").hasSize(1);
+    assertThat(report).issuesForMethod("other", "Prefix1", "addPrefix(java.lang.String)").hasSize(1);
     assertThat(report).issuesForMethod("other", "UnmarkedPrefix1", "addPrefix(java.lang.String)").hasSize(1);
     assertThat(report).issuesForMethod("other", "PrefixUnmarkedMethod1", "addPrefix(java.lang.String)").hasSize(1);
-    assertThat(report).issuesForMethod("packagemarked", "UnmarkedPrefix1", "addPrefix(java.lang.String)").hasSize(1);
-    assertThat(report).issuesForMethod("packageunmarked", "Prefix1", "addPrefix(java.lang.String)").hasSize(1);
-    assertThat(report).issuesForMethod("packageunmarked", "MarkedPrefixUnmarkedMethod1", "addPrefix(java.lang.String)").hasSize(1);
-    assertThat(report).issuesForMethod("packageunmarked", "UnmarkedPrefix1", "addPrefix(java.lang.String)").hasSize(1);
-    assertThat(report).issuesForField("other", "UnmarkedPrefix1", "prefix").hasSize(1);
+    assertThat(report).issuesForField("packageunmarked", "Prefix1", "prefix").hasSize(1);
+    assertThat(report).issuesForField("packageunmarked", "UnmarkedPrefix1", "prefix").hasSize(1);
+    assertThat(report).issuesForField("packageunmarked", "PrefixMarkedMethod1", "prefix").hasSize(1);
     assertThat(report).issuesForField("packagemarked", "UnmarkedPrefix1", "prefix").hasSize(1);
     assertThat(report).issuesForField("packagemarked", "UnmarkedPrefixMarkedMethod1", "prefix").hasSize(1);
-    assertThat(report).issuesForField("packageunmarked", "Prefix1", "prefix").hasSize(1);
-    assertThat(report).issuesForField("packageunmarked", "PrefixMarkedMethod1", "prefix").hasSize(1);
-    assertThat(report).issuesForField("packageunmarked", "UnmarkedPrefix1", "prefix").hasSize(1);
+    assertThat(report).issuesForField("other", "Prefix1", "prefix").hasSize(1);
+    assertThat(report).issuesForField("other", "UnmarkedPrefix1", "prefix").hasSize(1);
+    assertThat(report).issuesForField("other", "PrefixUnmarkedMethod1", "prefix").hasSize(1);
   }
 
 }

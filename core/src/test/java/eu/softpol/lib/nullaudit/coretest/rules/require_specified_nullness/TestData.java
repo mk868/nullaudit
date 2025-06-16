@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness;
+package eu.softpol.lib.nullaudit.coretest.rules.require_specified_nullness;
 
 public class TestData {
 

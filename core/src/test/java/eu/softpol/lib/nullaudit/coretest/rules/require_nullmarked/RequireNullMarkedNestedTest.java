@@ -1,9 +1,10 @@
-package eu.softpol.lib.nullaudit.coretest.rules.requirenullmarked;
+package eu.softpol.lib.nullaudit.coretest.rules.require_nullmarked;
 
 import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
+import eu.softpol.lib.nullaudit.coretest.rules.RulesConfig;
 import io.github.ascopes.jct.compilers.JctCompiler;
 import io.github.ascopes.jct.compilers.JctCompilers;
 import io.github.ascopes.jct.workspaces.Workspaces;
@@ -117,7 +118,7 @@ class RequireNullMarkedNestedTest {
 
   @Test
   void shouldReportIssueOnlyForOuterClass() {
-    var analyzer = new NullAuditAnalyzer(dir, RequireNullMarkedConfig.CONFIG);
+    var analyzer = new NullAuditAnalyzer(dir, RulesConfig.REQUIRE_NULLMARKED);
     var report = analyzer.run();
     assertThat(report).issues().hasSize(1);
     assertThat(report).issuesForClass("unmarked", "OuterClass").hasSize(1);

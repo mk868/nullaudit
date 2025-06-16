@@ -1,9 +1,10 @@
-package eu.softpol.lib.nullaudit.coretest.rules.requirespecifiednullness;
+package eu.softpol.lib.nullaudit.coretest.rules.require_nullmarked;
 
 import static eu.softpol.lib.nullaudit.coretest.assertions.CustomAssertions.assertThat;
 import static io.github.ascopes.jct.assertions.JctAssertions.assertThatCompilation;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
+import eu.softpol.lib.nullaudit.coretest.rules.RulesConfig;
 import io.github.ascopes.jct.compilers.JctCompiler;
 import io.github.ascopes.jct.compilers.JctCompilers;
 import io.github.ascopes.jct.workspaces.Workspaces;
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class InnerClassUnmarkedTest {
+class RequireNullMarkedTest {
 
   @TempDir
   Path dir;
@@ -24,21 +25,24 @@ class InnerClassUnmarkedTest {
       workspace.addClassOutputPackage(dir);
       workspace
           .createSourcePathPackage()
-          .createFile("root/scope/innerclassunmarked/Prefix1.java").withContents("""
-              package root.scope.innerclassunmarked;
+          .createFile("marked/SayHello.java").withContents("""
+              package marked;
               
               import org.jspecify.annotations.NullMarked;
-              import org.jspecify.annotations.NullUnmarked;
               
               @NullMarked
-              public class Prefix1 {
+              public class SayHello {
               
-                @NullUnmarked
-                public class Inner {
+                public void hello() {
+                }
+              }
+              """)
+          .createFile("unmarked/SayHello.java").withContents("""
+              package unmarked;
               
-                  public String addPrefix(String str) {
-                    return "prefix:" + str;
-                  }
+              public class SayHello {
+              
+                public void hello() {
                 }
               }
               """);
@@ -50,10 +54,11 @@ class InnerClassUnmarkedTest {
   }
 
   @Test
-  void shouldBeInNullMarkedScopeWhenModuleInfoAnnotatedWithNullMarked() {
-    var analyzer = new NullAuditAnalyzer(dir, RequireSpecifiedNullnessConfig.CONFIG);
+  void test() {
+    var analyzer = new NullAuditAnalyzer(dir, RulesConfig.REQUIRE_NULLMARKED);
     var report = analyzer.run();
-    assertThat(report).issues().isNotEmpty();
+    assertThat(report).issues().hasSize(1);
+    assertThat(report).issuesForClass("unmarked", "SayHello").hasSize(1);
   }
 
 }

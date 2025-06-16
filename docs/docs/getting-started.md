@@ -41,13 +41,23 @@ In your project's `pom.xml`, add the following configuration:
 
 :::tip
 
-You can configure only the rules you need!
+You can configure only the rules you need!  
+For example, to only verify JSpecify usage:
+
+```xml
+
+<configuration>
+    <rules>
+        <verifyJSpecifyAnnotations/>
+    </rules>
+</configuration>
+```
 
 :::
 
 ---
 
-## Build the Project
+## 2. Build the Project
 
 After configuring the plugin, simply run:
 
@@ -62,23 +72,3 @@ If any issues are found:
 * They will be printed in the console (up to a configurable limit).
 
 ---
-
-## Customize Rules (Optional)
-
-You can control what checks NullAudit enforces by enabling or disabling specific rules in
-the `rules` block.
-
-For example, to only verify JSpecify usage:
-
-```xml
-
-<configuration>
-    <rules>
-        <verifyJSpecifyAnnotations/>
-    </rules>
-</configuration>
-```
-
-Requirements:
-
-* Java 17 or higher

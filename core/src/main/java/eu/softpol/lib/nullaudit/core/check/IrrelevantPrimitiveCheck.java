@@ -1,25 +1,18 @@
 package eu.softpol.lib.nullaudit.core.check;
 
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
-import java.util.function.BiConsumer;
 
-public class IrrelevantPrimitiveCheck implements Check {
+public class IrrelevantPrimitiveCheck implements ClassChecker {
 
   private final MessageSolver messageSolver;
 
   public IrrelevantPrimitiveCheck(MessageSolver messageSolver) {
     this.messageSolver = messageSolver;
-  }
-
-  @Override
-  public void checkPackage(NAPackage naPackage, BiConsumer<Kind, String> addIssue) {
-    // NOP
   }
 
   @Override

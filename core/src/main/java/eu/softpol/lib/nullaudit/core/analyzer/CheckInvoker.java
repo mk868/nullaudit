@@ -5,8 +5,10 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAComponent;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAField;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAMethod;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
-import eu.softpol.lib.nullaudit.core.check.Check;
-import eu.softpol.lib.nullaudit.core.check.Check.AddIssue;
+import eu.softpol.lib.nullaudit.core.check.Checker;
+import eu.softpol.lib.nullaudit.core.check.ClassChecker;
+import eu.softpol.lib.nullaudit.core.check.ClassChecker.AddIssue;
+import eu.softpol.lib.nullaudit.core.check.PackageInfoChecker;
 import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
@@ -19,16 +21,19 @@ public class CheckInvoker {
 
   private final AnalysisContext context;
   private final ReportBuilder reportBuilder;
-  private final List<Check> checks;
+  private final List<Checker> checks;
 
-  public CheckInvoker(AnalysisContext context, ReportBuilder reportBuilder, List<Check> checks) {
+  public CheckInvoker(AnalysisContext context, ReportBuilder reportBuilder, List<Checker> checks) {
     this.context = context;
     this.reportBuilder = reportBuilder;
     this.checks = checks;
   }
 
   public void checkPackage(NAPackage naPackage) {
-    checks.forEach(c -> c.checkPackage(naPackage, (k, m) -> appendIssue(naPackage, k, m)));
+    checks.stream()
+        .filter(c -> c instanceof PackageInfoChecker)
+        .map(c -> (PackageInfoChecker) c)
+        .forEach(c -> c.checkPackage(naPackage, (k, m) -> appendIssue(naPackage, k, m)));
   }
 
   public void checkClass(NAClass naClass) {
@@ -37,33 +42,36 @@ public class CheckInvoker {
     reportBuilder.incSummaryTotalClasses();
 
     var issuesForClass = new HashMap<String, List<Kind>>();
-    checks.forEach(c -> c.checkClass(naClass, new AddIssue() {
-      @Override
-      public void addIssueForClass(Kind kind, String message) {
-        appendIssue(naClass, kind, message);
-      }
+    checks.stream()
+        .filter(c -> c instanceof ClassChecker)
+        .map(c -> (ClassChecker) c)
+        .forEach(c -> c.checkClass(naClass, new AddIssue() {
+          @Override
+          public void addIssueForClass(Kind kind, String message) {
+            appendIssue(naClass, kind, message);
+          }
 
-      @Override
-      public void addIssueForField(NAField field, Kind kind, String message) {
-        appendIssue(naClass, field.fieldName(), kind, message);
-        issuesForClass.computeIfAbsent(field.fieldName(), k -> new ArrayList<>())
-            .add(kind);
-      }
+          @Override
+          public void addIssueForField(NAField field, Kind kind, String message) {
+            appendIssue(naClass, field.fieldName(), kind, message);
+            issuesForClass.computeIfAbsent(field.fieldName(), k -> new ArrayList<>())
+                .add(kind);
+          }
 
-      @Override
-      public void addIssueForComponent(NAComponent component, Kind kind, String message) {
-        appendIssue(naClass, component.componentName(), kind, message);
-        issuesForClass.computeIfAbsent(component.componentName(), k -> new ArrayList<>())
-            .add(kind);
-      }
+          @Override
+          public void addIssueForComponent(NAComponent component, Kind kind, String message) {
+            appendIssue(naClass, component.componentName(), kind, message);
+            issuesForClass.computeIfAbsent(component.componentName(), k -> new ArrayList<>())
+                .add(kind);
+          }
 
-      @Override
-      public void addIssueForMethod(NAMethod method, Kind kind, String message) {
-        appendIssue(naClass, method.descriptiveMethodName(), kind, message);
-        issuesForClass.computeIfAbsent(method.descriptiveMethodName(), k -> new ArrayList<>())
-            .add(kind);
-      }
-    }));
+          @Override
+          public void addIssueForMethod(NAMethod method, Kind kind, String message) {
+            appendIssue(naClass, method.descriptiveMethodName(), kind, message);
+            issuesForClass.computeIfAbsent(method.descriptiveMethodName(), k -> new ArrayList<>())
+                .add(kind);
+          }
+        }));
 
     for (var componentInfo : naClass.components()) {
       reportBuilder.incSummaryTotalFields();

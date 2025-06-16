@@ -3,7 +3,7 @@ package eu.softpol.lib.nullaudit.core;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireSpecifiedNullness;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
 import eu.softpol.lib.nullaudit.core.analyzer.ClassFileAnalyzer;
-import eu.softpol.lib.nullaudit.core.check.Check;
+import eu.softpol.lib.nullaudit.core.check.Checker;
 import eu.softpol.lib.nullaudit.core.check.ExplicitNullMarkedScopeCheck;
 import eu.softpol.lib.nullaudit.core.check.IgnoreClassDecorator;
 import eu.softpol.lib.nullaudit.core.check.IrrelevantMarkedCheck;
@@ -47,7 +47,7 @@ public class NullAuditAnalyzer {
 
     var reportBuilder = new ReportBuilder();
     var fileAnalyzer = new ClassFileAnalyzer(reportBuilder, config.excludedPackages(),
-        toChecks(config));
+        toCheckers(config));
     if (Files.isDirectory(input)) {
       new DirSource(input).analyze(fileAnalyzer);
     } else if (input.getFileName().toString().endsWith(".jar")) {
@@ -63,34 +63,34 @@ public class NullAuditAnalyzer {
     return reportBuilder.build();
   }
 
-  private static List<Check> toChecks(NullAuditConfig config) {
+  private static List<Checker> toCheckers(NullAuditConfig config) {
     var messageSolver = new MessageSolver();
-    var result = new ArrayList<Check>();
+    var result = new ArrayList<Checker>();
     Optional.ofNullable(config.verifyJSpecifyAnnotations()).ifPresent(c -> {
-      List<Check> checks = List.of(
+      List<Checker> checkers = List.of(
           new IrrelevantMarkedCheck(messageSolver),
           new IrrelevantPrimitiveCheck(messageSolver)
       );
       if (!c.exclusions().isEmpty()) {
-        checks = checks.stream()
-            .map(x -> (Check) new IgnoreClassDecorator(x, c.exclusions()))
+        checkers = checkers.stream()
+            .map(x -> (Checker) new IgnoreClassDecorator(x, c.exclusions()))
             .toList();
       }
-      result.addAll(checks);
+      result.addAll(checkers);
     });
     Optional.ofNullable(config.requireNullMarked()).ifPresent(c -> {
-      Check check = new ExplicitNullMarkedScopeCheck(messageSolver);
+      Checker checkers = new ExplicitNullMarkedScopeCheck(messageSolver);
       if (!c.exclusions().isEmpty()) {
-        check = new IgnoreClassDecorator(check, c.exclusions());
+        checkers = new IgnoreClassDecorator(checkers, c.exclusions());
       }
-      result.add(check);
+      result.add(checkers);
     });
     Optional.ofNullable(config.requireSpecifiedNullness()).ifPresent(c -> {
-      Check check = new UnspecifiedNullnessCheck(messageSolver);
+      Checker checker = new UnspecifiedNullnessCheck(messageSolver);
       if (!c.exclusions().isEmpty()) {
-        check = new IgnoreClassDecorator(check, c.exclusions());
+        checker = new IgnoreClassDecorator(checker, c.exclusions());
       }
-      result.add(check);
+      result.add(checker);
     });
 
     return List.copyOf(result);

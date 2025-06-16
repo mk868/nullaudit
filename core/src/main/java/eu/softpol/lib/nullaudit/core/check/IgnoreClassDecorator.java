@@ -10,12 +10,12 @@ import eu.softpol.lib.nullaudit.core.report.Kind;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class IgnoreClassDecorator implements Check {
+public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {
 
-  private final Check delegate;
+  private final Checker delegate;
   private final List<FQCNMatcher> matchers;
 
-  public IgnoreClassDecorator(Check delegate, Exclusions exclusions) {
+  public IgnoreClassDecorator(Checker delegate, Exclusions exclusions) {
     this.delegate = delegate;
     this.matchers = exclusions.classes().stream()
         .map(
@@ -25,7 +25,9 @@ public class IgnoreClassDecorator implements Check {
 
   @Override
   public void checkPackage(NAPackage naPackage, BiConsumer<Kind, String> addIssue) {
-    delegate.checkPackage(naPackage, addIssue);
+    if (delegate instanceof PackageInfoChecker packageInfoChecker) {
+      packageInfoChecker.checkPackage(naPackage, addIssue);
+    }
   }
 
   @Override
@@ -36,6 +38,8 @@ public class IgnoreClassDecorator implements Check {
         return;
       }
     }
-    delegate.checkClass(naClass, addIssue);
+    if (delegate instanceof ClassChecker classChecker) {
+      classChecker.checkClass(naClass, addIssue);
+    }
   }
 }

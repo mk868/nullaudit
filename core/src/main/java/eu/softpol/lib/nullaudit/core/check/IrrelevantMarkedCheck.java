@@ -8,7 +8,7 @@ import eu.softpol.lib.nullaudit.core.report.Kind;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class IrrelevantMarkedCheck implements Check {
+public class IrrelevantMarkedCheck implements ClassChecker, PackageInfoChecker {
 
   private static final List<NullScopeAnnotation> INVALID_ANNOTATION_COMBINATION = List.of(
       NullScopeAnnotation.NULL_MARKED,

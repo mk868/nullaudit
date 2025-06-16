@@ -42,4 +42,14 @@ public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {
       classChecker.checkClass(naClass, addIssue);
     }
   }
+
+  public static Checker of(Checker delegate, Exclusions exclusions) {
+    return new IgnoreClassDecorator(delegate, exclusions);
+  }
+
+  public static List<Checker> of(List<Checker> delegate, Exclusions exclusions) {
+    return delegate.stream()
+        .map(x -> IgnoreClassDecorator.of(x, exclusions))
+        .toList();
+  }
 }

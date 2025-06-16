@@ -1,7 +1,8 @@
-package eu.softpol.lib.nullaudit.core.check;
+package eu.softpol.lib.nullaudit.core.check.require_nullmarked;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
+import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 

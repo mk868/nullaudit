@@ -1,8 +1,10 @@
-package eu.softpol.lib.nullaudit.core.check;
+package eu.softpol.lib.nullaudit.core.check.verify_jspecify_annotations;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScopeAnnotation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
+import eu.softpol.lib.nullaudit.core.check.ClassChecker;
+import eu.softpol.lib.nullaudit.core.check.PackageInfoChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import java.util.List;

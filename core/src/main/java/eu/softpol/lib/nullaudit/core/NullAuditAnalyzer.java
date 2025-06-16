@@ -4,11 +4,8 @@ import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireSpecifiedNullness;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
 import eu.softpol.lib.nullaudit.core.analyzer.ClassFileAnalyzer;
 import eu.softpol.lib.nullaudit.core.check.Checker;
-import eu.softpol.lib.nullaudit.core.check.ExplicitNullMarkedScopeCheck;
+import eu.softpol.lib.nullaudit.core.check.CheckerFactory;
 import eu.softpol.lib.nullaudit.core.check.IgnoreClassDecorator;
-import eu.softpol.lib.nullaudit.core.check.IrrelevantMarkedCheck;
-import eu.softpol.lib.nullaudit.core.check.IrrelevantPrimitiveCheck;
-import eu.softpol.lib.nullaudit.core.check.UnspecifiedNullnessCheck;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Report;
 import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
@@ -67,30 +64,25 @@ public class NullAuditAnalyzer {
     var messageSolver = new MessageSolver();
     var result = new ArrayList<Checker>();
     Optional.ofNullable(config.verifyJSpecifyAnnotations()).ifPresent(c -> {
-      List<Checker> checkers = List.of(
-          new IrrelevantMarkedCheck(messageSolver),
-          new IrrelevantPrimitiveCheck(messageSolver)
-      );
+      List<Checker> checkers = CheckerFactory.createVerifyJSpecifyAnnotations(messageSolver);
       if (!c.exclusions().isEmpty()) {
-        checkers = checkers.stream()
-            .map(x -> (Checker) new IgnoreClassDecorator(x, c.exclusions()))
-            .toList();
+        checkers = IgnoreClassDecorator.of(checkers, c.exclusions());
       }
       result.addAll(checkers);
     });
     Optional.ofNullable(config.requireNullMarked()).ifPresent(c -> {
-      Checker checkers = new ExplicitNullMarkedScopeCheck(messageSolver);
+      List<Checker> checkers = CheckerFactory.createRequireNullMarked(messageSolver);
       if (!c.exclusions().isEmpty()) {
-        checkers = new IgnoreClassDecorator(checkers, c.exclusions());
+        checkers = IgnoreClassDecorator.of(checkers, c.exclusions());
       }
-      result.add(checkers);
+      result.addAll(checkers);
     });
     Optional.ofNullable(config.requireSpecifiedNullness()).ifPresent(c -> {
-      Checker checker = new UnspecifiedNullnessCheck(messageSolver);
+      List<Checker> checkers = CheckerFactory.createRequireSpecifiedNullness(messageSolver);
       if (!c.exclusions().isEmpty()) {
-        checker = new IgnoreClassDecorator(checker, c.exclusions());
+        checkers = IgnoreClassDecorator.of(checkers, c.exclusions());
       }
-      result.add(checker);
+      result.addAll(checkers);
     });
 
     return List.copyOf(result);

@@ -3,6 +3,7 @@ package eu.softpol.lib.nullaudit.core.check.verify_jspecify_annotations;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
+import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
@@ -22,7 +23,7 @@ public class IrrelevantPrimitiveCheck implements ClassChecker {
       if (isPrimitiveAnnotated(componentInfo.fs())) {
         addIssue.addIssueForComponent(componentInfo,
             Kind.INVALID_NULLNESS_ON_PRIMITIVE,
-            messageSolver.invalidNullnessOnPrimitiveComponent()
+            messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_COMPONENT)
         );
       }
     }
@@ -32,7 +33,7 @@ public class IrrelevantPrimitiveCheck implements ClassChecker {
         if (isPrimitiveAnnotated(fieldInfo.fs())) {
           addIssue.addIssueForField(fieldInfo,
               Kind.INVALID_NULLNESS_ON_PRIMITIVE,
-              messageSolver.invalidNullnessOnPrimitiveField()
+              messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_FIELD)
           );
         }
       }
@@ -53,7 +54,7 @@ public class IrrelevantPrimitiveCheck implements ClassChecker {
 
             addIssue.addIssueForMethod(naMethod,
                 Kind.INVALID_NULLNESS_ON_PRIMITIVE,
-                messageSolver.invalidNullnessOnPrimitiveMethod()
+                messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_METHOD)
             );
           }
         });

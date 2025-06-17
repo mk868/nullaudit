@@ -4,6 +4,7 @@ import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAComponent;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
+import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
@@ -33,7 +34,7 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
           addIssue.addIssueForComponent(
               componentInfo,
               Kind.UNSPECIFIED_NULLNESS,
-              messageSolver.issueUnspecifiedNullnessComponent(
+              messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_COMPONENT,
                   s,
                   s.replaceAll("[^*]", " ").replace("*", "^")
               ));
@@ -54,7 +55,7 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
           addIssue.addIssueForField(
               fieldInfo,
               Kind.UNSPECIFIED_NULLNESS,
-              messageSolver.issueUnspecifiedNullnessField(
+              messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_FIELD,
                   s,
                   s.replaceAll("[^*]", " ").replace("*", "^")
               ));
@@ -109,7 +110,7 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
           addIssue.addIssueForMethod(
               methodInfo,
               Kind.UNSPECIFIED_NULLNESS,
-              messageSolver.issueUnspecifiedNullnessMethod(
+              messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_METHOD,
                   s,
                   s.replaceAll("[^*]", " ").replace("*", "^")
               ));

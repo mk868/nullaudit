@@ -5,6 +5,7 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.check.PackageInfoChecker;
+import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import java.util.List;
@@ -27,7 +28,7 @@ public class IrrelevantMarkedCheck implements ClassChecker, PackageInfoChecker {
     if (naPackage.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
       addIssue.accept(
           Kind.INVALID_NULL_MARK_COMBINATION,
-          messageSolver.invalidNullMarkCombinationPackage()
+          messageSolver.resolve(MessageKey.ISSUE_INVALID_NULL_MARK_COMBINATION_PACKAGE)
       );
     }
   }
@@ -37,7 +38,7 @@ public class IrrelevantMarkedCheck implements ClassChecker, PackageInfoChecker {
     if (naClass.annotations().containsAll(INVALID_ANNOTATION_COMBINATION)) {
       addIssue.addIssueForClass(
           Kind.INVALID_NULL_MARK_COMBINATION,
-          messageSolver.invalidNullMarkCombinationClass()
+          messageSolver.resolve(MessageKey.ISSUE_INVALID_NULL_MARK_COMBINATION_CLASS)
       );
     }
 
@@ -46,7 +47,7 @@ public class IrrelevantMarkedCheck implements ClassChecker, PackageInfoChecker {
         addIssue.addIssueForMethod(
             naMethod,
             Kind.INVALID_NULL_MARK_COMBINATION,
-            messageSolver.invalidNullMarkCombinationMethod()
+            messageSolver.resolve(MessageKey.ISSUE_INVALID_NULL_MARK_COMBINATION_METHOD)
         );
       }
     });

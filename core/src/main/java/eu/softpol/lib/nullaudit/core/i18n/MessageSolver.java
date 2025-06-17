@@ -5,78 +5,22 @@ import java.util.ResourceBundle;
 
 public class MessageSolver {
 
-  private final ResourceBundle resourceBundle;
+  private final ResourceBundle bundle;
 
   public MessageSolver() {
-    this.resourceBundle = ResourceBundle.getBundle("eu.softpol.lib.nullaudit.core.messages");
+    this.bundle = ResourceBundle.getBundle("eu.softpol.lib.nullaudit.core.messages");
   }
 
-  public String issueUnspecifiedNullnessClass(String signature, String errorPosition) {
-    return MessageFormat.format(
-        resourceBundle.getString("issue.UNSPECIFIED_NULLNESS.class"),
-        signature,
-        errorPosition
-    );
-  }
-
-  public String issueUnspecifiedNullnessField(String signature, String errorPosition) {
-    return MessageFormat.format(
-        resourceBundle.getString("issue.UNSPECIFIED_NULLNESS.field"),
-        signature,
-        errorPosition
-    );
-  }
-
-  public String issueUnspecifiedNullnessComponent(String signature, String errorPosition) {
-    return MessageFormat.format(
-        resourceBundle.getString("issue.UNSPECIFIED_NULLNESS.component"),
-        signature,
-        errorPosition
-    );
-  }
-
-  public String issueUnspecifiedNullnessMethod(String signature, String errorPosition) {
-    return MessageFormat.format(
-        resourceBundle.getString("issue.UNSPECIFIED_NULLNESS.method"),
-        signature,
-        errorPosition
-    );
-  }
-
-  public String invalidNullMarkCombinationPackage() {
-    return resourceBundle.getString("issue.INVALID_NULL_MARK_COMBINATION.package");
-  }
-
-  public String invalidNullMarkCombinationClass() {
-    return resourceBundle.getString("issue.INVALID_NULL_MARK_COMBINATION.class");
-  }
-
-  public String invalidNullMarkCombinationMethod() {
-    return resourceBundle.getString("issue.INVALID_NULL_MARK_COMBINATION.method");
-  }
-
-  public String invalidNullnessOnPrimitiveField() {
-    return resourceBundle.getString("issue.INVALID_NULLNESS_ON_PRIMITIVE.field");
-  }
-
-  public String invalidNullnessOnPrimitiveComponent() {
-    return resourceBundle.getString("issue.INVALID_NULLNESS_ON_PRIMITIVE.component");
-  }
-
-  public String invalidNullnessOnPrimitiveMethod() {
-    return resourceBundle.getString("issue.INVALID_NULLNESS_ON_PRIMITIVE.method");
-  }
-
-  public String missingNullMarkedAnnotationClass() {
-    return resourceBundle.getString("issue.MISSING_NULL_MARKED_ANNOTATION.class");
-  }
-
-  public String invalidNullableOnClass() {
-    return resourceBundle.getString("issue.INVALID_NULLABLE_ON_CLASS.class");
-  }
-
-  public String invalidNonNullOnClass() {
-    return resourceBundle.getString("issue.INVALID_NONNULL_ON_CLASS.class");
+  public String resolve(MessageKey key, Object... args) {
+    if (args.length != key.argCount()) {
+      throw new IllegalArgumentException(String.format(
+          "MessageKey '%s' expects %d args, got %d",
+          key, key.argCount(), args.length));
+    }
+    String pattern = bundle.getString(key.key());
+    return key.argCount() == 0
+        ? pattern
+        : MessageFormat.format(pattern, args);
   }
 
 }

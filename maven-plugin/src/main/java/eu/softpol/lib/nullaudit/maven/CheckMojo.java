@@ -2,6 +2,7 @@ package eu.softpol.lib.nullaudit.maven;
 
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import eu.softpol.lib.nullaudit.core.report.Issue;
+import eu.softpol.lib.nullaudit.maven.i18n.MessageKey;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -37,12 +38,12 @@ public class CheckMojo extends BaseMojo {
 
   public void execute() throws MojoExecutionException {
     if (isSkipPomPackaging() && hasPackagingPom()) {
-      getLog().info(messageSolver.skippingPomPackaging());
+      getLog().info(messageSolver.resolve(MessageKey.SKIPPING_POM_PACKAGING));
       return;
     }
 
     if (isSkipTilePackaging() && hasPackagingTile()) {
-      getLog().info(messageSolver.skippingTilePackaging());
+      getLog().info(messageSolver.resolve(MessageKey.SKIPPING_TILE_PACKAGING));
       return;
     }
 
@@ -52,13 +53,9 @@ public class CheckMojo extends BaseMojo {
     var issuesCount = report.issues().size();
 
     if (issuesCount == 0) {
-      getLog().info(messageSolver.checkNoIssuesFound());
+      getLog().info(messageSolver.resolve(MessageKey.CHECK_ISSUES_FOUND, 0));
     } else {
-      getLog().error(
-          issuesCount == 1 ?
-              messageSolver.checkOneIssueFound() :
-              messageSolver.checkMultipleIssuesFound(issuesCount)
-      );
+      getLog().error(messageSolver.resolve(MessageKey.CHECK_ISSUES_FOUND, issuesCount));
 
       List<Issue> issues = report.issues();
       int issuesToShow = issuesCount;
@@ -77,18 +74,12 @@ public class CheckMojo extends BaseMojo {
 
       var issuesLeft = issuesCount - issuesToShow;
       if (issuesLeft > 0) {
-        getLog().error(
-            issuesLeft == 1 ?
-                messageSolver.checkOneMoreIssue() :
-                messageSolver.checkMultipleMoreIssues(issuesLeft)
-        );
+        getLog().error(messageSolver.resolve(MessageKey.CHECK_MORE_ISSUES, issuesLeft));
       }
 
       if (failOnError) {
         throw new MojoExecutionException(
-            issuesCount == 1 ?
-                messageSolver.checkOneIssueFound() :
-                messageSolver.checkMultipleIssuesFound(issuesCount)
+            messageSolver.resolve(MessageKey.CHECK_ISSUES_FOUND, issuesCount)
         );
       }
     }

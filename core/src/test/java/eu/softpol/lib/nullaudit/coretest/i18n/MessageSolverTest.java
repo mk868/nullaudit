@@ -2,6 +2,7 @@ package eu.softpol.lib.nullaudit.coretest.i18n;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +24,8 @@ class MessageSolverTest {
     String signature = "<T extends Object*, T2 extends Number*> className";
     String positions = "                 ^                   ^           ";
     // WHEN
-    var msg = messageSolver.issueUnspecifiedNullnessClass(signature, positions);
+    var msg = messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_CLASS, signature,
+        positions);
     // THEN
     assertThat(msg).contains(signature);
     assertThat(msg).contains(positions);
@@ -39,7 +41,8 @@ class MessageSolverTest {
     String signature = "List*<String*> fieldName";
     String positions = "    ^       ^           ";
     // WHEN
-    var msg = messageSolver.issueUnspecifiedNullnessField(signature, positions);
+    var msg = messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_FIELD, signature,
+        positions);
     // THEN
     assertThat(msg).contains(signature);
     assertThat(msg).contains(positions);
@@ -54,7 +57,8 @@ class MessageSolverTest {
     String signature = "List*<String*> componentName";
     String positions = "    ^       ^               ";
     // WHEN
-    var msg = messageSolver.issueUnspecifiedNullnessComponent(signature, positions);
+    var msg = messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_COMPONENT, signature,
+        positions);
     // THEN
     assertThat(msg).contains(signature);
     assertThat(msg).contains(positions);
@@ -69,7 +73,8 @@ class MessageSolverTest {
     String signature = "List*<String*> methodName()";
     String positions = "    ^       ^              ";
     // WHEN
-    var msg = messageSolver.issueUnspecifiedNullnessMethod(signature, positions);
+    var msg = messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_METHOD, signature,
+        positions);
     // THEN
     assertThat(msg).contains(signature);
     assertThat(msg).contains(positions);
@@ -81,7 +86,7 @@ class MessageSolverTest {
   @Test
   void invalidNullMarkCombinationPackageTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.invalidNullMarkCombinationPackage();
+    var msg = messageSolver.resolve(MessageKey.ISSUE_INVALID_NULL_MARK_COMBINATION_PACKAGE);
     // THEN
     assertThat(msg).contains("package");
   }
@@ -89,7 +94,7 @@ class MessageSolverTest {
   @Test
   void invalidNullMarkCombinationClassTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.invalidNullMarkCombinationClass();
+    var msg = messageSolver.resolve(MessageKey.ISSUE_INVALID_NULL_MARK_COMBINATION_CLASS);
     // THEN
     assertThat(msg).contains("class");
   }
@@ -97,7 +102,7 @@ class MessageSolverTest {
   @Test
   void invalidNullMarkCombinationMethodTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.invalidNullMarkCombinationMethod();
+    var msg = messageSolver.resolve(MessageKey.ISSUE_INVALID_NULL_MARK_COMBINATION_METHOD);
     // THEN
     assertThat(msg).contains("method");
   }
@@ -105,7 +110,7 @@ class MessageSolverTest {
   @Test
   void invalidNullnessOnPrimitiveComponentTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.invalidNullnessOnPrimitiveComponent();
+    var msg = messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_COMPONENT);
     // THEN
     assertThat(msg).containsIgnoringCase("primitive");
   }
@@ -113,7 +118,7 @@ class MessageSolverTest {
   @Test
   void invalidNullnessOnPrimitiveFieldTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.invalidNullnessOnPrimitiveField();
+    var msg = messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_FIELD);
     // THEN
     assertThat(msg).containsIgnoringCase("primitive");
   }
@@ -121,7 +126,7 @@ class MessageSolverTest {
   @Test
   void invalidNullnessOnPrimitiveMethodTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.invalidNullnessOnPrimitiveMethod();
+    var msg = messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_METHOD);
     // THEN
     assertThat(msg).containsIgnoringCase("primitive");
   }
@@ -129,7 +134,7 @@ class MessageSolverTest {
   @Test
   void missingNullMarkedAnnotationClassTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.missingNullMarkedAnnotationClass();
+    var msg = messageSolver.resolve(MessageKey.ISSUE_MISSING_NULLMARKED_ANNOTATION_CLASS);
     // THEN
     assertThat(msg).containsIgnoringCase("@NullMarked");
   }

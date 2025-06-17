@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import eu.softpol.lib.nullaudit.core.report.Report;
+import eu.softpol.lib.nullaudit.maven.i18n.MessageKey;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -38,12 +39,12 @@ public class ReportMojo extends BaseMojo {
 
   public void execute() throws MojoExecutionException {
     if (isSkipPomPackaging() && hasPackagingPom()) {
-      getLog().info(messageSolver.skippingPomPackaging());
+      getLog().info(messageSolver.resolve(MessageKey.SKIPPING_POM_PACKAGING));
       return;
     }
 
     if (isSkipTilePackaging() && hasPackagingTile()) {
-      getLog().info(messageSolver.skippingTilePackaging());
+      getLog().info(messageSolver.resolve(MessageKey.SKIPPING_TILE_PACKAGING));
       return;
     }
 
@@ -59,7 +60,7 @@ public class ReportMojo extends BaseMojo {
     }
 
     saveReport(report, reportPath.toFile());
-    getLog().info(messageSolver.reportReportSaved(reportPath.toString()));
+    getLog().info(messageSolver.resolve(MessageKey.REPORT_REPORT_SAVED, reportPath.toString()));
   }
 
   private void saveReport(Report report, File file) {

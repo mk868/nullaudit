@@ -8,7 +8,6 @@ import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -21,63 +20,19 @@ class MessageSolverTest {
     messageSolver = new MessageSolver();
   }
 
-  @Test
-  void issueUnspecifiedNullnessClassTest() {
+  @ParameterizedTest
+  @EnumSource(value = MessageKey.class, names = {
+      "ISSUE_UNSPECIFIED_NULLNESS_CLASS",
+      "ISSUE_UNSPECIFIED_NULLNESS_FIELD",
+      "ISSUE_UNSPECIFIED_NULLNESS_COMPONENT",
+      "ISSUE_UNSPECIFIED_NULLNESS_METHOD"
+  })
+  void textPositionTest(MessageKey messageKey) {
     // GIVEN
     String signature = "<T extends Object*, T2 extends Number*> className";
     String positions = "                 ^                   ^           ";
     // WHEN
-    var msg = messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_CLASS, signature,
-        positions);
-    // THEN
-    assertThat(msg).contains(signature);
-    assertThat(msg).contains(positions);
-
-    assertThat(indexesOf(lineWithContent(msg, signature), '*'))
-        .isEqualTo(indexesOf(lineWithContent(msg, positions), '^'));
-  }
-
-
-  @Test
-  void issueUnspecifiedNullnessFieldTest() {
-    // GIVEN
-    String signature = "List*<String*> fieldName";
-    String positions = "    ^       ^           ";
-    // WHEN
-    var msg = messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_FIELD, signature,
-        positions);
-    // THEN
-    assertThat(msg).contains(signature);
-    assertThat(msg).contains(positions);
-
-    assertThat(indexesOf(lineWithContent(msg, signature), '*'))
-        .isEqualTo(indexesOf(lineWithContent(msg, positions), '^'));
-  }
-
-  @Test
-  void issueUnspecifiedNullnessComponentTest() {
-    // GIVEN
-    String signature = "List*<String*> componentName";
-    String positions = "    ^       ^               ";
-    // WHEN
-    var msg = messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_COMPONENT, signature,
-        positions);
-    // THEN
-    assertThat(msg).contains(signature);
-    assertThat(msg).contains(positions);
-
-    assertThat(indexesOf(lineWithContent(msg, signature), '*'))
-        .isEqualTo(indexesOf(lineWithContent(msg, positions), '^'));
-  }
-
-  @Test
-  void issueUnspecifiedNullnessMethodTest() {
-    // GIVEN
-    String signature = "List*<String*> methodName()";
-    String positions = "    ^       ^              ";
-    // WHEN
-    var msg = messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_METHOD, signature,
-        positions);
+    var msg = messageSolver.resolve(messageKey, signature, positions);
     // THEN
     assertThat(msg).contains(signature);
     assertThat(msg).contains(positions);

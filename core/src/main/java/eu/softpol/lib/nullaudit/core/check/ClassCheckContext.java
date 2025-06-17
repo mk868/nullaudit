@@ -1,6 +1,7 @@
 package eu.softpol.lib.nullaudit.core.check;
 
 import eu.softpol.lib.nullaudit.core.analyzer.CodeAnalysisData;
+import eu.softpol.lib.nullaudit.core.analyzer.CodeAnalysisData.IssueEntry;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.ClassLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
@@ -9,6 +10,7 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAField;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAMethod;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import eu.softpol.lib.nullaudit.core.report.Kind;
+import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 public class ClassCheckContext {
@@ -58,4 +60,7 @@ public class ClassCheckContext {
     codeAnalysisData.addIssue(codeLocation, kind, message);
   }
 
+  public List<IssueEntry> getIssues(CodeLocation codeLocation) {
+    return List.copyOf(codeAnalysisData.getIssues(codeLocation));
+  }
 }

@@ -7,11 +7,11 @@ import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 
-public class ExplicitNullMarkedScopeCheck implements ClassChecker {
+public class ExplicitNullMarkedOnClassCheck implements ClassChecker {
 
   private final MessageSolver messageSolver;
 
-  public ExplicitNullMarkedScopeCheck(MessageSolver messageSolver) {
+  public ExplicitNullMarkedOnClassCheck(MessageSolver messageSolver) {
     this.messageSolver = messageSolver;
   }
 

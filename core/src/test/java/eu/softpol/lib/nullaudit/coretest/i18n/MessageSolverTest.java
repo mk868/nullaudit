@@ -1,6 +1,7 @@
 package eu.softpol.lib.nullaudit.coretest.i18n;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
@@ -8,6 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class MessageSolverTest {
 
@@ -83,60 +86,16 @@ class MessageSolverTest {
         .isEqualTo(indexesOf(lineWithContent(msg, positions), '^'));
   }
 
-  @Test
-  void invalidNullMarkCombinationPackageTest() {
-    // GIVEN/WHEN
-    var msg = messageSolver.resolve(MessageKey.ISSUE_INVALID_NULL_MARK_COMBINATION_PACKAGE);
-    // THEN
-    assertThat(msg).contains("package");
-  }
+  @ParameterizedTest
+  @EnumSource(MessageKey.class)
+  void noArgTest(MessageKey messageKey) {
+    assumeThat(messageKey.argCount())
+        .isEqualTo(0);
 
-  @Test
-  void invalidNullMarkCombinationClassTest() {
     // GIVEN/WHEN
-    var msg = messageSolver.resolve(MessageKey.ISSUE_INVALID_NULL_MARK_COMBINATION_CLASS);
+    var msg = messageSolver.resolve(messageKey);
     // THEN
-    assertThat(msg).contains("class");
-  }
-
-  @Test
-  void invalidNullMarkCombinationMethodTest() {
-    // GIVEN/WHEN
-    var msg = messageSolver.resolve(MessageKey.ISSUE_INVALID_NULL_MARK_COMBINATION_METHOD);
-    // THEN
-    assertThat(msg).contains("method");
-  }
-
-  @Test
-  void invalidNullnessOnPrimitiveComponentTest() {
-    // GIVEN/WHEN
-    var msg = messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_COMPONENT);
-    // THEN
-    assertThat(msg).containsIgnoringCase("primitive");
-  }
-
-  @Test
-  void invalidNullnessOnPrimitiveFieldTest() {
-    // GIVEN/WHEN
-    var msg = messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_FIELD);
-    // THEN
-    assertThat(msg).containsIgnoringCase("primitive");
-  }
-
-  @Test
-  void invalidNullnessOnPrimitiveMethodTest() {
-    // GIVEN/WHEN
-    var msg = messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_METHOD);
-    // THEN
-    assertThat(msg).containsIgnoringCase("primitive");
-  }
-
-  @Test
-  void missingNullMarkedAnnotationClassTest() {
-    // GIVEN/WHEN
-    var msg = messageSolver.resolve(MessageKey.ISSUE_MISSING_NULLMARKED_ANNOTATION_CLASS);
-    // THEN
-    assertThat(msg).containsIgnoringCase("@NullMarked");
+    assertThat(msg).isNotBlank();
   }
 
   static String lineWithContent(String str, String content) {

@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.Clazz;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassReference;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.KnownAnnotations;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,46 +11,46 @@ import org.jspecify.annotations.Nullable;
 
 public final class MutableNAClass implements NAClass {
 
-  private final Clazz thisClazz;
-  private final Clazz superClazz;
+  private final ClassReference thisClass;
+  private final ClassReference superClass;
   private final List<NAComponent> components = new ArrayList<>();
   private final List<NAField> fields = new ArrayList<>();
   private final List<MutableNAMethod> methods = new ArrayList<>();
   private final Set<KnownAnnotations> annotations = new HashSet<>();
-  private @Nullable Clazz topClazz;
-  private @Nullable Clazz outerClass;
+  private @Nullable ClassReference topClass;
+  private @Nullable ClassReference outerClass;
   private NullScope effectiveNullScope = NullScope.NOT_DEFINED;
 
-  public MutableNAClass(Clazz thisClazz, Clazz superClazz) {
-    this.thisClazz = thisClazz;
-    this.superClazz = superClazz;
+  public MutableNAClass(ClassReference thisClass, ClassReference superClass) {
+    this.thisClass = thisClass;
+    this.superClass = superClass;
   }
 
   @Override
-  public Clazz thisClazz() {
-    return thisClazz;
+  public ClassReference thisClazz() {
+    return thisClass;
   }
 
   @Override
-  public Clazz superClazz() {
-    return superClazz;
+  public ClassReference superClazz() {
+    return superClass;
   }
 
   @Override
-  public Clazz topClass() {
-    return topClazz;
+  public ClassReference topClass() {
+    return topClass;
   }
 
-  public void setTopClazz(Clazz topClazz) {
-    this.topClazz = topClazz;
+  public void setTopClazz(ClassReference topClass) {
+    this.topClass = topClass;
   }
 
   @Override
-  public @Nullable Clazz outerClass() {
+  public @Nullable ClassReference outerClass() {
     return outerClass;
   }
 
-  public void setOuterClass(@Nullable Clazz outerClass) {
+  public void setOuterClass(@Nullable ClassReference outerClass) {
     this.outerClass = outerClass;
   }
 

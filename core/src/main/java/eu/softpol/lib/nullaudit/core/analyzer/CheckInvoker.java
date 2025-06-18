@@ -1,5 +1,8 @@
 package eu.softpol.lib.nullaudit.core.analyzer;
 
+import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.ClassLocation;
+import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.MemberLocation;
+import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.PackageLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAComponent;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAField;
@@ -15,7 +18,6 @@ import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.jspecify.annotations.Nullable;
 
 public class CheckInvoker {
 
@@ -33,7 +35,9 @@ public class CheckInvoker {
     checks.stream()
         .filter(c -> c instanceof PackageInfoChecker)
         .map(c -> (PackageInfoChecker) c)
-        .forEach(c -> c.checkPackage(naPackage, (k, m) -> appendIssue(naPackage, k, m)));
+        .forEach(c -> c.checkPackage(naPackage, (k, m) -> {
+          appendIssue(new PackageLocation(context.getModuleName(), naPackage.packageName()), k, m);
+        }));
   }
 
   public void checkClass(NAClass naClass) {
@@ -48,7 +52,9 @@ public class CheckInvoker {
         .forEach(c -> c.checkClass(naClass, new AddIssue() {
           @Override
           public void addIssueForClass(Kind kind, String message) {
-            appendIssue(naClass, kind, message);
+            appendIssue(
+                new ClassLocation(context.getModuleName(), naClass.thisClazz().packageName(),
+                    naClass.thisClazz().binarySimpleName()), kind, message);
           }
 
           @Override
@@ -111,38 +117,33 @@ public class CheckInvoker {
     }
   }
 
-  private void appendIssue(NAPackage naPackage, Kind kind, String message) {
-    var location = "";
-    if (context.getModuleName() != null) {
-      location = context.getModuleName() + "/";
+  private void appendIssue(NAClass naClass, String name, Kind kind, String message) {
+    appendIssue(new MemberLocation(context.getModuleName(), naClass.thisClazz().packageName(),
+        naClass.thisClazz().binarySimpleName(), name), kind, message);
+  }
+
+  private void appendIssue(CodeLocation codeLocation, Kind kind, String message) {
+    String location = "";
+    if (codeLocation.module() != null) {
+      location += codeLocation.module() + "/";
     }
-    location += naPackage.packageName() + ".package-info";
+    if (!codeLocation.packageName().isEmpty()) {
+      location += codeLocation.packageName() + ".";
+    }
+    if (codeLocation instanceof CodeLocation.PackageLocation __) {
+      location += "package-info";
+    } else if (codeLocation instanceof CodeLocation.ClassLocation classLocation) {
+      location += classLocation.className();
+    } else if (codeLocation instanceof CodeLocation.MemberLocation memberLocation) {
+      location += memberLocation.className() + "#" + memberLocation.memberName();
+    } else {
+      throw new IllegalArgumentException("Unsupported code location: " + codeLocation);
+    }
 
     reportBuilder.addIssue(new Issue(
         location,
         kind,
         message
     ));
-  }
-
-  private void appendIssue(NAClass naClass, @Nullable String name, Kind kind, String message) {
-    var location = "";
-    if (context.getModuleName() != null) {
-      location = context.getModuleName() + "/";
-    }
-    location += naClass.thisClazz().name();
-    if (name != null) {
-      location += "#" + name;
-    }
-
-    reportBuilder.addIssue(new Issue(
-        location,
-        kind,
-        message
-    ));
-  }
-
-  private void appendIssue(NAClass naClass, Kind kind, String message) {
-    appendIssue(naClass, null, kind, message);
   }
 }

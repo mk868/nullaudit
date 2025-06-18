@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.Clazz;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassReference;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.KnownAnnotations;
 import java.util.List;
 import java.util.Optional;
@@ -20,13 +20,13 @@ public interface NAClass {
     return superClazz().name().equals("java.lang.Record");
   }
 
-  Clazz thisClazz();
+  ClassReference thisClazz();
 
-  Clazz superClazz();
+  ClassReference superClazz();
 
-  Clazz topClass();
+  ClassReference topClass();
 
-  public @Nullable Clazz outerClass();
+  public @Nullable ClassReference outerClass();
 
   NullScope effectiveNullScope();
 

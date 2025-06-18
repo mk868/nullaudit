@@ -1,6 +1,6 @@
 package eu.softpol.lib.nullaudit.core.analyzer;
 
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.Clazz;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassReference;
 import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -10,7 +10,7 @@ public class AnalysisContext {
   private @Nullable String moduleName;
   private boolean moduleInfoNullMarked;
   private final Map<String, NullScope> packageNullScope = new HashMap<>();
-  private final Map<Clazz, NullScope> classNullScope = new HashMap<>();
+  private final Map<ClassReference, NullScope> classNullScope = new HashMap<>();
 
   public @Nullable String getModuleName() {
     return moduleName;
@@ -36,11 +36,11 @@ public class AnalysisContext {
     this.packageNullScope.put(packageName, nullScope);
   }
 
-  public NullScope getClassNullScope(Clazz clazz) {
-    return classNullScope.getOrDefault(clazz, NullScope.NOT_DEFINED);
+  public NullScope getClassNullScope(ClassReference classReference) {
+    return classNullScope.getOrDefault(classReference, NullScope.NOT_DEFINED);
   }
 
-  public void setClassNullScope(Clazz clazz, NullScope nullScope) {
-    this.classNullScope.put(clazz, nullScope);
+  public void setClassNullScope(ClassReference classReference, NullScope nullScope) {
+    this.classNullScope.put(classReference, nullScope);
   }
 }

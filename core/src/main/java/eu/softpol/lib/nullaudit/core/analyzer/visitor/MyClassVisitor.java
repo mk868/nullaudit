@@ -33,7 +33,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private static final System.Logger logger = System.getLogger(MyClassVisitor.class.getName());
 
   private final AnalysisContext context;
-  private final List<Clazz> classChain = new ArrayList<>();
+  private final List<ClassReference> classChain = new ArrayList<>();
   private String sourceFileName;
   private MutableNAClass naClass;
 
@@ -46,15 +46,15 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   public void visit(int version, int access, String name, String signature, String superName,
       String[] interfaces) {
     naClass = new MutableNAClass(
-        Clazz.of(name),
-        Clazz.of(superName)
+        ClassReference.of(name),
+        ClassReference.of(superName)
     );
     super.visit(version, access, name, signature, superName, interfaces);
   }
 
   @Override
   public void visitOuterClass(String owner, String name, String descriptor) {
-    naClass.setOuterClass(Clazz.of(owner));
+    naClass.setOuterClass(ClassReference.of(owner));
     super.visitOuterClass(owner, name, descriptor);
   }
 
@@ -62,10 +62,10 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   public void visitInnerClass(String name, @Nullable String outerName, @Nullable String innerName,
       int access) {
     if (outerName != null && naClass.thisClazz().internalName().startsWith(name)) {
-      classChain.add(Clazz.of(outerName));
+      classChain.add(ClassReference.of(outerName));
     }
     if (name.equals(naClass.thisClazz().internalName()) && outerName != null) {
-      naClass.setOuterClass(Clazz.of(outerName));
+      naClass.setOuterClass(ClassReference.of(outerName));
     }
     super.visitInnerClass(name, outerName, innerName, access);
   }

@@ -8,8 +8,9 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAField;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAMethod;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import eu.softpol.lib.nullaudit.core.check.Checker;
+import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
-import eu.softpol.lib.nullaudit.core.check.ClassChecker.AddIssue;
+import eu.softpol.lib.nullaudit.core.check.PackageInfoCheckContext;
 import eu.softpol.lib.nullaudit.core.check.PackageInfoChecker;
 import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.Kind;
@@ -32,12 +33,19 @@ public class CheckInvoker {
 
   public void checkPackage(NAPackage naPackage) {
     var packageLocation = new PackageLocation(context.getModuleName(), naPackage.packageName());
+    var packageInfoCheckContext = new PackageInfoCheckContext(
+        packageLocation,
+        naPackage
+    ) {
+      @Override
+      public void addIssue(Kind kind, String message) {
+        appendIssue(packageLocation, kind, message);
+      }
+    };
     checks.stream()
         .filter(c -> c instanceof PackageInfoChecker)
         .map(c -> (PackageInfoChecker) c)
-        .forEach(c -> c.checkPackage(naPackage, (k, m) -> {
-          appendIssue(packageLocation, k, m);
-        }));
+        .forEach(c -> c.checkPackage(packageInfoCheckContext));
   }
 
   public void checkClass(NAClass naClass) {
@@ -48,36 +56,38 @@ public class CheckInvoker {
     var issuesForClass = new HashMap<String, List<Kind>>();
     var classLocation = new ClassLocation(context.getModuleName(),
         naClass.thisClazz().packageName(), naClass.thisClazz().binarySimpleName());
+    var classCheckContext = new ClassCheckContext(classLocation, naClass) {
+      @Override
+      public void addIssueForClass(Kind kind, String message) {
+        appendIssue(classLocation, kind, message);
+      }
+
+      @Override
+      public void addIssueForField(NAField field, Kind kind, String message) {
+        appendIssue(classLocation.memberLocation(field.fieldName()), kind, message);
+        issuesForClass.computeIfAbsent(field.fieldName(), k -> new ArrayList<>())
+            .add(kind);
+      }
+
+      @Override
+      public void addIssueForComponent(NAComponent component, Kind kind, String message) {
+        appendIssue(classLocation.memberLocation(component.componentName()), kind, message);
+        issuesForClass.computeIfAbsent(component.componentName(), k -> new ArrayList<>())
+            .add(kind);
+      }
+
+      @Override
+      public void addIssueForMethod(NAMethod method, Kind kind, String message) {
+        appendIssue(classLocation.memberLocation(method.descriptiveMethodName()), kind,
+            message);
+        issuesForClass.computeIfAbsent(method.descriptiveMethodName(), k -> new ArrayList<>())
+            .add(kind);
+      }
+    };
     checks.stream()
         .filter(c -> c instanceof ClassChecker)
         .map(c -> (ClassChecker) c)
-        .forEach(c -> c.checkClass(naClass, new AddIssue() {
-          @Override
-          public void addIssueForClass(Kind kind, String message) {
-            appendIssue(classLocation, kind, message);
-          }
-
-          @Override
-          public void addIssueForField(NAField field, Kind kind, String message) {
-            appendIssue(classLocation.memberLocation(field.fieldName()), kind, message);
-            issuesForClass.computeIfAbsent(field.fieldName(), k -> new ArrayList<>())
-                .add(kind);
-          }
-
-          @Override
-          public void addIssueForComponent(NAComponent component, Kind kind, String message) {
-            appendIssue(classLocation.memberLocation(component.componentName()), kind, message);
-            issuesForClass.computeIfAbsent(component.componentName(), k -> new ArrayList<>())
-                .add(kind);
-          }
-
-          @Override
-          public void addIssueForMethod(NAMethod method, Kind kind, String message) {
-            appendIssue(classLocation.memberLocation(method.descriptiveMethodName()), kind, message);
-            issuesForClass.computeIfAbsent(method.descriptiveMethodName(), k -> new ArrayList<>())
-                .add(kind);
-          }
-        }));
+        .forEach(c -> c.checkClass(classCheckContext));
 
     for (var componentInfo : naClass.components()) {
       reportBuilder.incSummaryTotalFields();

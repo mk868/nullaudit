@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.check.require_nullmarked;
 
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.KnownAnnotations;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
+import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
@@ -16,12 +16,13 @@ public class ExplicitNullMarkedScopeCheck implements ClassChecker {
   }
 
   @Override
-  public void checkClass(NAClass naClass, AddIssue addIssue) {
+  public void checkClass(ClassCheckContext context) {
+    var naClass = context.naClass();
     if (naClass.outerClass() != null) {
       return;
     }
     if (!naClass.annotations().contains(KnownAnnotations.NULL_MARKED)) {
-      addIssue.addIssueForClass(
+      context.addIssueForClass(
           Kind.MISSING_NULL_MARKED_ANNOTATION,
           messageSolver.resolve(MessageKey.ISSUE_MISSING_NULLMARKED_ANNOTATION_CLASS)
       );

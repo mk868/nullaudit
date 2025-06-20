@@ -1,14 +1,10 @@
 package eu.softpol.lib.nullaudit.core.check;
 
 import eu.softpol.lib.nullaudit.core.Exclusions;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import eu.softpol.lib.nullaudit.core.matcher.AntLikeFQCNMatcher;
 import eu.softpol.lib.nullaudit.core.matcher.FQCNMatcher;
 import eu.softpol.lib.nullaudit.core.matcher.StaticFQCNMatcher;
-import eu.softpol.lib.nullaudit.core.report.Kind;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {
 
@@ -24,14 +20,15 @@ public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {
   }
 
   @Override
-  public void checkPackage(NAPackage naPackage, BiConsumer<Kind, String> addIssue) {
+  public void checkPackage(PackageInfoCheckContext context) {
     if (delegate instanceof PackageInfoChecker packageInfoChecker) {
-      packageInfoChecker.checkPackage(naPackage, addIssue);
+      packageInfoChecker.checkPackage(context);
     }
   }
 
   @Override
-  public void checkClass(NAClass naClass, AddIssue addIssue) {
+  public void checkClass(ClassCheckContext context) {
+    var naClass = context.naClass();
     for (FQCNMatcher matcher : matchers) {
       if (matcher.matches(naClass.topClass().name())) {
         // class ignored
@@ -39,7 +36,7 @@ public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {
       }
     }
     if (delegate instanceof ClassChecker classChecker) {
-      classChecker.checkClass(naClass, addIssue);
+      classChecker.checkClass(context);
     }
   }
 

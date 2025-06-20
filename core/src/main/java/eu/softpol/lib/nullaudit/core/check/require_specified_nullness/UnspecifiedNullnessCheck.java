@@ -1,8 +1,8 @@
 package eu.softpol.lib.nullaudit.core.check.require_specified_nullness;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAComponent;
+import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
@@ -19,7 +19,8 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
   }
 
   @Override
-  public void checkClass(NAClass naClass, AddIssue addIssue) {
+  public void checkClass(ClassCheckContext context) {
+    var naClass = context.naClass();
     var classAugmentedStringTranslator =
         new AugmentedStringTranslator(naClass.effectiveNullScope());
 
@@ -31,7 +32,7 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
             componentInfo.componentName()
         );
         if (s.contains("*")) {
-          addIssue.addIssueForComponent(
+          context.addIssueForComponent(
               componentInfo,
               Kind.UNSPECIFIED_NULLNESS,
               messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_COMPONENT,
@@ -52,7 +53,7 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
             fieldInfo.fieldName()
         );
         if (s.contains("*")) {
-          addIssue.addIssueForField(
+          context.addIssueForField(
               fieldInfo,
               Kind.UNSPECIFIED_NULLNESS,
               messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_FIELD,
@@ -75,9 +76,9 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
         }
 
         if (naClass.getComponent(methodName)
-            .filter(c -> classAugmentedStringTranslator.translate(c.fs())
-                .equals(classAugmentedStringTranslator.translate(methodInfo.ms().returnType())))
-            .isPresent()
+                .filter(c -> classAugmentedStringTranslator.translate(c.fs())
+                    .equals(classAugmentedStringTranslator.translate(methodInfo.ms().returnType())))
+                .isPresent()
             && methodInfo.ms().parameterTypes().isEmpty()
         ) {
           // skip default getter
@@ -107,7 +108,7 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
                 .collect(Collectors.joining(", "))
         );
         if (s.contains("*")) {
-          addIssue.addIssueForMethod(
+          context.addIssueForMethod(
               methodInfo,
               Kind.UNSPECIFIED_NULLNESS,
               messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_METHOD,

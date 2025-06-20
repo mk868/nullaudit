@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.check.verify_jspecify_annotations;
 
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
+import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
@@ -18,10 +18,11 @@ public class IrrelevantPrimitiveCheck implements ClassChecker {
   }
 
   @Override
-  public void checkClass(NAClass naClass, AddIssue addIssue) {
+  public void checkClass(ClassCheckContext context) {
+    var naClass = context.naClass();
     for (var componentInfo : naClass.components()) {
       if (isPrimitiveAnnotated(componentInfo.fs())) {
-        addIssue.addIssueForComponent(componentInfo,
+        context.addIssueForComponent(componentInfo,
             Kind.INVALID_NULLNESS_ON_PRIMITIVE,
             messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_COMPONENT)
         );
@@ -31,7 +32,7 @@ public class IrrelevantPrimitiveCheck implements ClassChecker {
     if (!naClass.isRecord()) {
       for (var fieldInfo : naClass.fields()) {
         if (isPrimitiveAnnotated(fieldInfo.fs())) {
-          addIssue.addIssueForField(fieldInfo,
+          context.addIssueForField(fieldInfo,
               Kind.INVALID_NULLNESS_ON_PRIMITIVE,
               messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_FIELD)
           );
@@ -52,7 +53,7 @@ public class IrrelevantPrimitiveCheck implements ClassChecker {
               naMethod.ms().parameterTypes().stream()
                   .anyMatch(IrrelevantPrimitiveCheck::isPrimitiveAnnotated)) {
 
-            addIssue.addIssueForMethod(naMethod,
+            context.addIssueForMethod(naMethod,
                 Kind.INVALID_NULLNESS_ON_PRIMITIVE,
                 messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_METHOD)
             );
@@ -69,6 +70,6 @@ public class IrrelevantPrimitiveCheck implements ClassChecker {
 
   private static boolean isAnnotated(PrimitiveTypeNode type) {
     return type.getAnnotations().contains(TypeUseAnnotation.JSPECIFY_NULLABLE) ||
-        type.getAnnotations().contains(TypeUseAnnotation.JSPECIFY_NON_NULL);
+           type.getAnnotations().contains(TypeUseAnnotation.JSPECIFY_NON_NULL);
   }
 }

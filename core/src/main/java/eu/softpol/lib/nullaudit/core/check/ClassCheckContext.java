@@ -1,5 +1,6 @@
 package eu.softpol.lib.nullaudit.core.check;
 
+import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.ClassLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAComponent;
@@ -25,12 +26,22 @@ public abstract class ClassCheckContext {
     return naClass;
   }
 
-  public abstract void addIssueForClass(Kind kind, String message);
+  public void addIssueForClass(Kind kind, String message) {
+    addIssue(location, kind, message);
+  }
 
-  public abstract void addIssueForField(NAField field, Kind kind, String message);
+  public void addIssueForField(NAField field, Kind kind, String message) {
+    addIssue(location.memberLocation(field.fieldName()), kind, message);
+  }
 
-  public abstract void addIssueForComponent(NAComponent field, Kind kind, String message);
+  public void addIssueForComponent(NAComponent component, Kind kind, String message) {
+    addIssue(location.memberLocation(component.componentName()), kind, message);
+  }
 
-  public abstract void addIssueForMethod(NAMethod method, Kind kind, String message);
+  public void addIssueForMethod(NAMethod method, Kind kind, String message) {
+    addIssue(location.memberLocation(method.descriptiveMethodName()), kind, message);
+  }
+
+  public abstract void addIssue(CodeLocation codeLocation, Kind kind, String message);
 
 }

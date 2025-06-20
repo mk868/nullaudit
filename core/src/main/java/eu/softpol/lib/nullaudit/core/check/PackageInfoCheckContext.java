@@ -1,5 +1,6 @@
 package eu.softpol.lib.nullaudit.core.check;
 
+import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.PackageLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import eu.softpol.lib.nullaudit.core.report.Kind;
@@ -22,5 +23,9 @@ public abstract class PackageInfoCheckContext {
     return naPackage;
   }
 
-  public abstract void addIssue(Kind kind, String message);
+  public void addIssue(Kind kind, String message) {
+    addIssue(location, kind, message);
+  }
+
+  public abstract void addIssue(CodeLocation location, Kind kind, String message);
 }

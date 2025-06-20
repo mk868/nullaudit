@@ -3,9 +3,6 @@ package eu.softpol.lib.nullaudit.core.analyzer;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.ClassLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.PackageLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAComponent;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAField;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAMethod;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import eu.softpol.lib.nullaudit.core.check.Checker;
 import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
@@ -38,8 +35,8 @@ public class CheckInvoker {
         naPackage
     ) {
       @Override
-      public void addIssue(Kind kind, String message) {
-        appendIssue(packageLocation, kind, message);
+      public void addIssue(CodeLocation location, Kind kind, String message) {
+        appendIssue(location, kind, message);
       }
     };
     checks.stream()
@@ -53,34 +50,14 @@ public class CheckInvoker {
 
     reportBuilder.incSummaryTotalClasses();
 
-    var issuesForClass = new HashMap<String, List<Kind>>();
+    var issues = new HashMap<CodeLocation, List<Kind>>();
     var classLocation = new ClassLocation(context.getModuleName(),
         naClass.thisClazz().packageName(), naClass.thisClazz().binarySimpleName());
     var classCheckContext = new ClassCheckContext(classLocation, naClass) {
       @Override
-      public void addIssueForClass(Kind kind, String message) {
-        appendIssue(classLocation, kind, message);
-      }
-
-      @Override
-      public void addIssueForField(NAField field, Kind kind, String message) {
-        appendIssue(classLocation.memberLocation(field.fieldName()), kind, message);
-        issuesForClass.computeIfAbsent(field.fieldName(), k -> new ArrayList<>())
-            .add(kind);
-      }
-
-      @Override
-      public void addIssueForComponent(NAComponent component, Kind kind, String message) {
-        appendIssue(classLocation.memberLocation(component.componentName()), kind, message);
-        issuesForClass.computeIfAbsent(component.componentName(), k -> new ArrayList<>())
-            .add(kind);
-      }
-
-      @Override
-      public void addIssueForMethod(NAMethod method, Kind kind, String message) {
-        appendIssue(classLocation.memberLocation(method.descriptiveMethodName()), kind,
-            message);
-        issuesForClass.computeIfAbsent(method.descriptiveMethodName(), k -> new ArrayList<>())
+      public void addIssue(CodeLocation codeLocation, Kind kind, String message) {
+        appendIssue(codeLocation, kind, message);
+        issues.computeIfAbsent(codeLocation, k -> new ArrayList<>())
             .add(kind);
       }
     };
@@ -92,8 +69,8 @@ public class CheckInvoker {
     for (var componentInfo : naClass.components()) {
       reportBuilder.incSummaryTotalFields();
 
-      if (issuesForClass.getOrDefault(componentInfo.componentName(), List.of())
-          .contains(Kind.UNSPECIFIED_NULLNESS)) {
+      var l = classLocation.memberLocation(componentInfo.componentName());
+      if (issues.getOrDefault(l, List.of()).contains(Kind.UNSPECIFIED_NULLNESS)) {
         reportBuilder.incSummaryUnspecifiedNullnessFields();
         unspecifiedNullnessFound = true;
       }
@@ -106,8 +83,8 @@ public class CheckInvoker {
       }
       reportBuilder.incSummaryTotalFields();
 
-      if (issuesForClass.getOrDefault(fieldInfo.fieldName(), List.of())
-          .contains(Kind.UNSPECIFIED_NULLNESS)) {
+      var l = classLocation.memberLocation(fieldInfo.fieldName());
+      if (issues.getOrDefault(l, List.of()).contains(Kind.UNSPECIFIED_NULLNESS)) {
         reportBuilder.incSummaryUnspecifiedNullnessFields();
         unspecifiedNullnessFound = true;
       }
@@ -115,8 +92,9 @@ public class CheckInvoker {
 
     for (var methodInfo : naClass.methods()) {
       reportBuilder.incSummaryTotalMethods();
-      if (issuesForClass.getOrDefault(methodInfo.descriptiveMethodName(), List.of())
-          .contains(Kind.UNSPECIFIED_NULLNESS)) {
+
+      var l = classLocation.memberLocation(methodInfo.descriptiveMethodName());
+      if (issues.getOrDefault(l, List.of()).contains(Kind.UNSPECIFIED_NULLNESS)) {
         reportBuilder.incSummaryUnspecifiedNullnessMethods();
         unspecifiedNullnessFound = true;
       }

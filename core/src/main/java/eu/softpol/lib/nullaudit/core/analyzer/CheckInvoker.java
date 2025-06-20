@@ -1,7 +1,6 @@
 package eu.softpol.lib.nullaudit.core.analyzer;
 
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.ClassLocation;
-import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.MemberLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.PackageLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAComponent;
@@ -32,11 +31,12 @@ public class CheckInvoker {
   }
 
   public void checkPackage(NAPackage naPackage) {
+    var packageLocation = new PackageLocation(context.getModuleName(), naPackage.packageName());
     checks.stream()
         .filter(c -> c instanceof PackageInfoChecker)
         .map(c -> (PackageInfoChecker) c)
         .forEach(c -> c.checkPackage(naPackage, (k, m) -> {
-          appendIssue(new PackageLocation(context.getModuleName(), naPackage.packageName()), k, m);
+          appendIssue(packageLocation, k, m);
         }));
   }
 
@@ -46,34 +46,34 @@ public class CheckInvoker {
     reportBuilder.incSummaryTotalClasses();
 
     var issuesForClass = new HashMap<String, List<Kind>>();
+    var classLocation = new ClassLocation(context.getModuleName(),
+        naClass.thisClazz().packageName(), naClass.thisClazz().binarySimpleName());
     checks.stream()
         .filter(c -> c instanceof ClassChecker)
         .map(c -> (ClassChecker) c)
         .forEach(c -> c.checkClass(naClass, new AddIssue() {
           @Override
           public void addIssueForClass(Kind kind, String message) {
-            appendIssue(
-                new ClassLocation(context.getModuleName(), naClass.thisClazz().packageName(),
-                    naClass.thisClazz().binarySimpleName()), kind, message);
+            appendIssue(classLocation, kind, message);
           }
 
           @Override
           public void addIssueForField(NAField field, Kind kind, String message) {
-            appendIssue(naClass, field.fieldName(), kind, message);
+            appendIssue(classLocation.memberLocation(field.fieldName()), kind, message);
             issuesForClass.computeIfAbsent(field.fieldName(), k -> new ArrayList<>())
                 .add(kind);
           }
 
           @Override
           public void addIssueForComponent(NAComponent component, Kind kind, String message) {
-            appendIssue(naClass, component.componentName(), kind, message);
+            appendIssue(classLocation.memberLocation(component.componentName()), kind, message);
             issuesForClass.computeIfAbsent(component.componentName(), k -> new ArrayList<>())
                 .add(kind);
           }
 
           @Override
           public void addIssueForMethod(NAMethod method, Kind kind, String message) {
-            appendIssue(naClass, method.descriptiveMethodName(), kind, message);
+            appendIssue(classLocation.memberLocation(method.descriptiveMethodName()), kind, message);
             issuesForClass.computeIfAbsent(method.descriptiveMethodName(), k -> new ArrayList<>())
                 .add(kind);
           }
@@ -115,11 +115,6 @@ public class CheckInvoker {
     if (unspecifiedNullnessFound) {
       reportBuilder.incSummaryUnspecifiedNullnessClasses();
     }
-  }
-
-  private void appendIssue(NAClass naClass, String name, Kind kind, String message) {
-    appendIssue(new MemberLocation(context.getModuleName(), naClass.thisClazz().packageName(),
-        naClass.thisClazz().binarySimpleName(), name), kind, message);
   }
 
   private void appendIssue(CodeLocation codeLocation, Kind kind, String message) {

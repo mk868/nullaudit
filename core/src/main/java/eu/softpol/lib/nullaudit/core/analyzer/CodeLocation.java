@@ -28,6 +28,10 @@ public interface CodeLocation {
     public MemberLocation memberLocation(String memberName) {
       return new MemberLocation(module, packageName, className, memberName);
     }
+
+    public PackageLocation packageLocation() {
+      return new PackageLocation(module, packageName);
+    }
   }
 
   record MemberLocation(
@@ -37,5 +41,8 @@ public interface CodeLocation {
       String memberName
   ) implements CodeLocation {
 
+    public ClassLocation classLocation() {
+      return new ClassLocation(module, packageName, className);
+    }
   }
 }

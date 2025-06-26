@@ -178,7 +178,7 @@ public abstract class BaseMojo extends AbstractMojo {
                 Optional.ofNullable(r.getExclusionsFile())
                     .map(BaseMojo::toIgnoredClasses)
                     .orElse(Exclusions.empty()),
-                On.valueOf(r.getOn())
+                On.fromText(r.getOn())
             ))
             .orElse(null),
         Optional.ofNullable(rules.getRequireSpecifiedNullness())

@@ -1,5 +1,6 @@
 package eu.softpol.lib.nullaudit.core;
 
+import java.util.Arrays;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -27,7 +28,14 @@ public record NullAuditConfig(
 
     public enum On {
       CLASS,
-      PACKAGE
+      PACKAGE;
+
+      public static On fromText(String text) {
+        return Arrays.stream(values())
+            .filter(x -> x.name().equalsIgnoreCase(text))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Unknown 'on' value: " + text));
+      }
     }
   }
 

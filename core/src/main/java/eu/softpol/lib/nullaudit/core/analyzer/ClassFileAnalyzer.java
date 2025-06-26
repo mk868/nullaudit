@@ -6,7 +6,6 @@ import eu.softpol.lib.nullaudit.core.analyzer.visitor.ModuleInfoClassVisitor;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.MyClassVisitor;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.PackageInfoClassVisitor;
 import eu.softpol.lib.nullaudit.core.check.Checker;
-import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.System.Logger.Level;
@@ -22,15 +21,13 @@ public class ClassFileAnalyzer implements FileAnalyzer {
   private static final System.Logger logger = System.getLogger(ClassFileAnalyzer.class.getName());
 
   private final AnalysisContext context = new AnalysisContext();
-  private final ReportBuilder reportBuilder;
   private final List<String> excludePackages;
   private final CheckInvoker checkInvoker;
 
-  public ClassFileAnalyzer(ReportBuilder reportBuilder, List<String> excludePackages,
+  public ClassFileAnalyzer(CodeAnalysisData codeAnalysisData, List<String> excludePackages,
       List<Checker> checkers) {
-    this.reportBuilder = reportBuilder;
     this.excludePackages = List.copyOf(excludePackages);
-    this.checkInvoker = new CheckInvoker(context, reportBuilder, checkers);
+    this.checkInvoker = new CheckInvoker(context, codeAnalysisData, checkers);
   }
 
   @Override

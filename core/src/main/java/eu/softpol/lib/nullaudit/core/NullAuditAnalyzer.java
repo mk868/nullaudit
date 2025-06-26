@@ -3,12 +3,13 @@ package eu.softpol.lib.nullaudit.core;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireSpecifiedNullness;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
 import eu.softpol.lib.nullaudit.core.analyzer.ClassFileAnalyzer;
+import eu.softpol.lib.nullaudit.core.analyzer.CodeAnalysisData;
+import eu.softpol.lib.nullaudit.core.analyzer.ReportBuilder;
 import eu.softpol.lib.nullaudit.core.check.Checker;
 import eu.softpol.lib.nullaudit.core.check.CheckerFactory;
 import eu.softpol.lib.nullaudit.core.check.IgnoreClassDecorator;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.report.Report;
-import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import eu.softpol.lib.nullaudit.core.source.DirSource;
 import eu.softpol.lib.nullaudit.core.source.JarSource;
 import java.nio.file.Files;
@@ -42,8 +43,8 @@ public class NullAuditAnalyzer {
       throw new RuntimeException("File %s does not exist.".formatted(input));
     }
 
-    var reportBuilder = new ReportBuilder();
-    var fileAnalyzer = new ClassFileAnalyzer(reportBuilder, config.excludedPackages(),
+    var codeAnalysisData = new CodeAnalysisData();
+    var fileAnalyzer = new ClassFileAnalyzer(codeAnalysisData, config.excludedPackages(),
         toCheckers(config));
     if (Files.isDirectory(input)) {
       new DirSource(input).analyze(fileAnalyzer);
@@ -53,11 +54,7 @@ public class NullAuditAnalyzer {
       throw new RuntimeException("Unsupported file type: %s".formatted(input));
     }
 
-    reportBuilder.setCoveragePercentage(calculateCoveragePercentage(
-        reportBuilder.getSummaryTotalClasses(),
-        reportBuilder.getSummaryUnspecifiedNullnessClasses()
-    ));
-    return reportBuilder.build();
+    return ReportBuilder.build(codeAnalysisData);
   }
 
   private static List<Checker> toCheckers(NullAuditConfig config) {
@@ -86,9 +83,5 @@ public class NullAuditAnalyzer {
     });
 
     return List.copyOf(result);
-  }
-
-  private double calculateCoveragePercentage(int totalClasses, int unspecifiedNullnessClasses) {
-    return Math.round(1000.0 * (totalClasses - unspecifiedNullnessClasses) / totalClasses) / 10.0;
   }
 }

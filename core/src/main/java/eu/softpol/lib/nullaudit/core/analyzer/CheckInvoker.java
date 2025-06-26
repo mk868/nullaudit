@@ -15,12 +15,15 @@ import eu.softpol.lib.nullaudit.core.report.ReportBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 public class CheckInvoker {
 
   private final AnalysisContext context;
   private final ReportBuilder reportBuilder;
   private final List<Checker> checks;
+  private @Nullable NAPackage lastPackage;
 
   public CheckInvoker(AnalysisContext context, ReportBuilder reportBuilder, List<Checker> checks) {
     this.context = context;
@@ -43,6 +46,7 @@ public class CheckInvoker {
         .filter(c -> c instanceof PackageInfoChecker)
         .map(c -> (PackageInfoChecker) c)
         .forEach(c -> c.checkPackage(packageInfoCheckContext));
+    lastPackage = naPackage;
   }
 
   public void checkClass(NAClass naClass) {
@@ -53,7 +57,10 @@ public class CheckInvoker {
     var issues = new HashMap<CodeLocation, List<Kind>>();
     var classLocation = new ClassLocation(context.getModuleName(),
         naClass.thisClazz().packageName(), naClass.thisClazz().binarySimpleName());
-    var classCheckContext = new ClassCheckContext(classLocation, naClass) {
+    var naPackage = Optional.ofNullable(lastPackage)
+        .filter(p -> p.packageName().equals(naClass.thisClazz().packageName()))
+        .orElse(null);
+    var classCheckContext = new ClassCheckContext(classLocation, naPackage, naClass) {
       @Override
       public void addIssue(CodeLocation codeLocation, Kind kind, String message) {
         appendIssue(codeLocation, kind, message);

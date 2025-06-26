@@ -21,9 +21,14 @@ public record NullAuditConfig(
   }
 
   public record RequireNullMarked(
-      Exclusions exclusions
+      Exclusions exclusions,
+      On on
   ) implements Rule {
 
+    public enum On {
+      CLASS,
+      PACKAGE
+    }
   }
 
   public record RequireSpecifiedNullness(

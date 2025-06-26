@@ -118,7 +118,7 @@ class RequireNullMarkedNestedTest {
 
   @Test
   void shouldReportIssueOnlyForOuterClass() {
-    var analyzer = new NullAuditAnalyzer(dir, RulesConfig.REQUIRE_NULLMARKED);
+    var analyzer = new NullAuditAnalyzer(dir, RulesConfig.REQUIRE_NULLMARKED_ON_CLASS);
     var report = analyzer.run();
     assertThat(report).issues().hasSize(1);
     assertThat(report).issuesForClass("unmarked", "OuterClass").hasSize(1);

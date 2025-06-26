@@ -6,6 +6,7 @@ import eu.softpol.lib.nullaudit.core.Exclusions;
 import eu.softpol.lib.nullaudit.core.ExclusionsFileParser;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireNullMarked;
+import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireNullMarked.On;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireSpecifiedNullness;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
 import eu.softpol.lib.nullaudit.maven.config.BaseRule;
@@ -176,7 +177,8 @@ public abstract class BaseMojo extends AbstractMojo {
             .map(r -> new RequireNullMarked(
                 Optional.ofNullable(r.getExclusionsFile())
                     .map(BaseMojo::toIgnoredClasses)
-                    .orElse(Exclusions.empty())
+                    .orElse(Exclusions.empty()),
+                On.valueOf(r.getOn())
             ))
             .orElse(null),
         Optional.ofNullable(rules.getRequireSpecifiedNullness())

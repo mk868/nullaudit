@@ -60,22 +60,23 @@ public class NullAuditAnalyzer {
   private static List<Checker> toCheckers(NullAuditConfig config) {
     var messageSolver = new MessageSolver();
     var result = new ArrayList<Checker>();
+    var checkerFactory = new CheckerFactory(messageSolver);
     Optional.ofNullable(config.verifyJSpecifyAnnotations()).ifPresent(c -> {
-      List<Checker> checkers = CheckerFactory.createVerifyJSpecifyAnnotations(messageSolver);
+      List<Checker> checkers = checkerFactory.createVerifyJSpecifyAnnotations();
       if (!c.exclusions().isEmpty()) {
         checkers = IgnoreClassDecorator.of(checkers, c.exclusions());
       }
       result.addAll(checkers);
     });
     Optional.ofNullable(config.requireNullMarked()).ifPresent(c -> {
-      List<Checker> checkers = CheckerFactory.createRequireNullMarked(messageSolver);
+      List<Checker> checkers = checkerFactory.createRequireNullMarked(c.on());
       if (!c.exclusions().isEmpty()) {
         checkers = IgnoreClassDecorator.of(checkers, c.exclusions());
       }
       result.addAll(checkers);
     });
     Optional.ofNullable(config.requireSpecifiedNullness()).ifPresent(c -> {
-      List<Checker> checkers = CheckerFactory.createRequireSpecifiedNullness(messageSolver);
+      List<Checker> checkers = checkerFactory.createRequireSpecifiedNullness();
       if (!c.exclusions().isEmpty()) {
         checkers = IgnoreClassDecorator.of(checkers, c.exclusions());
       }

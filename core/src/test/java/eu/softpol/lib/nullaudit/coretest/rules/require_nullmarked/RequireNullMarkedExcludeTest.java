@@ -7,6 +7,7 @@ import eu.softpol.lib.nullaudit.core.Exclusions;
 import eu.softpol.lib.nullaudit.core.NullAuditAnalyzer;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireNullMarked;
+import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireNullMarked.On;
 import io.github.ascopes.jct.compilers.JctCompiler;
 import io.github.ascopes.jct.compilers.JctCompilers;
 import io.github.ascopes.jct.workspaces.Workspaces;
@@ -51,7 +52,7 @@ class RequireNullMarkedExcludeTest {
             "demo.Prefix1",
             "demo.Prefix2",
             "demo.foo.Prefix4"
-        )));
+        ), On.CLASS));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report).issues().hasSize(2);
@@ -62,7 +63,7 @@ class RequireNullMarkedExcludeTest {
     var config = NullAuditConfig.of()
         .withRequireNullMarked(new RequireNullMarked(Exclusions.of(
             "demo.*"
-        )));
+        ), On.CLASS));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report)
@@ -77,7 +78,7 @@ class RequireNullMarkedExcludeTest {
     var config = NullAuditConfig.of()
         .withRequireNullMarked(new RequireNullMarked(Exclusions.of(
             "demo.**"
-        )));
+        ), On.CLASS));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report.issues()).isEmpty();

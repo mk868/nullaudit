@@ -11,7 +11,6 @@ import io.github.ascopes.jct.compilers.JctCompiler;
 import io.github.ascopes.jct.compilers.JctCompilers;
 import io.github.ascopes.jct.workspaces.Workspaces;
 import java.nio.file.Path;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -49,11 +48,11 @@ class RequireSpecifiedNullnessExcludeTest {
   @Test
   void shouldNotReportExcludedClasses() {
     var config = NullAuditConfig.of()
-        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(new Exclusions(Set.of(
+        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(Exclusions.ofClasses(
             "demo.Prefix1",
             "demo.Prefix2",
             "demo.foo.Prefix4"
-        ))));
+        )));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report)
@@ -71,9 +70,9 @@ class RequireSpecifiedNullnessExcludeTest {
   @Test
   void shouldNotReportExcludedWildcardClasses() {
     var config = NullAuditConfig.of()
-        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(new Exclusions(Set.of(
+        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(Exclusions.ofClasses(
             "demo.*"
-        ))));
+        )));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report)
@@ -91,9 +90,9 @@ class RequireSpecifiedNullnessExcludeTest {
   @Test
   void shouldNotReportExcludedWildcardClassesAndSubpackages() {
     var config = NullAuditConfig.of()
-        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(new Exclusions(Set.of(
+        .withRequireSpecifiedNullness(new RequireSpecifiedNullness(Exclusions.ofClasses(
             "demo.**"
-        ))));
+        )));
     var analyzer = new NullAuditAnalyzer(dir, config);
     var report = analyzer.run();
     assertThat(report.issues()).isEmpty();

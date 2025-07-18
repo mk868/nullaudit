@@ -1,6 +1,7 @@
 package eu.softpol.lib.nullaudit.core.check;
 
 import eu.softpol.lib.nullaudit.core.Exclusions;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.matcher.AntLikeFQCNMatcher;
 import eu.softpol.lib.nullaudit.core.matcher.FQCNMatcher;
 import eu.softpol.lib.nullaudit.core.matcher.StaticFQCNMatcher;
@@ -10,6 +11,7 @@ public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {
 
   private final Checker delegate;
   private final List<FQCNMatcher> matchers;
+  private final List<String> ignoredAnnotations;
 
   public IgnoreClassDecorator(Checker delegate, Exclusions exclusions) {
     this.delegate = delegate;
@@ -17,6 +19,7 @@ public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {
         .map(
             rule -> rule.contains("*") ? new AntLikeFQCNMatcher(rule) : new StaticFQCNMatcher(rule))
         .toList();
+    this.ignoredAnnotations = List.copyOf(exclusions.annotations());
   }
 
   @Override
@@ -28,6 +31,9 @@ public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {
 
   @Override
   public void checkClass(ClassCheckContext context) {
+    if (!(delegate instanceof ClassChecker classChecker)) {
+      return;
+    }
     var naClass = context.naClass();
     for (FQCNMatcher matcher : matchers) {
       if (matcher.matches(naClass.topClass().name())) {
@@ -35,9 +41,14 @@ public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {
         return;
       }
     }
-    if (delegate instanceof ClassChecker classChecker) {
-      classChecker.checkClass(context);
+    for (var annotation : ignoredAnnotations) {
+      if (naClass.annotations().stream().map(NAAnnotation::fqcn)
+          .anyMatch(a -> a.equals(annotation))) {
+        // class ignored
+        return;
+      }
     }
+    classChecker.checkClass(context);
   }
 
   public static Checker of(Checker delegate, Exclusions exclusions) {

@@ -19,7 +19,7 @@ public class ExclusionsFileParser {
    * @return exclusions object
    * @throws IOException in case of IO problems.
    */
-  public static Exclusions parse(Path filePath) throws IOException {
+  public static Set<String> parse(Path filePath) throws IOException {
     Set<String> patterns = new HashSet<>();
 
     for (String line : Files.readAllLines(filePath, StandardCharsets.UTF_8)) {
@@ -31,7 +31,7 @@ public class ExclusionsFileParser {
       patterns.add(trimmed);
     }
 
-    return new Exclusions(Set.copyOf(patterns));
+    return Set.copyOf(patterns);
   }
 
 

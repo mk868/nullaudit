@@ -1,18 +1,18 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
-public record NAAnnotation(String descriptor) {
+public record NAAnnotation(String fqcn) {
 
-  public static final NAAnnotation NULL_MARKED =
-      fromDescriptor("Lorg/jspecify/annotations/NullMarked;");
-  public static final NAAnnotation NULL_UNMARKED =
-      fromDescriptor("Lorg/jspecify/annotations/NullUnmarked;");
-  public static final NAAnnotation NULLABLE =
-      fromDescriptor("Lorg/jspecify/annotations/Nullable;");
-  public static final NAAnnotation NON_NULL =
-      fromDescriptor("Lorg/jspecify/annotations/NonNull;");
-  public static final NAAnnotation KOTLIN_METADATA = fromDescriptor("Lkotlin/Metadata;");
+  public static final NAAnnotation NULL_MARKED = of("org.jspecify.annotations.NullMarked");
+  public static final NAAnnotation NULL_UNMARKED = of("org.jspecify.annotations.NullUnmarked");
+  public static final NAAnnotation NULLABLE = of("org.jspecify.annotations.Nullable");
+  public static final NAAnnotation NON_NULL = of("org.jspecify.annotations.NonNull");
+  public static final NAAnnotation KOTLIN_METADATA = of("kotlin.Metadata");
+
+  public static NAAnnotation of(String fqcn) {
+    return new NAAnnotation(fqcn);
+  }
 
   public static NAAnnotation fromDescriptor(String descriptor) {
-    return new NAAnnotation(descriptor);
+    return new NAAnnotation(ClassUtil.getClassNameFromDescriptor(descriptor));
   }
 }

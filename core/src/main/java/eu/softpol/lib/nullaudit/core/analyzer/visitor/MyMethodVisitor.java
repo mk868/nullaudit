@@ -68,8 +68,7 @@ public class MyMethodVisitor extends MethodVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    KnownAnnotations.fromDescriptor(descriptor)
-        .ifPresent(naMethod::addAnnotation);
+    naMethod.addAnnotation(NAAnnotation.fromDescriptor(descriptor));
     return super.visitAnnotation(descriptor, visible);
   }
 }

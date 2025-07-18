@@ -2,7 +2,7 @@ package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassReference;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.KnownAnnotations;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.NAAnnotation;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +16,7 @@ public final class MutableNAClass implements NAClass {
   private final List<NAComponent> components = new ArrayList<>();
   private final List<NAField> fields = new ArrayList<>();
   private final List<MutableNAMethod> methods = new ArrayList<>();
-  private final Set<KnownAnnotations> annotations = new HashSet<>();
+  private final Set<NAAnnotation> annotations = new HashSet<>();
   private @Nullable ClassReference topClass;
   private @Nullable ClassReference outerClass;
   private NullScope effectiveNullScope = NullScope.NOT_DEFINED;
@@ -91,11 +91,11 @@ public final class MutableNAClass implements NAClass {
   }
 
   @Override
-  public Set<KnownAnnotations> annotations() {
+  public Set<NAAnnotation> annotations() {
     return annotations;
   }
 
-  public void addAnnotation(KnownAnnotations annotation) {
+  public void addAnnotation(NAAnnotation annotation) {
     annotations.add(annotation);
   }
 

@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.check.require_nullmarked;
 
 import eu.softpol.lib.nullaudit.core.analyzer.CodeAnalysisData.IssueEntry;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.KnownAnnotations;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.check.PackageInfoCheckContext;
@@ -21,7 +21,7 @@ public class ExplicitNullMarkedOnPackageCheck implements PackageInfoChecker, Cla
   @Override
   public void checkPackage(PackageInfoCheckContext context) {
     var naPackage = context.naPackage();
-    if (!naPackage.annotations().contains(KnownAnnotations.NULL_MARKED)) {
+    if (!naPackage.annotations().contains(NAAnnotation.NULL_MARKED)) {
       context.addIssue(
           Kind.MISSING_NULL_MARKED_ANNOTATION,
           messageSolver.resolve(MessageKey.ISSUE_MISSING_NULLMARKED_ANNOTATION_PACKAGE)
@@ -36,7 +36,7 @@ public class ExplicitNullMarkedOnPackageCheck implements PackageInfoChecker, Cla
     if (naClass.outerClass() != null) {
       return;
     }
-    if (naPackage == null || !naPackage.annotations().contains(KnownAnnotations.NULL_MARKED)) {
+    if (naPackage == null || !naPackage.annotations().contains(NAAnnotation.NULL_MARKED)) {
       var packageLocation = context.location().packageLocation();
       var alreadyExist = context.getIssues(packageLocation).stream()
           .map(IssueEntry::kind)

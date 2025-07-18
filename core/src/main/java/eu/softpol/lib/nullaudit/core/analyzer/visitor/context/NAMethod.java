@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.KnownAnnotations;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
@@ -24,6 +24,6 @@ public interface NAMethod {
 
   MethodSignature ms();
 
-  Set<KnownAnnotations> annotations();
+  Set<NAAnnotation> annotations();
 
 }

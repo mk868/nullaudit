@@ -1,6 +1,6 @@
 package eu.softpol.lib.nullaudit.core.analyzer;
 
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.KnownAnnotations;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.NAAnnotation;
 import java.util.Set;
 
 public enum NullScope {
@@ -8,16 +8,16 @@ public enum NullScope {
   NULL_UNMARKED,
   NOT_DEFINED;
 
-  public static NullScope from(Set<KnownAnnotations> annotations) {
-    if (annotations.contains(KnownAnnotations.NULL_MARKED) &&
-        !annotations.contains(KnownAnnotations.NULL_UNMARKED)) {
+  public static NullScope from(Set<NAAnnotation> annotations) {
+    if (annotations.contains(NAAnnotation.NULL_MARKED) &&
+        !annotations.contains(NAAnnotation.NULL_UNMARKED)) {
       return NullScope.NULL_MARKED;
     }
-    if (annotations.contains(KnownAnnotations.NULL_UNMARKED) &&
-        !annotations.contains(KnownAnnotations.NULL_MARKED)) {
+    if (annotations.contains(NAAnnotation.NULL_UNMARKED) &&
+        !annotations.contains(NAAnnotation.NULL_MARKED)) {
       return NullScope.NULL_UNMARKED;
     }
-    if (annotations.contains(KnownAnnotations.KOTLIN_METADATA)) {
+    if (annotations.contains(NAAnnotation.KOTLIN_METADATA)) {
       return NullScope.NULL_UNMARKED;
     }
     return NullScope.NOT_DEFINED;

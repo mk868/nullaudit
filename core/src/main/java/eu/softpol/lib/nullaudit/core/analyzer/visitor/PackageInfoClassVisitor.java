@@ -31,8 +31,7 @@ public class PackageInfoClassVisitor extends ClassVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    KnownAnnotations.fromDescriptor(descriptor)
-        .ifPresent(naPackage::addAnnotation);
+    naPackage.addAnnotation(NAAnnotation.fromDescriptor(descriptor));
     return super.visitAnnotation(descriptor, visible);
   }
 

@@ -1,6 +1,6 @@
 package eu.softpol.lib.nullaudit.core.check.verify_jspecify_annotations;
 
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.KnownAnnotations;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
@@ -18,13 +18,13 @@ public class TypeUseAnnotationsOnClassCheck implements ClassChecker {
   @Override
   public void checkClass(ClassCheckContext context) {
     var naClass = context.naClass();
-    if (naClass.annotations().contains(KnownAnnotations.NULLABLE)) {
+    if (naClass.annotations().contains(NAAnnotation.NULLABLE)) {
       context.addIssueForClass(
           Kind.NULLABLE_ON_CLASS,
          messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLABLE_ON_CLASS)
       );
     }
-    if (naClass.annotations().contains(KnownAnnotations.NON_NULL)) {
+    if (naClass.annotations().contains(NAAnnotation.NON_NULL)) {
       context.addIssueForClass(
           Kind.NON_NULL_ON_CLASS,
          messageSolver.resolve(MessageKey.ISSUE_INVALID_NONNULL_ON_CLASS)

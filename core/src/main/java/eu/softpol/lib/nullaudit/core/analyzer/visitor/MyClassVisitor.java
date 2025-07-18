@@ -78,8 +78,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    KnownAnnotations.fromDescriptor(descriptor)
-        .ifPresent(naClass::addAnnotation);
+    naClass.addAnnotation(NAAnnotation.fromDescriptor(descriptor));
     return super.visitAnnotation(descriptor, visible);
   }
 

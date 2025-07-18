@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.KnownAnnotations;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +14,7 @@ public final class MutableNAMethod implements NAMethod {
   private final String methodDescriptor;
   private final @Nullable String methodSignature;
   private final MethodSignature ms;
-  private final Set<KnownAnnotations> annotations = new HashSet<>();
+  private final Set<NAAnnotation> annotations = new HashSet<>();
   private NullScope effectiveNullScope = NullScope.NOT_DEFINED;
 
   public MutableNAMethod(String methodName, String descriptiveMethodName,
@@ -62,11 +62,11 @@ public final class MutableNAMethod implements NAMethod {
   }
 
   @Override
-  public Set<KnownAnnotations> annotations() {
+  public Set<NAAnnotation> annotations() {
     return Set.copyOf(annotations);
   }
 
-  public void addAnnotation(KnownAnnotations annotation) {
+  public void addAnnotation(NAAnnotation annotation) {
     annotations.add(annotation);
   }
 }

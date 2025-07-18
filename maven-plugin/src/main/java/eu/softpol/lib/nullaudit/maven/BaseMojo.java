@@ -21,6 +21,8 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -54,7 +56,7 @@ public abstract class BaseMojo extends AbstractMojo {
    * This parameter is particularly useful for Maven builds that do not require operations to be
    * performed on aggregation projects or parent POMs.
    * <p>
-   * Default value is "true".
+   * The default value is "true".
    */
   @Parameter(defaultValue = "true")
   private boolean skipPomPackaging;
@@ -68,7 +70,7 @@ public abstract class BaseMojo extends AbstractMojo {
    *   <li>If false, the tasks will proceed even if the project packaging type is "tile".</li>
    * </ul>
    * <p>
-   * Default value is "true".
+   * The default value is "true".
    */
   @Parameter(defaultValue = "true")
   private boolean skipTilePackaging;
@@ -167,35 +169,41 @@ public abstract class BaseMojo extends AbstractMojo {
         Optional.ofNullable(rules.getVerifyJSpecifyAnnotations())
             .filter(BaseRule::isActive)
             .map(r -> new VerifyJSpecifyAnnotations(
-                Optional.ofNullable(r.getExclusionsFile())
-                    .map(BaseMojo::toIgnoredClasses)
-                    .orElse(Exclusions.empty())
+                toExclusions(r)
             ))
             .orElse(null),
         Optional.ofNullable(rules.getRequireNullMarked())
             .filter(BaseRule::isActive)
             .map(r -> new RequireNullMarked(
-                Optional.ofNullable(r.getExclusionsFile())
-                    .map(BaseMojo::toIgnoredClasses)
-                    .orElse(Exclusions.empty()),
+                toExclusions(r),
                 On.fromText(r.getOn())
             ))
             .orElse(null),
         Optional.ofNullable(rules.getRequireSpecifiedNullness())
             .filter(BaseRule::isActive)
             .map(r -> new RequireSpecifiedNullness(
-                Optional.ofNullable(r.getExclusionsFile())
-                    .map(BaseMojo::toIgnoredClasses)
-                    .orElse(Exclusions.empty())
+                toExclusions(r)
             ))
             .orElse(null)
     );
   }
 
-  private static @Nullable Exclusions toIgnoredClasses(@Nullable String exclusionsFile) {
-    if (exclusionsFile == null || exclusionsFile.isBlank()) {
-      return null;
-    }
+  private static Exclusions toExclusions(BaseRule rule) {
+    var classes = Optional.ofNullable(rule.getExclusionsFile())
+        .filter(not(String::isBlank))
+        .map(BaseMojo::readClassExclusionsFile)
+        .orElse(Set.of());
+    var annotations = Optional.ofNullable(rule.getExcludeAnnotations())
+        .filter(not(String::isBlank))
+        .map(s -> Arrays.stream(s.split(","))
+            .map(String::trim)
+            .filter(not(String::isBlank))
+            .collect(Collectors.toUnmodifiableSet()))
+        .orElse(Set.of());
+    return new Exclusions(classes, annotations);
+  }
+
+  private static Set<String> readClassExclusionsFile(String exclusionsFile) {
     try {
       return ExclusionsFileParser.parse(Path.of(exclusionsFile));
     } catch (IOException e) {

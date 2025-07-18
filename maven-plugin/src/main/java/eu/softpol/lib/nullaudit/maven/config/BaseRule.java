@@ -15,6 +15,19 @@ public abstract class BaseRule {
   private boolean active = true;
 
   /**
+   * Comma-separated list of fully-qualified annotation names that cause the rule to skip the
+   * annotated element and, optionally, its members.
+   *
+   * <p>
+   * Typical use-case: exclude generated code by listing annotations such as
+   * {@code javax.annotation.Generated} or {@code jakarta.annotation.Generated}.
+   *
+   * <p>If {@code null} or empty, no annotation-based exclusions are applied.</p>
+   */
+  @Parameter
+  private @Nullable String excludeAnnotations;
+
+  /**
    * A file listing classes (or patterns) to ignore for this rule.
    */
   @Parameter
@@ -26,6 +39,14 @@ public abstract class BaseRule {
 
   public void setActive(boolean active) {
     this.active = active;
+  }
+
+  public @Nullable String getExcludeAnnotations() {
+    return excludeAnnotations;
+  }
+
+  public void setExcludeAnnotations(@Nullable String excludeAnnotations) {
+    this.excludeAnnotations = excludeAnnotations;
   }
 
   public @Nullable String getExclusionsFile() {

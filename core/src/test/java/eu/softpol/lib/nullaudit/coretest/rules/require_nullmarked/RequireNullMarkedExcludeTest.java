@@ -48,7 +48,7 @@ class RequireNullMarkedExcludeTest {
   @Test
   void shouldNotReportExcludedClasses() {
     var config = NullAuditConfig.of()
-        .withRequireNullMarked(new RequireNullMarked(Exclusions.of(
+        .withRequireNullMarked(new RequireNullMarked(Exclusions.ofClasses(
             "demo.Prefix1",
             "demo.Prefix2",
             "demo.foo.Prefix4"
@@ -61,7 +61,7 @@ class RequireNullMarkedExcludeTest {
   @Test
   void shouldNotReportExcludedWildcardClasses() {
     var config = NullAuditConfig.of()
-        .withRequireNullMarked(new RequireNullMarked(Exclusions.of(
+        .withRequireNullMarked(new RequireNullMarked(Exclusions.ofClasses(
             "demo.*"
         ), On.CLASS));
     var analyzer = new NullAuditAnalyzer(dir, config);
@@ -76,7 +76,7 @@ class RequireNullMarkedExcludeTest {
   @Test
   void shouldNotReportExcludedWildcardClassesAndSubpackages() {
     var config = NullAuditConfig.of()
-        .withRequireNullMarked(new RequireNullMarked(Exclusions.of(
+        .withRequireNullMarked(new RequireNullMarked(Exclusions.ofClasses(
             "demo.**"
         ), On.CLASS));
     var analyzer = new NullAuditAnalyzer(dir, config);

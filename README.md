@@ -56,7 +56,7 @@ DataHolder#sayHi(java.lang.String): Irrelevant annotations, the method should no
 
 ### :star: `requireNullMarked`
 
-Requires to put `@NullMarked` on classes.
+Requires to put `@NullMarked` on classes or packages.
 
 ## Features
 

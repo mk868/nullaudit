@@ -1,16 +1,16 @@
 # requireNullMarked
 
 **Category**: Rules Reference  
-**Scope**: Classes, Interfaces, Enums, Annotations  
-**Purpose**: Ensures that classes are annotated with `@NullMarked` to define a clear default
-nullness context.
+**Scope**: Classes, Interfaces, Enums, Annotations, Packages  
+**Purpose**: Ensures that classes or packages are annotated with `@NullMarked` to define a clear
+default nullness context.
 
 ---
 
 ## What does it check?
 
-The `requireNullMarked` rule verifies that classes (and other types like interfaces and enums) are
-properly annotated with `@NullMarked`, unless explicitly excluded.
+The `requireNullMarked` rule verifies that classes (and other types like interfaces and enums) or
+packages are properly annotated with `@NullMarked`, unless explicitly excluded.
 
 Without `@NullMarked`, types may have **unspecified nullness**, which can lead to ambiguity or bugs.
 
@@ -18,8 +18,9 @@ Without `@NullMarked`, types may have **unspecified nullness**, which can lead t
 
 ## Why is it important?
 
-- Enforces **explicit nullness context** at the class level.
+- Enforces **explicit nullness context** at the class or package level.
 - Helps avoid missing nullability specifications on fields, methods, and parameters.
+- Provides a way to set nullness context for entire packages.
 
 ---
 
@@ -75,9 +76,11 @@ You can enable the requireNullMarked rule by adding it to your plugin configurat
 
 Optional parameters:
 
-| Parameter        | Type     | Default	 | Description                                                                                                      |
-|------------------|----------|----------|------------------------------------------------------------------------------------------------------------------|
-| `exclusionsFile` | `String` | (none)   | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file) |
+| Parameter            | Type     | Default | Description                                                                                                             |
+|----------------------|----------|---------|-------------------------------------------------------------------------------------------------------------------------|
+| `exclusionsFile`     | `String` | (none)  | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file)        |
+| `excludeAnnotations` | `String` | (none)  | Comma-separated list of fully qualified annotation names. Classes with these annotations will be excluded from analysis |
+| `on`                 | `String` | `CLASS` | Define where to require putting the `@NullMarked` annotation. Allowed values are `CLASS` or `PACKAGE`                   |
 
 ---
 
@@ -89,12 +92,14 @@ Recommended for:
 * Projects migrating to explicit nullness declarations.
 * Teams that want to enforce consistent annotation practices during development and in CI/CD
   pipelines.
+* Projects that prefer package-level nullness declarations (`<on>PACKAGE</on>`).
 
 ---
 
 ## Limitations
 
-* Only verifies the presence of @NullMarked.
-* The rule does not require @NullMarked on package-info.java — it only focuses on types (classes,
-  interfaces, enums, etc.).
-
+* Only verifies the presence of `@NullMarked`.
+* When using `<on>CLASS</on>`, the rule does not require `@NullMarked` on package-info.java — it
+  only focuses on types (classes, interfaces, enums, etc.).
+* When using `<on>PACKAGE</on>`, all packages must have a package-info.java file with `@NullMarked`.
+* Annotation-based exclusions only work at the class level, not for individual members or packages.

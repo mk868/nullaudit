@@ -70,7 +70,34 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <version>3.9.1</version>
+        <executions>
+          <execution>
+            <id>install</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>install</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+
+        <configuration>
+          <projectsDirectory>${project.basedir}/src/it</projectsDirectory>
+          <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+          <streamLogs>true</streamLogs>
+          <failIfNoProjects>true</failIfNoProjects>
+          <postBuildHookScript>verify</postBuildHookScript>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
-
 </project>

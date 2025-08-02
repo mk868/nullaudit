@@ -91,9 +91,10 @@ You can enable the `verifyJSpecifyAnnotations` rule by adding it in your plugin 
 
 Optional parameters:
 
-| Parameter        | Type     | Default	 | Description                                                                                                      |
-|------------------|----------|----------|------------------------------------------------------------------------------------------------------------------|
-| `exclusionsFile` | `String` | (none)   | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file) |
+| Parameter            | Type     | Default	 | Description                                                                                                             |
+|----------------------|----------|----------|-------------------------------------------------------------------------------------------------------------------------|
+| `exclusionsFile`     | `String` | (none)   | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file)        |
+| `excludeAnnotations` | `String` | (none)   | Comma-separated list of fully qualified annotation names. Classes with these annotations will be excluded from analysis |
 
 ---
 
@@ -110,3 +111,4 @@ Recommended for:
 ## Limitations
 
 * Only checks for structural mistakes (conflicts, invalid targets).
+* Annotation-based exclusions only work at the class level, not for individual members or packages.

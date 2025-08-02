@@ -1,0 +1,2 @@
+org.example.requirenullmarked.ignored.*
+org.example.requirenullmarked.ignored2.*

@@ -24,9 +24,21 @@ public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {
 
   @Override
   public void checkPackage(PackageInfoCheckContext context) {
-    if (delegate instanceof PackageInfoChecker packageInfoChecker) {
-      packageInfoChecker.checkPackage(context);
+    if (!(delegate instanceof PackageInfoChecker packageInfoChecker)) {
+      return;
     }
+    var packageInfoFQCN = context.naPackage().packageName();
+    if (!packageInfoFQCN.isEmpty()) {
+      packageInfoFQCN += ".";
+    }
+    packageInfoFQCN += "package-info";
+    for (FQCNMatcher matcher : matchers) {
+      if (matcher.matches(packageInfoFQCN)) {
+        // package-info ignored
+        return;
+      }
+    }
+    packageInfoChecker.checkPackage(context);
   }
 
   @Override

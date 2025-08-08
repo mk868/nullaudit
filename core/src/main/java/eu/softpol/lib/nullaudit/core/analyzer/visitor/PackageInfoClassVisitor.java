@@ -4,8 +4,9 @@ import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getPackag
 
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAPackage;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
+import eu.softpol.lib.nullaudit.core.model.MutableNAPackage;
+import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
+import eu.softpol.lib.nullaudit.core.model.NAPackage;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;

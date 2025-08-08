@@ -6,12 +6,13 @@ import static java.util.function.Predicate.not;
 
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAClass;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAMethod;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAComponent;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAField;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
+import eu.softpol.lib.nullaudit.core.model.MutableNAClass;
+import eu.softpol.lib.nullaudit.core.model.MutableNAMethod;
+import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
+import eu.softpol.lib.nullaudit.core.model.NAClass;
+import eu.softpol.lib.nullaudit.core.model.NAComponent;
+import eu.softpol.lib.nullaudit.core.model.NAField;
 import eu.softpol.lib.nullaudit.core.signature.FieldSignatureAnalyzer;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignatureAnalyzer;

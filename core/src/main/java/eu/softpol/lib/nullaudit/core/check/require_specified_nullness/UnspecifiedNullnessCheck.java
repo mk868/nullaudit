@@ -1,11 +1,11 @@
 package eu.softpol.lib.nullaudit.core.check.require_specified_nullness;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAComponent;
 import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
+import eu.softpol.lib.nullaudit.core.model.NAComponent;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
 import java.util.stream.Collectors;

@@ -1,7 +1,8 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.MutableNAMethod;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
+import eu.softpol.lib.nullaudit.core.model.MutableNAMethod;
+import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.type.QueryNode;
 import java.lang.System.Logger.Level;
 import org.jspecify.annotations.Nullable;

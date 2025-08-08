@@ -1,6 +1,7 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
+import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ModuleVisitor;

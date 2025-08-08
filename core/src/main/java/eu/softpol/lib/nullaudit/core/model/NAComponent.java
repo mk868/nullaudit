@@ -1,4 +1,4 @@
-package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
+package eu.softpol.lib.nullaudit.core.model;
 
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import org.jspecify.annotations.Nullable;

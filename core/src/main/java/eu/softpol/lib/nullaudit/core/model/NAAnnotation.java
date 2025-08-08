@@ -1,4 +1,6 @@
-package eu.softpol.lib.nullaudit.core.analyzer.visitor;
+package eu.softpol.lib.nullaudit.core.model;
+
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil;
 
 public record NAAnnotation(String fqcn) {
 

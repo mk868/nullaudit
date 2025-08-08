@@ -1,6 +1,6 @@
 package eu.softpol.lib.nullaudit.core.analyzer;
 
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.NAAnnotation;
+import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import java.util.Set;
 
 public enum NullScope {

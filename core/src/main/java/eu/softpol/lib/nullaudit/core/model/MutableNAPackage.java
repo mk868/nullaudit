@@ -1,6 +1,5 @@
-package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
+package eu.softpol.lib.nullaudit.core.model;
 
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.NAAnnotation;
 import java.util.HashSet;
 import java.util.Set;
 

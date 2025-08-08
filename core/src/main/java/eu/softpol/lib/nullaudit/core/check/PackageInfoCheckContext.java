@@ -3,7 +3,7 @@ package eu.softpol.lib.nullaudit.core.check;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeAnalysisData;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.PackageLocation;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
+import eu.softpol.lib.nullaudit.core.model.NAPackage;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 
 public class PackageInfoCheckContext {

@@ -2,13 +2,13 @@ package eu.softpol.lib.nullaudit.core.analyzer;
 
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.ClassLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.PackageLocation;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAClass;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAPackage;
 import eu.softpol.lib.nullaudit.core.check.Checker;
 import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.check.PackageInfoCheckContext;
 import eu.softpol.lib.nullaudit.core.check.PackageInfoChecker;
+import eu.softpol.lib.nullaudit.core.model.NAClass;
+import eu.softpol.lib.nullaudit.core.model.NAPackage;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;

@@ -1,7 +1,7 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.context.NAField;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
+import eu.softpol.lib.nullaudit.core.model.NAField;
 import eu.softpol.lib.nullaudit.core.type.QueryNode;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;

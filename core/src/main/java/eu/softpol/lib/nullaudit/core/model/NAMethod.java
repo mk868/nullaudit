@@ -1,7 +1,6 @@
-package eu.softpol.lib.nullaudit.core.analyzer.visitor.context;
+package eu.softpol.lib.nullaudit.core.model;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;

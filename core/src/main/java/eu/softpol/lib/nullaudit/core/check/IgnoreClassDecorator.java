@@ -1,10 +1,10 @@
 package eu.softpol.lib.nullaudit.core.check;
 
 import eu.softpol.lib.nullaudit.core.Exclusions;
-import eu.softpol.lib.nullaudit.core.analyzer.visitor.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.matcher.AntLikeFQCNMatcher;
 import eu.softpol.lib.nullaudit.core.matcher.FQCNMatcher;
 import eu.softpol.lib.nullaudit.core.matcher.StaticFQCNMatcher;
+import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import java.util.List;
 
 public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {

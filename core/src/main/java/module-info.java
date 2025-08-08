@@ -16,4 +16,5 @@ module eu.softpol.lib.nullaudit.core {
   requires org.objectweb.asm;
   requires org.jspecify;
   requires java.naming;
+  requires org.immutables.value;
 }

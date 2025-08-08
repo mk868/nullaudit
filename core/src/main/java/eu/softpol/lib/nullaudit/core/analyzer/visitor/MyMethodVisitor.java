@@ -1,8 +1,9 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
-import eu.softpol.lib.nullaudit.core.model.MutableNAMethod;
+import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod;
 import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
+import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import eu.softpol.lib.nullaudit.core.type.QueryNode;
 import java.lang.System.Logger.Level;
 import org.jspecify.annotations.Nullable;
@@ -20,11 +21,13 @@ public class MyMethodVisitor extends MethodVisitor {
 
   private static final System.Logger logger = System.getLogger(MyMethodVisitor.class.getName());
 
-  private final MutableNAMethod naMethod;
+  private final ImmutableNAMethod.Builder naMethodBuilder;
+  private final MethodSignature ms;
 
-  protected MyMethodVisitor(MutableNAMethod naMethod) {
+  protected MyMethodVisitor(ImmutableNAMethod.Builder naMethodBuilder, MethodSignature ms) {
     super(Opcodes.ASM9);
-    this.naMethod = naMethod;
+    this.naMethodBuilder = naMethodBuilder;
+    this.ms = ms;
   }
 
   @Override
@@ -45,7 +48,7 @@ public class MyMethodVisitor extends MethodVisitor {
       } else if (typePathStr.contains(".")) {
         // TODO how to handle this case...
       } else {
-        QueryNode.find(naMethod.ms().returnType(), typePath).addAnnotation(annotation);
+        QueryNode.find(ms.returnType(), typePath).addAnnotation(annotation);
       }
     } else if (sort == TypeReference.METHOD_FORMAL_PARAMETER) {
       var index = typeReference.getFormalParameterIndex();
@@ -54,7 +57,7 @@ public class MyMethodVisitor extends MethodVisitor {
       } else if (typePathStr.contains(".")) {
         // TODO how to handle this case...
       } else {
-        QueryNode.find(naMethod.ms().parameterTypes().get(index), typePath)
+        QueryNode.find(ms.parameterTypes().get(index), typePath)
             .addAnnotation(annotation);
       }
     } else if (sort == TypeReference.METHOD_TYPE_PARAMETER_BOUND) {
@@ -69,7 +72,7 @@ public class MyMethodVisitor extends MethodVisitor {
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    naMethod.addAnnotation(NAAnnotation.fromDescriptor(descriptor));
+    naMethodBuilder.addAnnotations(NAAnnotation.fromDescriptor(descriptor));
     return super.visitAnnotation(descriptor, visible);
   }
 }

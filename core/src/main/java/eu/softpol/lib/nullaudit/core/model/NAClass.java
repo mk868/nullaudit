@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.immutables.value.Value;
 
+@Value.Immutable
 public interface NAClass {
 
   default Optional<NAComponent> getComponent(String componentName) {

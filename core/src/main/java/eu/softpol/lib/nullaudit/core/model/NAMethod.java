@@ -4,7 +4,9 @@ import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.immutables.value.Value;
 
+@Value.Immutable
 public interface NAMethod {
 
   default boolean isConstructor() {

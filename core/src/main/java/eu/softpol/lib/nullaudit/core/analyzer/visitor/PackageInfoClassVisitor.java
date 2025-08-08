@@ -4,17 +4,20 @@ import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getPackag
 
 import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.model.MutableNAPackage;
+import eu.softpol.lib.nullaudit.core.model.ImmutableNAPackage;
 import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.model.NAPackage;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 
 public class PackageInfoClassVisitor extends ClassVisitor {
 
+  private final ImmutableNAPackage.Builder naPackageBuilder = ImmutableNAPackage.builder();
   private final AnalysisContext context;
-  private MutableNAPackage naPackage;
+  private @Nullable NAPackage naPackage;
 
   public PackageInfoClassVisitor(AnalysisContext context) {
     super(Opcodes.ASM9);
@@ -24,26 +27,25 @@ public class PackageInfoClassVisitor extends ClassVisitor {
   @Override
   public void visit(int version, int access, String name, String signature, String superName,
       String[] interfaces) {
-    naPackage = new MutableNAPackage(
-        getPackageName(name)
-    );
+    naPackageBuilder.packageName(getPackageName(name));
     super.visit(version, access, name, signature, superName, interfaces);
   }
 
   @Override
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-    naPackage.addAnnotation(NAAnnotation.fromDescriptor(descriptor));
+    naPackageBuilder.addAnnotations(NAAnnotation.fromDescriptor(descriptor));
     return super.visitAnnotation(descriptor, visible);
   }
 
   @Override
   public void visitEnd() {
+    naPackage = naPackageBuilder.build();
     var nullScope = NullScope.from(naPackage.annotations());
     context.setPackageNullScope(naPackage.packageName(), nullScope);
     super.visitEnd();
   }
 
   public NAPackage getNaPackage() {
-    return naPackage;
+    return Objects.requireNonNull(naPackage, "naPackage");
   }
 }

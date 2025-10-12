@@ -100,7 +100,7 @@
       <dependency>
         <groupId>io.github.ascopes.jct</groupId>
         <artifactId>java-compiler-testing</artifactId>
-        <version>5.0.4</version>
+        <version>6.0.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>

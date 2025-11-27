@@ -43,23 +43,9 @@ public class MyMethodVisitor extends MethodVisitor {
     var sort = typeReference.getSort();
     var typePathStr = typePath == null ? "" : typePath.toString();
     if (sort == TypeReference.METHOD_RETURN) {
-      if (typePathStr.contains("*")) {
-        // TODO super not yet supported
-      } else if (typePathStr.contains(".")) {
-        // TODO how to handle this case...
-      } else {
-        QueryNode.find(ms.returnType(), typePath).addAnnotation(annotation);
-      }
+      handleMethodReturn(typePath, typePathStr, annotation);
     } else if (sort == TypeReference.METHOD_FORMAL_PARAMETER) {
-      var index = typeReference.getFormalParameterIndex();
-      if (typePathStr.contains("*")) {
-        // TODO super not yet supported
-      } else if (typePathStr.contains(".")) {
-        // TODO how to handle this case...
-      } else {
-        QueryNode.find(ms.parameterTypes().get(index), typePath)
-            .addAnnotation(annotation);
-      }
+      handleMethodFormalParameter(typePath, typeReference, typePathStr, annotation);
     } else if (sort == TypeReference.METHOD_TYPE_PARAMETER_BOUND) {
       logger.log(Level.DEBUG, "METHOD_TYPE_PARAMETER_BOUND not supported yet");
     } else if (sort == TypeReference.METHOD_TYPE_PARAMETER) {
@@ -68,6 +54,29 @@ public class MyMethodVisitor extends MethodVisitor {
       throw new UnsupportedOperationException("Unsupported sort: " + sort);
     }
     return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
+  }
+
+  private void handleMethodReturn(@Nullable TypePath typePath, String typePathStr, TypeUseAnnotation annotation) {
+    if (typePathStr.contains("*")) {
+      // TODO super not yet supported
+    } else if (typePathStr.contains(".")) {
+      // TODO how to handle this case...
+    } else {
+      QueryNode.find(ms.returnType(), typePath).addAnnotation(annotation);
+    }
+  }
+
+  private void handleMethodFormalParameter(@Nullable TypePath typePath, TypeReference typeReference, String typePathStr,
+      TypeUseAnnotation annotation) {
+    var index = typeReference.getFormalParameterIndex();
+    if (typePathStr.contains("*")) {
+      // TODO super not yet supported
+    } else if (typePathStr.contains(".")) {
+      // TODO how to handle this case...
+    } else {
+      QueryNode.find(ms.parameterTypes().get(index), typePath)
+          .addAnnotation(annotation);
+    }
   }
 
   @Override

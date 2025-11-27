@@ -122,38 +122,11 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       return super.visitMethod(access, methodName, methodDescriptor, methodSignature, exceptions);
     }
 
-    final MethodSignature ms;
-    try {
-      ms = MethodSignatureAnalyzer.analyze(requireNonNullElse(methodSignature, methodDescriptor));
-    } catch (RuntimeException e) {
-      throw new RuntimeException(
-          "Reading signature of " + methodName + methodDescriptor + " (" + methodSignature
-          + ") failed", e);
-    }
-    var parameterTypes = ms.parameterTypes();
+    MethodSignature ms = analyzeMethodSignature(methodName, methodDescriptor, methodSignature);
 
-    if (!classChain.isEmpty()) {
-      // it's probably inner class
-      var outerClassName = classChain.get(classChain.size() - 1).name();
-      // check if the first constructor's argument has outer class type
-      if (methodName.equals("<init>") &&
-          !parameterTypes.isEmpty() &&
-          parameterTypes.get(0) instanceof ClassTypeNode classTypeNode &&
-          classTypeNode.getClazz().equals(outerClassName)) {
-        classTypeNode.addAnnotation(TypeUseAnnotation.JSPECIFY_NON_NULL); // TODO should not be here
-      }
-      // alternatively, I can search for the ACC_SYNTHETIC field of outerClassName type, but the compiler can skip this field when it's not used.
-    }
+    handleInnerClassConstructor(methodName, ms);
 
-    String descriptiveMethodName;
-    if (methodName.equals("<init>")) {
-      descriptiveMethodName = thisClass.simpleName();
-    } else {
-      descriptiveMethodName = methodName;
-    }
-    descriptiveMethodName += Arrays.stream(Type.getArgumentTypes(methodDescriptor))
-        .map(Type::getClassName)
-        .collect(Collectors.joining(", ", "(", ")"));
+    String descriptiveMethodName = computeDescriptiveMethodName(methodName, methodDescriptor);
 
     var methodBuilder = ImmutableNAMethod.builder()
         .methodName(methodName)
@@ -167,8 +140,56 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     return new MyMethodVisitor(methodBuilder, ms);
   }
 
+  private static MethodSignature analyzeMethodSignature(String methodName, String methodDescriptor,
+      @Nullable String methodSignature) {
+    final MethodSignature ms;
+    try {
+      ms = MethodSignatureAnalyzer.analyze(requireNonNullElse(methodSignature, methodDescriptor));
+    } catch (RuntimeException e) {
+      throw new RuntimeException(
+          "Reading signature of " + methodName + methodDescriptor + " (" + methodSignature
+          + ") failed", e);
+    }
+    return ms;
+  }
+
+  private void handleInnerClassConstructor(String methodName, MethodSignature ms) {
+    if (classChain.isEmpty()) {
+      return;
+    }
+    var parameterTypes = ms.parameterTypes();
+    // it's probably inner class
+    var outerClassName = classChain.get(classChain.size() - 1).name();
+    // check if the first constructor's argument has outer class type
+    if (methodName.equals("<init>") &&
+        !parameterTypes.isEmpty() &&
+        parameterTypes.get(0) instanceof ClassTypeNode classTypeNode &&
+        classTypeNode.getClazz().equals(outerClassName)) {
+      classTypeNode.addAnnotation(TypeUseAnnotation.JSPECIFY_NON_NULL); // TODO should not be here
+    }
+    // alternatively, I can search for the ACC_SYNTHETIC field of outerClassName type, but the compiler can skip this field when it's not used.
+  }
+
+  private String computeDescriptiveMethodName(String methodName, String methodDescriptor) {
+    String simpleName;
+    if (methodName.equals("<init>")) {
+      simpleName = thisClass.simpleName();
+    } else {
+      simpleName = methodName;
+    }
+    return simpleName + Arrays.stream(Type.getArgumentTypes(methodDescriptor))
+        .map(Type::getClassName)
+        .collect(Collectors.joining(", ", "(", ")"));
+  }
+
   @Override
   public void visitEnd() {
+    determineTopClass();
+    buildFinalNAClass();
+    super.visitEnd();
+  }
+
+  private void determineTopClass() {
     if (classChain.isEmpty()) {
       if (outerClass != null) {
         naClassBuilder.topClass(outerClass);
@@ -178,6 +199,9 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     } else {
       naClassBuilder.topClass(classChain.get(0));
     }
+  }
+
+  private void buildFinalNAClass() {
     // Build a temporary class with NOT_DEFINED to extract annotations
     var tempClass = naClassBuilder
         .effectiveNullScope(NullScope.NOT_DEFINED)
@@ -200,8 +224,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     // Build final class
     naClass = naClassBuilder.build();
-
-    super.visitEnd();
   }
 
   public NAClass getNaClass() {

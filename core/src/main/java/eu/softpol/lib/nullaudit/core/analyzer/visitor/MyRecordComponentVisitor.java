@@ -32,7 +32,7 @@ public class MyRecordComponentVisitor extends RecordComponentVisitor {
       } else if (typePathStr.contains(".")) {
         // TODO how to handle this case...
       } else {
-        QueryNode.find(naComponent.fs(), typePath).addAnnotation(annotation);
+        QueryNode.find(naComponent.type(), typePath).addAnnotation(annotation);
       }
     }
     return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);

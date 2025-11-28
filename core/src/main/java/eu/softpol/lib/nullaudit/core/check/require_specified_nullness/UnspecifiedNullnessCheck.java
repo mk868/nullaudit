@@ -31,7 +31,7 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
 
       for (var componentInfo : naClass.components()) {
         var s = "%s %s".formatted(
-            classAugmentedStringTranslator.translate(componentInfo.fs()),
+            classAugmentedStringTranslator.translate(componentInfo.type()),
             componentInfo.componentName()
         );
         if (s.contains("*")) {
@@ -52,7 +52,7 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
         }
 
         var s = "%s %s".formatted(
-            classAugmentedStringTranslator.translate(fieldInfo.fs()),
+            classAugmentedStringTranslator.translate(fieldInfo.type()),
             fieldInfo.fieldName()
         );
         if (s.contains("*")) {
@@ -79,7 +79,7 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
         }
 
         if (naClass.getComponent(methodName)
-                .filter(c -> classAugmentedStringTranslator.translate(c.fs())
+                .filter(c -> classAugmentedStringTranslator.translate(c.type())
                     .equals(classAugmentedStringTranslator.translate(methodInfo.returnType())))
                 .isPresent()
             && methodInfo.parameters().isEmpty()
@@ -91,7 +91,7 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
             .map(NAMethodParam::type)
             .map(classAugmentedStringTranslator::translate)
             .collect(Collectors.joining(",")).equals(naClass.components().stream()
-                .map(NAComponent::fs)
+                .map(NAComponent::type)
                 .map(classAugmentedStringTranslator::translate)
                 .collect(Collectors.joining(",")))
         ) {

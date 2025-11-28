@@ -32,7 +32,7 @@ public class MyFieldVisitor extends FieldVisitor {
       } else if (typePathStr.contains(".")) {
         // TODO how to handle this case...
       } else {
-        QueryNode.find(naField.fs(), typePath).addAnnotation(annotation);
+        QueryNode.find(naField.type(), typePath).addAnnotation(annotation);
       }
     }
     return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);

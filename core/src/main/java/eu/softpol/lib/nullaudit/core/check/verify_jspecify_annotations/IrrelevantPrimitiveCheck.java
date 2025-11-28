@@ -22,7 +22,7 @@ public class IrrelevantPrimitiveCheck implements ClassChecker {
   public void checkClass(ClassCheckContext context) {
     var naClass = context.naClass();
     for (var componentInfo : naClass.components()) {
-      if (isPrimitiveAnnotated(componentInfo.fs())) {
+      if (isPrimitiveAnnotated(componentInfo.type())) {
         context.addIssueForComponent(componentInfo,
             Kind.INVALID_NULLNESS_ON_PRIMITIVE,
             messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_COMPONENT)
@@ -32,7 +32,7 @@ public class IrrelevantPrimitiveCheck implements ClassChecker {
 
     if (!naClass.isRecord()) {
       for (var fieldInfo : naClass.fields()) {
-        if (isPrimitiveAnnotated(fieldInfo.fs())) {
+        if (isPrimitiveAnnotated(fieldInfo.type())) {
           context.addIssueForField(fieldInfo,
               Kind.INVALID_NULLNESS_ON_PRIMITIVE,
               messageSolver.resolve(MessageKey.ISSUE_INVALID_NULLNESS_ON_PRIMITIVE_FIELD)

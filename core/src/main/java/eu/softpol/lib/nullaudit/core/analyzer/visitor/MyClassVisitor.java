@@ -4,12 +4,12 @@ import static java.util.Objects.requireNonNullElse;
 
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAClass;
+import eu.softpol.lib.nullaudit.core.model.ImmutableNAComponent;
+import eu.softpol.lib.nullaudit.core.model.ImmutableNAField;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethodParam;
 import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.model.NAClass;
-import eu.softpol.lib.nullaudit.core.model.NAComponent;
-import eu.softpol.lib.nullaudit.core.model.NAField;
 import eu.softpol.lib.nullaudit.core.model.NAMethodParam;
 import eu.softpol.lib.nullaudit.core.signature.FieldSignatureAnalyzer;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
@@ -89,7 +89,12 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       @Nullable String signature) {
 
     var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
-    var naComponent = new NAComponent(name, descriptor, signature, fs);
+    var naComponent = ImmutableNAComponent.builder()
+        .componentName(name)
+        .componentDescriptor(descriptor)
+        .componentSignature(signature)
+        .type(fs)
+        .build();
     naClassBuilder.addComponents(naComponent);
 
     return new MyRecordComponentVisitor(naComponent);
@@ -103,7 +108,12 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     }
 
     var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
-    var naField = new NAField(name, descriptor, signature, fs);
+    var naField = ImmutableNAField.builder()
+        .fieldName(name)
+        .fieldDescriptor(descriptor)
+        .fieldSignature(signature)
+        .type(fs)
+        .build();
     naClassBuilder.addFields(naField);
 
     return new MyFieldVisitor(naField);

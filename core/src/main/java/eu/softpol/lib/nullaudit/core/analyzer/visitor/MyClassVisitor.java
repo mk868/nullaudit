@@ -5,10 +5,12 @@ import static java.util.Objects.requireNonNullElse;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAClass;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod;
+import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethodParam;
 import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.model.NAClass;
 import eu.softpol.lib.nullaudit.core.model.NAComponent;
 import eu.softpol.lib.nullaudit.core.model.NAField;
+import eu.softpol.lib.nullaudit.core.model.NAMethodParam;
 import eu.softpol.lib.nullaudit.core.signature.FieldSignatureAnalyzer;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignatureAnalyzer;
@@ -120,14 +122,20 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     String descriptiveMethodName = computeDescriptiveMethodName(methodName, methodDescriptor);
 
+    var parameters = ms.parameterTypes().stream()
+        .map(p -> ImmutableNAMethodParam.builder().type(p).build())
+        .map(p -> (NAMethodParam) p)
+        .toList();
+
     var methodBuilder = ImmutableNAMethod.builder()
         .methodName(methodName)
         .descriptiveMethodName(descriptiveMethodName)
         .methodDescriptor(methodDescriptor)
         .methodSignature(methodSignature)
-        .ms(ms);
+        .returnType(ms.returnType())
+        .parameters(parameters);
 
-    return new MyMethodVisitor(methodBuilder, ms, () -> {
+    return new MyMethodVisitor(methodBuilder, ms.returnType(), parameters, () -> {
       var naMethod = methodBuilder.build();
       naClassBuilder.addMethods(naMethod);
     });

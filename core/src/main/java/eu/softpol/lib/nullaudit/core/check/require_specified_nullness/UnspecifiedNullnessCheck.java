@@ -6,6 +6,7 @@ import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.model.NAComponent;
+import eu.softpol.lib.nullaudit.core.model.NAMethodParam;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
 import eu.softpol.lib.nullaudit.core.util.NullScopeUtil;
@@ -79,14 +80,15 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
 
         if (naClass.getComponent(methodName)
                 .filter(c -> classAugmentedStringTranslator.translate(c.fs())
-                    .equals(classAugmentedStringTranslator.translate(methodInfo.ms().returnType())))
+                    .equals(classAugmentedStringTranslator.translate(methodInfo.returnType())))
                 .isPresent()
-            && methodInfo.ms().parameterTypes().isEmpty()
+            && methodInfo.parameters().isEmpty()
         ) {
           // skip default getter
           continue;
         }
-        if (methodName.equals("<init>") && methodInfo.ms().parameterTypes().stream()
+        if (methodName.equals("<init>") && methodInfo.parameters().stream()
+            .map(NAMethodParam::type)
             .map(classAugmentedStringTranslator::translate)
             .collect(Collectors.joining(",")).equals(naClass.components().stream()
                 .map(NAComponent::fs)
@@ -104,10 +106,10 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
       if (methodEffectiveNullScope != NullScope.NULL_MARKED) {
         var augmentedStringTranslator = new AugmentedStringTranslator(methodEffectiveNullScope);
         var s = "%s %s(%s)".formatted(
-            augmentedStringTranslator.translate(methodInfo.ms().returnType()),
+            augmentedStringTranslator.translate(methodInfo.returnType()),
             methodInfo.methodName(),
-            methodInfo.ms()
-                .parameterTypes().stream()
+            methodInfo.parameters().stream()
+                .map(NAMethodParam::type)
                 .map(augmentedStringTranslator::translate)
                 .collect(Collectors.joining(", "))
         );

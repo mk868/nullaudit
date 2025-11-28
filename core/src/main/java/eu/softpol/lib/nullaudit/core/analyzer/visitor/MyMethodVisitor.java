@@ -3,9 +3,11 @@ package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod;
 import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
-import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
+import eu.softpol.lib.nullaudit.core.model.NAMethodParam;
 import eu.softpol.lib.nullaudit.core.type.QueryNode;
+import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import java.lang.System.Logger.Level;
+import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
@@ -22,13 +24,16 @@ public class MyMethodVisitor extends MethodVisitor {
   private static final System.Logger logger = System.getLogger(MyMethodVisitor.class.getName());
 
   private final ImmutableNAMethod.Builder naMethodBuilder;
-  private final MethodSignature ms;
+  private final TypeNode returnType;
+  private final List<NAMethodParam> parameters;
   private final Runnable onEnd;
 
-  protected MyMethodVisitor(ImmutableNAMethod.Builder naMethodBuilder, MethodSignature ms, Runnable onEnd) {
+  protected MyMethodVisitor(ImmutableNAMethod.Builder naMethodBuilder, TypeNode returnType,
+      List<NAMethodParam> parameters, Runnable onEnd) {
     super(Opcodes.ASM9);
     this.naMethodBuilder = naMethodBuilder;
-    this.ms = ms;
+    this.returnType = returnType;
+    this.parameters = parameters;
     this.onEnd = onEnd;
   }
 
@@ -64,7 +69,7 @@ public class MyMethodVisitor extends MethodVisitor {
     } else if (typePathStr.contains(".")) {
       // TODO how to handle this case...
     } else {
-      QueryNode.find(ms.returnType(), typePath).addAnnotation(annotation);
+      QueryNode.find(returnType, typePath).addAnnotation(annotation);
     }
   }
 
@@ -76,7 +81,7 @@ public class MyMethodVisitor extends MethodVisitor {
     } else if (typePathStr.contains(".")) {
       // TODO how to handle this case...
     } else {
-      QueryNode.find(ms.parameterTypes().get(index), typePath)
+      QueryNode.find(parameters.get(index).type(), typePath)
           .addAnnotation(annotation);
     }
   }

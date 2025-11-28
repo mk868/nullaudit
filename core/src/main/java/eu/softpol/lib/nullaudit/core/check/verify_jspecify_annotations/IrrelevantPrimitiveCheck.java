@@ -5,6 +5,7 @@ import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
+import eu.softpol.lib.nullaudit.core.model.NAMethodParam;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
@@ -49,8 +50,9 @@ public class IrrelevantPrimitiveCheck implements ClassChecker {
             !naClass.isRecord() || naClass.getComponent(naMethod.methodName())
                 .isEmpty())
         .forEach(naMethod -> {
-          if (isPrimitiveAnnotated(naMethod.ms().returnType()) ||
-              naMethod.ms().parameterTypes().stream()
+          if (isPrimitiveAnnotated(naMethod.returnType()) ||
+              naMethod.parameters().stream()
+                  .map(NAMethodParam::type)
                   .anyMatch(IrrelevantPrimitiveCheck::isPrimitiveAnnotated)) {
 
             context.addIssueForMethod(naMethod,

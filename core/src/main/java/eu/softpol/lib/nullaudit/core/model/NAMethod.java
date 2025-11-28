@@ -1,6 +1,7 @@
 package eu.softpol.lib.nullaudit.core.model;
 
-import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
+import eu.softpol.lib.nullaudit.core.type.TypeNode;
+import java.util.List;
 import java.util.Set;
 import org.immutables.value.Value;
 import org.jspecify.annotations.Nullable;
@@ -20,7 +21,9 @@ public interface NAMethod {
 
   @Nullable String methodSignature();
 
-  MethodSignature ms();
+  TypeNode returnType();
+
+  List<NAMethodParam> parameters();
 
   Set<NAAnnotation> annotations();
 

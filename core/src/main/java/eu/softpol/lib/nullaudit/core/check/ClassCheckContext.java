@@ -4,6 +4,7 @@ import eu.softpol.lib.nullaudit.core.analyzer.CodeAnalysisData;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeAnalysisData.IssueEntry;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.ClassLocation;
+import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.model.NAClass;
 import eu.softpol.lib.nullaudit.core.model.NAComponent;
 import eu.softpol.lib.nullaudit.core.model.NAField;
@@ -19,13 +20,18 @@ public class ClassCheckContext {
   private final @Nullable NAPackage naPackage;
   private final NAClass naClass;
   private final CodeAnalysisData codeAnalysisData;
+  private final NullScope effectiveClassNullScope;
 
-  public ClassCheckContext(ClassLocation location, @Nullable NAPackage naPackage, NAClass naClass,
-      CodeAnalysisData codeAnalysisData) {
+  public ClassCheckContext(
+      ClassLocation location,
+      @Nullable NAPackage naPackage,
+      NAClass naClass,
+      CodeAnalysisData codeAnalysisData, NullScope effectiveClassNullScope) {
     this.location = location;
     this.naPackage = naPackage;
     this.naClass = naClass;
     this.codeAnalysisData = codeAnalysisData;
+    this.effectiveClassNullScope = effectiveClassNullScope;
   }
 
   public ClassLocation location() {
@@ -34,6 +40,10 @@ public class ClassCheckContext {
 
   public @Nullable NAPackage naPackage() {
     return naPackage;
+  }
+
+  public NullScope effectiveClassNullScope() {
+    return effectiveClassNullScope;
   }
 
   public NAClass naClass() {

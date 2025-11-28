@@ -1,11 +1,7 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import static java.util.Objects.requireNonNullElse;
-import static java.util.function.Predicate.isEqual;
-import static java.util.function.Predicate.not;
 
-import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
-import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAClass;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod;
@@ -34,7 +30,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
   private static final System.Logger logger = System.getLogger(MyClassVisitor.class.getName());
 
-  private final AnalysisContext context;
   private final List<ClassReference> classChain = new ArrayList<>();
   private final ImmutableNAClass.Builder naClassBuilder = ImmutableNAClass.builder();
   private final List<ImmutableNAMethod.Builder> methodBuilders = new ArrayList<>();
@@ -43,9 +38,8 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   private @Nullable ClassReference outerClass;
   private @Nullable NAClass naClass;
 
-  public MyClassVisitor(AnalysisContext context) {
+  public MyClassVisitor() {
     super(Opcodes.ASM9);
-    this.context = context;
   }
 
   @Override
@@ -53,8 +47,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       String[] interfaces) {
     this.thisClass = ClassReference.of(name);
     naClassBuilder.thisClazz(this.thisClass)
-        .superClazz(ClassReference.of(superName))
-        .effectiveNullScope(NullScope.NOT_DEFINED);
+        .superClazz(ClassReference.of(superName));
     super.visit(version, access, name, signature, superName, interfaces);
   }
 
@@ -133,7 +126,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
         .descriptiveMethodName(descriptiveMethodName)
         .methodDescriptor(methodDescriptor)
         .methodSignature(methodSignature)
-        .effectiveNullScope(NullScope.NOT_DEFINED)
         .ms(ms);
     methodBuilders.add(methodBuilder);
 
@@ -202,24 +194,9 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   }
 
   private void buildFinalNAClass() {
-    // Build a temporary class with NOT_DEFINED to extract annotations
-    var tempClass = naClassBuilder
-        .effectiveNullScope(NullScope.NOT_DEFINED)
-        .build();
-    context.setClassNullScope(thisClass,
-        NullScope.from(tempClass.annotations()));
-    var nullScopes = getNullScopesForClass();
-
-    var classEffective = getEffectiveNullMarkedScope(nullScopes);
-    // Set the real effective scope now
-    naClassBuilder.effectiveNullScope(classEffective);
-
     // Build methods, compute their effective scopes, and add to class builder
     for (var mb : methodBuilders) {
-      var built = mb.build();
-      var methodEffective = getEffectiveNullMarkedScope(
-          List.of(classEffective, NullScope.from(built.annotations())));
-      naClassBuilder.addMethods(built.withEffectiveNullScope(methodEffective));
+      naClassBuilder.addMethods(mb.build());
     }
 
     // Build final class
@@ -228,30 +205,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
   public NAClass getNaClass() {
     return Objects.requireNonNull(naClass, "naClass");
-  }
-
-  private List<NullScope> getNullScopesForClass() {
-    var nullScopes = new ArrayList<NullScope>();
-    if (context.isModuleInfoNullMarked()) {
-      nullScopes.add(NullScope.NULL_MARKED);
-    }
-    nullScopes.add(context.getPackageNullScope(thisClass.packageName()));
-    for (var outerClass : classChain) {
-      nullScopes.add(context.getClassNullScope(outerClass));
-    }
-    nullScopes.add(context.getClassNullScope(thisClass));
-    return List.copyOf(nullScopes);
-  }
-
-  /**
-   * @param nullScopes null scopes from inner to outer
-   * @return effective nullness scope
-   */
-  private static NullScope getEffectiveNullMarkedScope(List<NullScope> nullScopes) {
-    return nullScopes.stream()
-        .filter(not(isEqual(NullScope.NOT_DEFINED)))
-        .reduce((f, s) -> s) // get last
-        .orElse(NullScope.NULL_UNMARKED);
   }
 
 }

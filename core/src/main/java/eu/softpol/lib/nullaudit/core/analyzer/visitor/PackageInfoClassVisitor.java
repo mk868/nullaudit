@@ -2,8 +2,6 @@ package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import static eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassUtil.getPackageName;
 
-import eu.softpol.lib.nullaudit.core.analyzer.AnalysisContext;
-import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAPackage;
 import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.model.NAPackage;
@@ -16,12 +14,10 @@ import org.objectweb.asm.Opcodes;
 public class PackageInfoClassVisitor extends ClassVisitor {
 
   private final ImmutableNAPackage.Builder naPackageBuilder = ImmutableNAPackage.builder();
-  private final AnalysisContext context;
   private @Nullable NAPackage naPackage;
 
-  public PackageInfoClassVisitor(AnalysisContext context) {
+  public PackageInfoClassVisitor() {
     super(Opcodes.ASM9);
-    this.context = context;
   }
 
   @Override
@@ -40,8 +36,6 @@ public class PackageInfoClassVisitor extends ClassVisitor {
   @Override
   public void visitEnd() {
     naPackage = naPackageBuilder.build();
-    var nullScope = NullScope.from(naPackage.annotations());
-    context.setPackageNullScope(naPackage.packageName(), nullScope);
     super.visitEnd();
   }
 

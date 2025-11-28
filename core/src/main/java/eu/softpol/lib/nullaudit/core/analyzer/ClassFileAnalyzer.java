@@ -20,29 +20,28 @@ public class ClassFileAnalyzer implements FileAnalyzer {
 
   private static final System.Logger logger = System.getLogger(ClassFileAnalyzer.class.getName());
 
-  private final AnalysisContext context = new AnalysisContext();
   private final List<String> excludePackages;
   private final CheckInvoker checkInvoker;
 
   public ClassFileAnalyzer(CodeAnalysisData codeAnalysisData, List<String> excludePackages,
       List<Checker> checkers) {
     this.excludePackages = List.copyOf(excludePackages);
-    this.checkInvoker = new CheckInvoker(context, codeAnalysisData, checkers);
+    this.checkInvoker = new CheckInvoker(codeAnalysisData, checkers);
   }
 
   @Override
   public boolean analyze(String fileName, InputStreamSupplier iss) {
     try {
       if (fileName.equals("module-info.class")) {
-        analyze(iss, new ModuleInfoClassVisitor(context));
+        analyze(iss, new ModuleInfoClassVisitor());
         return true;
       }
       if (fileName.equals("package-info.class")) {
-        analyze(iss, new PackageInfoClassVisitor(context));
+        analyze(iss, new PackageInfoClassVisitor());
         return true;
       }
       if (fileName.endsWith(".class")) {
-        analyze(iss, new MyClassVisitor(context));
+        analyze(iss, new MyClassVisitor());
         return true;
       }
     } catch (IOException e) {
@@ -69,6 +68,8 @@ public class ClassFileAnalyzer implements FileAnalyzer {
         checkInvoker.checkClass(cv.getNaClass());
       } else if (classVisitor instanceof PackageInfoClassVisitor picv) {
         checkInvoker.checkPackage(picv.getNaPackage());
+      } if (classVisitor instanceof ModuleInfoClassVisitor micv) {
+        checkInvoker.setModule(micv.getNAModule());
       }
     }
   }

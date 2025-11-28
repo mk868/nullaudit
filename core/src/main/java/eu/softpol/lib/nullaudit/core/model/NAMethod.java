@@ -1,10 +1,9 @@
 package eu.softpol.lib.nullaudit.core.model;
 
-import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import java.util.Set;
-import org.jspecify.annotations.Nullable;
 import org.immutables.value.Value;
+import org.jspecify.annotations.Nullable;
 
 @Value.Immutable
 public interface NAMethod {
@@ -19,9 +18,7 @@ public interface NAMethod {
 
   String methodDescriptor();
 
-  public @Nullable String methodSignature();
-
-  NullScope effectiveNullScope();
+  @Nullable String methodSignature();
 
   MethodSignature ms();
 

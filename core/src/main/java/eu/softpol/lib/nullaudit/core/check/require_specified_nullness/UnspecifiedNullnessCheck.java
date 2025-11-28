@@ -8,6 +8,7 @@ import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.model.NAComponent;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
+import eu.softpol.lib.nullaudit.core.util.NullScopeUtil;
 import java.util.stream.Collectors;
 
 public class UnspecifiedNullnessCheck implements ClassChecker {
@@ -21,10 +22,11 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
   @Override
   public void checkClass(ClassCheckContext context) {
     var naClass = context.naClass();
-    var classAugmentedStringTranslator =
-        new AugmentedStringTranslator(naClass.effectiveNullScope());
+    var classEffectiveNullScope = context.effectiveClassNullScope();
 
-    if (naClass.effectiveNullScope() != NullScope.NULL_MARKED) {
+    var classAugmentedStringTranslator = new AugmentedStringTranslator(classEffectiveNullScope);
+
+    if (classEffectiveNullScope != NullScope.NULL_MARKED) {
 
       for (var componentInfo : naClass.components()) {
         var s = "%s %s".formatted(
@@ -96,9 +98,11 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
         }
       }
 
-      if (methodInfo.effectiveNullScope() != NullScope.NULL_MARKED) {
-        var augmentedStringTranslator = new AugmentedStringTranslator(
-            methodInfo.effectiveNullScope());
+      var methodEffectiveNullScope = NullScopeUtil.effectiveNullScopeForMethod(
+          classEffectiveNullScope, methodInfo);
+
+      if (methodEffectiveNullScope != NullScope.NULL_MARKED) {
+        var augmentedStringTranslator = new AugmentedStringTranslator(methodEffectiveNullScope);
         var s = "%s %s(%s)".formatted(
             augmentedStringTranslator.translate(methodInfo.ms().returnType()),
             methodInfo.methodName(),

@@ -2,33 +2,40 @@ package eu.softpol.lib.nullaudit.core.analyzer;
 
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.ClassLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.PackageLocation;
+import eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassReference;
 import eu.softpol.lib.nullaudit.core.check.Checker;
 import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.check.PackageInfoCheckContext;
 import eu.softpol.lib.nullaudit.core.check.PackageInfoChecker;
 import eu.softpol.lib.nullaudit.core.model.NAClass;
+import eu.softpol.lib.nullaudit.core.model.NAModule;
 import eu.softpol.lib.nullaudit.core.model.NAPackage;
+import eu.softpol.lib.nullaudit.core.util.NullScopeUtil;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 public class CheckInvoker {
 
-  private final AnalysisContext context;
   private final CodeAnalysisData codeAnalysisData;
   private final List<Checker> checks;
+  private final Map<ClassReference, NAClass> cachedClasses = new HashMap<>();
+  private @Nullable NAModule naModule;
   private @Nullable NAPackage lastPackage;
 
-  public CheckInvoker(AnalysisContext context, CodeAnalysisData codeAnalysisData,
-      List<Checker> checks) {
-    this.context = context;
+  public CheckInvoker(CodeAnalysisData codeAnalysisData, List<Checker> checks) {
     this.codeAnalysisData = codeAnalysisData;
     this.checks = checks;
   }
 
   public void checkPackage(NAPackage naPackage) {
-    var packageLocation = new PackageLocation(context.getModuleName(), naPackage.packageName());
+    var packageLocation = new PackageLocation(
+        naModule != null ? naModule.moduleName() : null,
+        naPackage.packageName()
+    );
     var packageInfoCheckContext = new PackageInfoCheckContext(packageLocation, naPackage,
         codeAnalysisData);
     checks.stream()
@@ -41,13 +48,28 @@ public class CheckInvoker {
   public void checkClass(NAClass naClass) {
     codeAnalysisData.incSummaryTotalClasses();
 
-    var classLocation = new ClassLocation(context.getModuleName(),
-        naClass.thisClazz().packageName(), naClass.thisClazz().binarySimpleName());
     var naPackage = Optional.ofNullable(lastPackage)
         .filter(p -> p.packageName().equals(naClass.thisClazz().packageName()))
         .orElse(null);
+    if (naClass.outerClass() == null) {
+      cachedClasses.clear();
+    }
+    cachedClasses.put(naClass.thisClazz(), naClass);
+    var classEffectiveNullScope = NullScopeUtil.effectiveNullScopeForClass(
+        naModule,
+        naPackage,
+        cachedClasses,
+        naClass
+    );
+
+    var classLocation = new ClassLocation(
+        naModule != null ? naModule.moduleName() : null,
+        naClass.thisClazz().packageName(),
+        naClass.thisClazz().binarySimpleName()
+    );
+
     var classCheckContext = new ClassCheckContext(classLocation, naPackage, naClass,
-        codeAnalysisData);
+        codeAnalysisData, classEffectiveNullScope);
     checks.stream()
         .filter(c -> c instanceof ClassChecker)
         .map(c -> (ClassChecker) c)
@@ -63,4 +85,7 @@ public class CheckInvoker {
     codeAnalysisData.incSummaryTotalMethods(naClass.methods().size());
   }
 
+  public void setModule(NAModule naModule) {
+    this.naModule = naModule;
+  }
 }

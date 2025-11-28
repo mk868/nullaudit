@@ -1,12 +1,11 @@
 package eu.softpol.lib.nullaudit.core.model;
 
-import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassReference;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.jspecify.annotations.Nullable;
 import org.immutables.value.Value;
+import org.jspecify.annotations.Nullable;
 
 @Value.Immutable
 public interface NAClass {
@@ -27,9 +26,7 @@ public interface NAClass {
 
   ClassReference topClass();
 
-  public @Nullable ClassReference outerClass();
-
-  NullScope effectiveNullScope();
+  @Nullable ClassReference outerClass();
 
   List<NAComponent> components();
 

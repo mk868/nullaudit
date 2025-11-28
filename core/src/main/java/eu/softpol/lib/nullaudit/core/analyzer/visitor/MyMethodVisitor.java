@@ -23,11 +23,13 @@ public class MyMethodVisitor extends MethodVisitor {
 
   private final ImmutableNAMethod.Builder naMethodBuilder;
   private final MethodSignature ms;
+  private final Runnable onEnd;
 
-  protected MyMethodVisitor(ImmutableNAMethod.Builder naMethodBuilder, MethodSignature ms) {
+  protected MyMethodVisitor(ImmutableNAMethod.Builder naMethodBuilder, MethodSignature ms, Runnable onEnd) {
     super(Opcodes.ASM9);
     this.naMethodBuilder = naMethodBuilder;
     this.ms = ms;
+    this.onEnd = onEnd;
   }
 
   @Override
@@ -83,5 +85,11 @@ public class MyMethodVisitor extends MethodVisitor {
   public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
     naMethodBuilder.addAnnotations(NAAnnotation.fromDescriptor(descriptor));
     return super.visitAnnotation(descriptor, visible);
+  }
+
+  @Override
+  public void visitEnd() {
+    super.visitEnd();
+    onEnd.run();
   }
 }

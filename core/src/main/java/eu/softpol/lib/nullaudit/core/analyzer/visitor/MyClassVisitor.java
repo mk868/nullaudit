@@ -32,7 +32,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
   private final List<ClassReference> classChain = new ArrayList<>();
   private final ImmutableNAClass.Builder naClassBuilder = ImmutableNAClass.builder();
-  private final List<ImmutableNAMethod.Builder> methodBuilders = new ArrayList<>();
   private @Nullable String sourceFileName;
   private @Nullable ClassReference thisClass;
   private @Nullable ClassReference outerClass;
@@ -127,9 +126,11 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
         .methodDescriptor(methodDescriptor)
         .methodSignature(methodSignature)
         .ms(ms);
-    methodBuilders.add(methodBuilder);
 
-    return new MyMethodVisitor(methodBuilder, ms);
+    return new MyMethodVisitor(methodBuilder, ms, () -> {
+      var naMethod = methodBuilder.build();
+      naClassBuilder.addMethods(naMethod);
+    });
   }
 
   private static MethodSignature analyzeMethodSignature(String methodName, String methodDescriptor,
@@ -177,7 +178,7 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
   @Override
   public void visitEnd() {
     determineTopClass();
-    buildFinalNAClass();
+    naClass = naClassBuilder.build();
     super.visitEnd();
   }
 
@@ -191,16 +192,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     } else {
       naClassBuilder.topClass(classChain.get(0));
     }
-  }
-
-  private void buildFinalNAClass() {
-    // Build methods, compute their effective scopes, and add to class builder
-    for (var mb : methodBuilders) {
-      naClassBuilder.addMethods(mb.build());
-    }
-
-    // Build final class
-    naClass = naClassBuilder.build();
   }
 
   public NAClass getNaClass() {

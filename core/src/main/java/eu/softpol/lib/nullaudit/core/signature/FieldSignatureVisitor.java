@@ -6,6 +6,7 @@ import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import eu.softpol.lib.nullaudit.core.type.UnboundedTypeNode;
 import eu.softpol.lib.nullaudit.core.type.VariableTypeNode;
+import eu.softpol.lib.nullaudit.core.type.WildcardTypeNode;
 import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -58,7 +59,23 @@ public class FieldSignatureVisitor extends SignatureVisitor {
   public SignatureVisitor visitTypeArgument(char wildcard) {
     return new FieldSignatureVisitor(childNode -> {
       if (currentClassBuilder != null) {
-        currentClassBuilder.addChild(childNode);
+        if (wildcard == '=') {
+          currentClassBuilder.addChild(childNode);
+        } else if (wildcard == '+') {
+          // ? extends T
+          var wildcardNode = WildcardTypeNode.builder()
+              .bound(WildcardTypeNode.Bound.EXTENDS)
+              .boundType(childNode)
+              .build();
+          currentClassBuilder.addChild(wildcardNode);
+        } else if (wildcard == '-') {
+          // ? super T
+          var wildcardNode = WildcardTypeNode.builder()
+              .bound(WildcardTypeNode.Bound.SUPER)
+              .boundType(childNode)
+              .build();
+          currentClassBuilder.addChild(wildcardNode);
+        }
       }
     });
   }

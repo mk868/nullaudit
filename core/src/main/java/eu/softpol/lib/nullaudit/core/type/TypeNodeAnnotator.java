@@ -29,7 +29,7 @@ public class TypeNodeAnnotator {
       if (node instanceof ArrayTypeNode arrayNode) {
         TypeNode newChild = traverse(arrayNode.getChildren().get(0), path, pathIndex + 1,
             annotation);
-        return ((ArrayTypeNode.Builder) arrayNode.toBuilder())
+        return arrayNode.toBuilder()
             .withComponentType(newChild)
             .build();
       }
@@ -47,11 +47,20 @@ public class TypeNodeAnnotator {
             annotation);
         children.set(argumentIndex, modifiedChild);
 
-        var builder = (ClassTypeNode.Builder) classNode.toBuilder();
+        var builder = classNode.toBuilder();
         builder.clearChildren();
         children.forEach(builder::addChild);
         return builder.build();
       }
+    } else if (step == TypePath.WILDCARD_BOUND) {
+      if (node instanceof WildcardTypeNode wildcardNode) {
+        TypeNode newBound = traverse(wildcardNode.getBoundType(), path, pathIndex + 1, annotation);
+        return wildcardNode.toBuilder()
+            .boundType(newBound)
+            .build();
+      }
+      throw new IllegalStateException(
+          "TypePath expects WILDCARD_BOUND but found " + node.getClass().getSimpleName());
     }
 
     return node;

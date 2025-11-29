@@ -41,7 +41,7 @@ public class UserProfile {
 **Problem detected:**
 
 ```
-[ERROR] com.example.UserProfile: Missing @NullMarked annotation on the class.
+[ERROR] com.example.UserProfile: Missing @NullMarked annotation on class.
 ```
 
 ### ✅ Valid Example: Class with `@NullMarked`

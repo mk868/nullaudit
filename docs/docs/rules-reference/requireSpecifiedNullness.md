@@ -49,7 +49,7 @@ public class UserService {
 **Problems detected:**
 
 ```
-[ERROR] com.example.UserService#findUsernameById(java.lang.Integer): Unspecified nullness found:
+[ERROR] com.example.UserService#findUsernameById(java.lang.Integer): Unspecified nullness detected:
 [ERROR]     java.lang.String* findUsernameById(java.lang.Integer*)
 [ERROR]                     ^                                   ^ 
 ```

@@ -9,6 +9,7 @@ import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import eu.softpol.lib.nullaudit.core.type.UnboundedTypeNode;
 import eu.softpol.lib.nullaudit.core.type.VariableTypeNode;
+import eu.softpol.lib.nullaudit.core.type.WildcardTypeNode;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,6 +44,11 @@ public class AugmentedStringTranslator implements Translator<String> {
       return "?";
     } else if (typeNode instanceof VariableTypeNode variableTypeNode) {
       return variableTypeNode.getName();
+    } else if (typeNode instanceof WildcardTypeNode wildcardTypeNode) {
+      return "? %s %s".formatted(
+          wildcardTypeNode.getBound() == WildcardTypeNode.Bound.EXTENDS ? "extends" : "super",
+          translate(wildcardTypeNode.getBoundType())
+      );
     }
     throw new UnsupportedOperationException();
   }

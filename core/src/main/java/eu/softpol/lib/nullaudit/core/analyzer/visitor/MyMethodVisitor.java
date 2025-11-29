@@ -62,11 +62,10 @@ public class MyMethodVisitor extends MethodVisitor {
     var annotation = TypeUseAnnotation.ofDescriptor(descriptor);
     var typeReference = new TypeReference(typeRef);
     var sort = typeReference.getSort();
-    var typePathStr = typePath == null ? "" : typePath.toString();
     if (sort == TypeReference.METHOD_RETURN) {
-      handleMethodReturn(typePath, typePathStr, annotation);
+      handleMethodReturn(typePath, annotation);
     } else if (sort == TypeReference.METHOD_FORMAL_PARAMETER) {
-      handleMethodFormalParameter(typePath, typeReference, typePathStr, annotation);
+      handleMethodFormalParameter(typePath, typeReference, annotation);
     } else if (sort == TypeReference.METHOD_TYPE_PARAMETER_BOUND) {
       logger.log(Level.DEBUG, "METHOD_TYPE_PARAMETER_BOUND not supported yet");
     } else if (sort == TypeReference.METHOD_TYPE_PARAMETER) {
@@ -77,30 +76,16 @@ public class MyMethodVisitor extends MethodVisitor {
     return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
   }
 
-  private void handleMethodReturn(@Nullable TypePath typePath, String typePathStr,
-      TypeUseAnnotation annotation) {
-    if (typePathStr.contains("*")) {
-      // TODO super not yet supported
-    } else if (typePathStr.contains(".")) {
-      // TODO how to handle this case...
-    } else {
-      this.returnType = TypeNodeAnnotator.annotate(this.returnType, typePath, annotation);
-    }
+  private void handleMethodReturn(@Nullable TypePath typePath, TypeUseAnnotation annotation) {
+    this.returnType = TypeNodeAnnotator.annotate(this.returnType, typePath, annotation);
   }
 
   private void handleMethodFormalParameter(@Nullable TypePath typePath, TypeReference typeReference,
-      String typePathStr,
       TypeUseAnnotation annotation) {
     var index = typeReference.getFormalParameterIndex();
-    if (typePathStr.contains("*")) {
-      // TODO super not yet supported
-    } else if (typePathStr.contains(".")) {
-      // TODO how to handle this case...
-    } else {
-      TypeNode oldType = parameterTypes.get(index);
-      TypeNode newType = TypeNodeAnnotator.annotate(oldType, typePath, annotation);
-      parameterTypes.set(index, newType);
-    }
+    TypeNode oldType = parameterTypes.get(index);
+    TypeNode newType = TypeNodeAnnotator.annotate(oldType, typePath, annotation);
+    parameterTypes.set(index, newType);
   }
 
   @Override

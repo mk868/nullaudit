@@ -22,35 +22,39 @@ class FieldSignatureAnalyzerTest {
         Arguments.of("[Ljava/lang/String;", "java.lang.String[]"),
         Arguments.of("Ljava/util/List<Ljava/lang/String;>;", "java.util.List<java.lang.String>"),
         Arguments.of("Ljava/util/List<*>;", "java.util.List<?>"),
-//        Arguments.of("Ljava/util/List<+Ljava/lang/Number;>;",
-//            "java.util.List<? extends java.lang.Number>"),
+        Arguments.of("Ljava/util/List<+Ljava/lang/Number;>;",
+            "java.util.List<? extends java.lang.Number>"),
         Arguments.of("Ljava/util/Map<Ljava/lang/String;Ljava/lang/Integer;>;",
             "java.util.Map<java.lang.String, java.lang.Integer>"),
-//        Arguments.of("Ljava/util/Map<Ljava/lang/String;Ljava/util/List<+Ljava/lang/Number;>;>;",
-//            "java.util.Map<String, java.util.List<? extends java.lang.Number>>"),
-//        Arguments.of("Ljava/util/Map<-Ljava/lang/Integer;+Ljava/util/List<Ljava/lang/String;>;>;",
-//            "java.util.Map<? super java.lang.Integer, ? extends java.util.List<String>>"),
-//        Arguments.of("Ljava/util/List<+Ljava/util/List<-Ljava/lang/Integer;>;>;",
-//            "java.util.List<? extends java.util.List<? super java.lang.Integer>>"),
-//        Arguments.of(
-//            "<T:Ljava/lang/Number;:Ljava/lang/Comparable<TT;>;>;",
-//            "T extends java.lang.Number & java.lang.Comparable<T>"),
+        Arguments.of("Ljava/util/Map<Ljava/lang/String;Ljava/util/List<+Ljava/lang/Number;>;>;",
+            "java.util.Map<java.lang.String, java.util.List<? extends java.lang.Number>>"),
+        Arguments.of("Ljava/util/Map<-Ljava/lang/Integer;+Ljava/util/List<Ljava/lang/String;>;>;",
+            "java.util.Map<? super java.lang.Integer, ? extends java.util.List<java.lang.String>>"),
+        Arguments.of("Ljava/util/List<+Ljava/util/List<-Ljava/lang/Integer;>;>;",
+            "java.util.List<? extends java.util.List<? super java.lang.Integer>>"),
         Arguments.of(
             "LParent<Ljava/lang/String;>;",
             "Parent<java.lang.String>"),
-        Arguments.of("I", "int"),
 
         Arguments.of("Ljava/util/List;", "java.util.List"),
-//        Arguments.of("Ljava/util/List<-Ljava/lang/Integer;>;",
-//            "java.util.List<? super java.lang.Integer>"),
+        Arguments.of("Ljava/util/List<-Ljava/lang/Integer;>;",
+            "java.util.List<? super java.lang.Integer>"),
         Arguments.of("Ljava/util/Map;", "java.util.Map"),
 
         Arguments.of("Ljava/util/List<Ljava/util/List<Ljava/lang/String;>;>;",
-            "java.util.List<java.util.List<java.lang.String>>")
-//        Arguments.of("Ljava/util/Map<Ljava/lang/String;Ljava/util/List<+Ljava/lang/Number;>;>;",
-//            "java.util.Map<java.lang.String, java.util.List<? extends java.lang.Number>>"),
-//        Arguments.of("Ljava/util/Map<-Ljava/lang/Integer;+Ljava/util/List<Ljava/lang/String;>;>;",
-//            "java.util.Map<? super java.lang.Integer, ? extends java.util.List<java.lang.String>>")
+            "java.util.List<java.util.List<java.lang.String>>"),
+        Arguments.of("Ljava/util/Map<Ljava/lang/String;Ljava/util/List<+Ljava/lang/Number;>;>;",
+            "java.util.Map<java.lang.String, java.util.List<? extends java.lang.Number>>"),
+
+        Arguments.of("[[Ljava/util/List<Ljava/lang/String;>;",
+            "java.util.List<java.lang.String>[][]"),
+        Arguments.of("Ljava/util/List<[Ljava/lang/String;>;", "java.util.List<java.lang.String[]>"),
+        Arguments.of("[Ljava/util/List<*>;", "java.util.List<?>[]"),
+//        Arguments.of("Ljava/util/Map$Entry<Ljava/lang/String;Ljava/lang/String;>;",
+//            "java.util.Map.Entry<java.lang.String, java.lang.String>"),
+        Arguments.of("[TT;", "T[]"),
+        Arguments.of("Ljava/util/List<+[Ljava/lang/String;>;",
+            "java.util.List<? extends java.lang.String[]>")
     );
   }
 

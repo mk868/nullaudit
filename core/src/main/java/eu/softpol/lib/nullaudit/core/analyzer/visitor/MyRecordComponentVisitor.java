@@ -38,15 +38,8 @@ public class MyRecordComponentVisitor extends RecordComponentVisitor {
     var annotation = TypeUseAnnotation.ofDescriptor(descriptor);
     var typeReference = new TypeReference(typeRef);
     var sort = typeReference.getSort();
-    var typePathStr = typePath == null ? "" : typePath.toString();
     if (sort == TypeReference.FIELD) {
-      if (typePathStr.contains("*")) {
-        // TODO super not yet supported
-      } else if (typePathStr.contains(".")) {
-        // TODO how to handle this case...
-      } else {
-        this.type = TypeNodeAnnotator.annotate(this.type, typePath, annotation);
-      }
+      this.type = TypeNodeAnnotator.annotate(this.type, typePath, annotation);
     }
     return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
   }

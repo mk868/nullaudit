@@ -5,9 +5,10 @@ import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod.Builder;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethodParam;
 import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
-import eu.softpol.lib.nullaudit.core.type.QueryNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
+import eu.softpol.lib.nullaudit.core.type.TypeNodeAnnotator;
 import java.lang.System.Logger.Level;
+import java.util.ArrayList;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;
@@ -25,7 +26,7 @@ public class MyMethodVisitor extends MethodVisitor {
   private static final System.Logger logger = System.getLogger(MyMethodVisitor.class.getName());
 
   private final ImmutableNAMethod.Builder naMethodBuilder;
-  private final TypeNode returnType;
+  private TypeNode returnType;
   private final List<TypeNode> parameterTypes;
   private final List<ImmutableNAMethodParam.Builder> parametersBuilders;
   private final Runnable onEnd;
@@ -35,7 +36,7 @@ public class MyMethodVisitor extends MethodVisitor {
     super(Opcodes.ASM9);
     this.naMethodBuilder = naMethodBuilder;
     this.returnType = returnType;
-    this.parameterTypes = parameterTypes;
+    this.parameterTypes = new ArrayList<>(parameterTypes);
     this.parametersBuilders = parameterTypes.stream()
         .map(t -> ImmutableNAMethodParam.builder().type(t))
         .toList();
@@ -83,7 +84,7 @@ public class MyMethodVisitor extends MethodVisitor {
     } else if (typePathStr.contains(".")) {
       // TODO how to handle this case...
     } else {
-      QueryNode.find(returnType, typePath).addAnnotation(annotation);
+      this.returnType = TypeNodeAnnotator.annotate(this.returnType, typePath, annotation);
     }
   }
 
@@ -96,8 +97,9 @@ public class MyMethodVisitor extends MethodVisitor {
     } else if (typePathStr.contains(".")) {
       // TODO how to handle this case...
     } else {
-      QueryNode.find(parameterTypes.get(index), typePath)
-          .addAnnotation(annotation);
+      TypeNode oldType = parameterTypes.get(index);
+      TypeNode newType = TypeNodeAnnotator.annotate(oldType, typePath, annotation);
+      parameterTypes.set(index, newType);
     }
   }
 
@@ -110,10 +112,16 @@ public class MyMethodVisitor extends MethodVisitor {
   @Override
   public void visitEnd() {
     super.visitEnd();
-    var parameters = parametersBuilders.stream()
-        .map(ImmutableNAMethodParam.Builder::build)
-        .toList();
-    naMethodBuilder.parameters(parameters);
+    var finalParameters = new ArrayList<ImmutableNAMethodParam>();
+    for (int i = 0; i < parameterTypes.size(); i++) {
+      var type = parameterTypes.get(i);
+      var builder = parametersBuilders.get(i);
+
+      builder.type(type);
+      finalParameters.add(builder.build());
+    }
+    naMethodBuilder.returnType(this.returnType);
+    naMethodBuilder.parameters(finalParameters);
     onEnd.run();
   }
 }

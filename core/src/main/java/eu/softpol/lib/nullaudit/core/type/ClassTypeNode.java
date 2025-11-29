@@ -6,16 +6,13 @@ import java.util.List;
 public final class ClassTypeNode extends CompositeTypeNode {
 
   // generic types
-  private final List<TypeNode> children = new ArrayList<>();
+  private final List<TypeNode> children;
   private final String clazz;
 
-  public ClassTypeNode(String clazz) {
-    this.clazz = clazz;
-  }
-
-  @Override
-  protected void addChild(TypeNode child) {
-    children.add(child);
+  private ClassTypeNode(Builder builder) {
+    super(builder);
+    this.clazz = builder.clazz;
+    this.children = List.copyOf(builder.children);
   }
 
   @Override
@@ -25,5 +22,42 @@ public final class ClassTypeNode extends CompositeTypeNode {
 
   public String getClazz() {
     return clazz;
+  }
+
+  @Override
+  public Builder toBuilder() {
+    var builder = new Builder(clazz)
+        .addAnnotations(getAnnotations());
+    children.forEach(builder::addChild);
+    return builder;
+  }
+
+  public static Builder builder(String clazz) {
+    return new Builder(clazz);
+  }
+
+  public static final class Builder extends TypeNode.Builder<Builder> {
+
+    private final String clazz;
+    private final List<TypeNode> children = new ArrayList<>();
+
+    private Builder(String clazz) {
+      this.clazz = clazz;
+    }
+
+    public Builder addChild(TypeNode child) {
+      this.children.add(child);
+      return this;
+    }
+
+    public Builder clearChildren() {
+      this.children.clear();
+      return this;
+    }
+
+    @Override
+    public ClassTypeNode build() {
+      return new ClassTypeNode(this);
+    }
   }
 }

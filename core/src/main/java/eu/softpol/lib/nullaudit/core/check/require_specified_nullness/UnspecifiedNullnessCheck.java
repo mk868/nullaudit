@@ -9,14 +9,18 @@ import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
+import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod;
+import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethodParam;
 import eu.softpol.lib.nullaudit.core.model.NAComponent;
 import eu.softpol.lib.nullaudit.core.model.NAField;
 import eu.softpol.lib.nullaudit.core.model.NAMethod;
 import eu.softpol.lib.nullaudit.core.model.NAMethodParam;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
+import eu.softpol.lib.nullaudit.core.type.TypeNodeAnnotator;
 import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
 import eu.softpol.lib.nullaudit.core.util.NullScopeUtil;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class UnspecifiedNullnessCheck implements ClassChecker {
@@ -92,10 +96,18 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
       // ignore the first parameter from the inner class constructor
       var outerClass = naClass.outerClass();
       if (outerClass != null && method.isConstructor() && !method.parameters().isEmpty()) {
+        var firstParam = method.parameters().get(0);
         // check if the first constructor's argument has the outer class type
-        if (method.parameters().get(0).type() instanceof ClassTypeNode classTypeNode &&
+        if (firstParam.type() instanceof ClassTypeNode classTypeNode &&
             classTypeNode.getClazz().equals(outerClass.name())) {
-          classTypeNode.addAnnotation(TypeUseAnnotation.JSPECIFY_NON_NULL);
+          var newType = TypeNodeAnnotator.annotate(firstParam.type(), null,
+              TypeUseAnnotation.JSPECIFY_NON_NULL);
+          var parameters = new ArrayList<>(method.parameters());
+          parameters.set(0, ImmutableNAMethodParam.builder()
+              .from(firstParam)
+              .type(newType)
+              .build());
+          method = ImmutableNAMethod.builder().from(method).parameters(parameters).build();
         }
       }
 

@@ -2,105 +2,74 @@ package eu.softpol.lib.nullaudit.core.signature;
 
 import eu.softpol.lib.nullaudit.core.type.ArrayTypeNode;
 import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
-import eu.softpol.lib.nullaudit.core.type.CompositeTypeNode;
 import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
+import eu.softpol.lib.nullaudit.core.type.UnboundedTypeNode;
 import eu.softpol.lib.nullaudit.core.type.VariableTypeNode;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.signature.SignatureVisitor;
 
 public class FieldSignatureVisitor extends SignatureVisitor {
 
-  private final Map<TypeNode, TypeNode> nodeToParent = new HashMap<>();
-  private @Nullable TypeNode node;
-  private @Nullable TypeNode root;
+  private final Consumer<TypeNode> onResult;
 
-  public FieldSignatureVisitor() {
+  private ClassTypeNode.@Nullable Builder currentClassBuilder;
+
+  public FieldSignatureVisitor(Consumer<TypeNode> onResult) {
     super(Opcodes.ASM9);
-  }
-
-  @Override
-  public void visitFormalTypeParameter(String name) {
-    var clazz = name.replace("/", ".");
-    if (root == null) {
-      root = node = new ClassTypeNode(clazz);
-    } else {
-      goToChild(((CompositeTypeNode) node).addClassChild(clazz));
-    }
-    super.visitFormalTypeParameter(name);
+    this.onResult = onResult;
   }
 
   @Override
   public void visitClassType(String name) {
-    var clazz = name.replace("/", ".");
-    if (root == null) {
-      root = node = new ClassTypeNode(clazz);
-    } else {
-      goToChild(((CompositeTypeNode) node).addClassChild(clazz));
-    }
-    super.visitClassType(name);
+    currentClassBuilder = ClassTypeNode.builder(name.replace("/", "."));
   }
 
   @Override
   public SignatureVisitor visitArrayType() {
-    if (root == null) {
-      root = node = new ArrayTypeNode();
-    } else {
-      goToChild(((CompositeTypeNode) node).addArrayChild());
-    }
-    return super.visitArrayType();
+    return new FieldSignatureVisitor(childNode -> {
+      var arrayNode = ArrayTypeNode.builder()
+          .withComponentType(childNode)
+          .build();
+      onResult.accept(arrayNode);
+    });
   }
 
   @Override
   public void visitBaseType(char descriptor) {
-    if (root == null) {
-      root = node = new PrimitiveTypeNode(descriptor);
-    } else {
-      goToChild(((CompositeTypeNode) node).addPrimitiveChild(descriptor));
-      goBack();
-    }
+    onResult.accept(PrimitiveTypeNode.builder().descriptor(descriptor).build());
   }
 
   @Override
   public void visitTypeVariable(String name) {
-    if (root == null) {
-      root = node = new VariableTypeNode(name);
-    } else {
-      goToChild(((CompositeTypeNode) node).addVariableChild(name));
-      goBack();
-    }
-    super.visitTypeVariable(name);
+    onResult.accept(VariableTypeNode.builder().name(name).build());
   }
 
   @Override
   public void visitTypeArgument() {
-    goToChild(((CompositeTypeNode) node).addUnboundedChild());
-    goBack();
-    super.visitTypeArgument();
+    if (currentClassBuilder != null) {
+      currentClassBuilder.addChild(UnboundedTypeNode.builder().build());
+    }
+  }
+
+  @Override
+  public SignatureVisitor visitTypeArgument(char wildcard) {
+    return new FieldSignatureVisitor(childNode -> {
+      if (currentClassBuilder != null) {
+        currentClassBuilder.addChild(childNode);
+      }
+    });
   }
 
   @Override
   public void visitEnd() {
-    goBack();
+    if (currentClassBuilder != null) {
+      onResult.accept(currentClassBuilder.build());
+      currentClassBuilder = null;
+    }
     super.visitEnd();
   }
 
-  private void goBack() {
-    node = nodeToParent.get(node);
-    while (node instanceof ArrayTypeNode) {
-      node = nodeToParent.get(node);
-    }
-  }
-
-  private void goToChild(TypeNode child) {
-    nodeToParent.put(child, node);
-    node = child;
-  }
-
-  public TypeNode getFieldType() {
-    return root;
-  }
 }

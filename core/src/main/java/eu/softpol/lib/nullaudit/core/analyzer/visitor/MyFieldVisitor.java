@@ -3,8 +3,8 @@ package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAField;
 import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
-import eu.softpol.lib.nullaudit.core.type.QueryNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
+import eu.softpol.lib.nullaudit.core.type.TypeNodeAnnotator;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
@@ -15,7 +15,7 @@ import org.objectweb.asm.TypeReference;
 public class MyFieldVisitor extends FieldVisitor {
 
   private final ImmutableNAField.Builder naFieldBuilder;
-  private final TypeNode type;
+  private TypeNode type;
   private final Runnable onEnd;
 
   protected MyFieldVisitor(ImmutableNAField.Builder naFieldBuilder, TypeNode type, Runnable onEnd) {
@@ -44,7 +44,7 @@ public class MyFieldVisitor extends FieldVisitor {
       } else if (typePathStr.contains(".")) {
         // TODO how to handle this case...
       } else {
-        QueryNode.find(type, typePath).addAnnotation(annotation);
+        this.type = TypeNodeAnnotator.annotate(this.type, typePath, annotation);
       }
     }
     return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
@@ -53,6 +53,7 @@ public class MyFieldVisitor extends FieldVisitor {
   @Override
   public void visitEnd() {
     super.visitEnd();
+    naFieldBuilder.type(this.type);
     onEnd.run();
   }
 }

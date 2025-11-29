@@ -1,34 +1,49 @@
 package eu.softpol.lib.nullaudit.core.type;
 
 import java.util.List;
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 public final class ArrayTypeNode extends CompositeTypeNode {
 
-  private @Nullable TypeNode child;
+  private final TypeNode child;
 
-  @Override
-  protected void addChild(TypeNode child) {
-    throwWhenChildAlreadySet();
-    this.child = child;
-  }
-
-  @Override
-  public TypeNode addUnboundedChild() {
-    throw new UnsupportedOperationException("Array type cannot have unbounded child");
+  private ArrayTypeNode(Builder builder) {
+    super(builder);
+    this.child = Objects.requireNonNull(builder.child, "Array must have a component type");
   }
 
   @Override
   public List<TypeNode> getChildren() {
-    if (child == null) {
-      throw new IllegalStateException("Array type has no children");
-    }
     return List.of(child);
   }
 
-  private void throwWhenChildAlreadySet() {
-    if (child != null) {
-      throw new IllegalStateException("Array type already has a child");
+  @Override
+  public Builder toBuilder() {
+    return new Builder()
+        .withComponentType(child)
+        .addAnnotations(getAnnotations());
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static final class Builder extends TypeNode.Builder<Builder> {
+
+    private @Nullable TypeNode child;
+
+    public Builder withComponentType(TypeNode child) {
+      this.child = child;
+      return this;
+    }
+
+    @Override
+    public ArrayTypeNode build() {
+      if (this.child == null) {
+        throw new IllegalStateException("Cannot build ArrayTypeNode without a component type");
+      }
+      return new ArrayTypeNode(this);
     }
   }
 }

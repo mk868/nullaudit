@@ -4,9 +4,8 @@ import java.util.List;
 
 public final class UnboundedTypeNode extends CompositeTypeNode {
 
-  @Override
-  protected void addChild(TypeNode child) {
-    throw new IllegalStateException("Wildcard type has no children");
+  private UnboundedTypeNode(Builder builder) {
+    super(builder);
   }
 
   @Override
@@ -14,4 +13,21 @@ public final class UnboundedTypeNode extends CompositeTypeNode {
     return List.of();
   }
 
+  @Override
+  public Builder toBuilder() {
+    return new Builder()
+        .addAnnotations(getAnnotations());
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static final class Builder extends TypeNode.Builder<Builder> {
+
+    @Override
+    public UnboundedTypeNode build() {
+      return new UnboundedTypeNode(this);
+    }
+  }
 }

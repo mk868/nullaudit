@@ -2,17 +2,12 @@ package eu.softpol.lib.nullaudit.core.type;
 
 import java.util.List;
 
-public final class VariableTypeNode extends TypeNode {
+public final class VariableTypeNode extends LeafTypeNode {
 
   private final String name;
 
   public VariableTypeNode(String name) {
     this.name = name;
-  }
-
-  @Override
-  protected void addChild(TypeNode child) {
-    throw new IllegalStateException("Variable type has no children");
   }
 
   @Override

@@ -3,7 +3,7 @@ package eu.softpol.lib.nullaudit.core.type;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
-public final class ArrayTypeNode extends TypeNode {
+public final class ArrayTypeNode extends CompositeTypeNode {
 
   private @Nullable TypeNode child;
 

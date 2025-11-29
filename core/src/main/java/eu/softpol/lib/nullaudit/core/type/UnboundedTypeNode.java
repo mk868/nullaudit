@@ -2,7 +2,7 @@ package eu.softpol.lib.nullaudit.core.type;
 
 import java.util.List;
 
-public final class UnboundedTypeNode extends TypeNode {
+public final class UnboundedTypeNode extends CompositeTypeNode {
 
   @Override
   protected void addChild(TypeNode child) {

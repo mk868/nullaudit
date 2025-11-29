@@ -2,17 +2,12 @@ package eu.softpol.lib.nullaudit.core.type;
 
 import java.util.List;
 
-public final class PrimitiveTypeNode extends TypeNode {
+public final class PrimitiveTypeNode extends LeafTypeNode {
 
   private final char descriptor;
 
   public PrimitiveTypeNode(char descriptor) {
     this.descriptor = descriptor;
-  }
-
-  @Override
-  protected void addChild(TypeNode child) {
-    throw new IllegalStateException("Base type has no children");
   }
 
   @Override

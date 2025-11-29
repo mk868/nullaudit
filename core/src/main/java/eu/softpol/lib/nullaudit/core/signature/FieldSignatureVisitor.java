@@ -2,6 +2,7 @@ package eu.softpol.lib.nullaudit.core.signature;
 
 import eu.softpol.lib.nullaudit.core.type.ArrayTypeNode;
 import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
+import eu.softpol.lib.nullaudit.core.type.CompositeTypeNode;
 import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import eu.softpol.lib.nullaudit.core.type.VariableTypeNode;
@@ -27,7 +28,7 @@ public class FieldSignatureVisitor extends SignatureVisitor {
     if (root == null) {
       root = node = new ClassTypeNode(clazz);
     } else {
-      goToChild(node.addClassChild(clazz));
+      goToChild(((CompositeTypeNode) node).addClassChild(clazz));
     }
     super.visitFormalTypeParameter(name);
   }
@@ -38,7 +39,7 @@ public class FieldSignatureVisitor extends SignatureVisitor {
     if (root == null) {
       root = node = new ClassTypeNode(clazz);
     } else {
-      goToChild(node.addClassChild(clazz));
+      goToChild(((CompositeTypeNode) node).addClassChild(clazz));
     }
     super.visitClassType(name);
   }
@@ -48,7 +49,7 @@ public class FieldSignatureVisitor extends SignatureVisitor {
     if (root == null) {
       root = node = new ArrayTypeNode();
     } else {
-      goToChild(node.addArrayChild());
+      goToChild(((CompositeTypeNode) node).addArrayChild());
     }
     return super.visitArrayType();
   }
@@ -58,7 +59,7 @@ public class FieldSignatureVisitor extends SignatureVisitor {
     if (root == null) {
       root = node = new PrimitiveTypeNode(descriptor);
     } else {
-      goToChild(node.addPrimitiveChild(descriptor));
+      goToChild(((CompositeTypeNode) node).addPrimitiveChild(descriptor));
       goBack();
     }
   }
@@ -68,7 +69,7 @@ public class FieldSignatureVisitor extends SignatureVisitor {
     if (root == null) {
       root = node = new VariableTypeNode(name);
     } else {
-      goToChild(node.addVariableChild(name));
+      goToChild(((CompositeTypeNode) node).addVariableChild(name));
       goBack();
     }
     super.visitTypeVariable(name);
@@ -76,7 +77,7 @@ public class FieldSignatureVisitor extends SignatureVisitor {
 
   @Override
   public void visitTypeArgument() {
-    goToChild(node.addUnboundedChild());
+    goToChild(((CompositeTypeNode) node).addUnboundedChild());
     goBack();
     super.visitTypeArgument();
   }

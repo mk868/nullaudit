@@ -1,11 +1,16 @@
 package eu.softpol.lib.nullaudit.core.check.require_specified_nullness;
 
+import static eu.softpol.lib.nullaudit.core.check.CheckUtils.isDefaultRecordAccessorMethod;
+import static eu.softpol.lib.nullaudit.core.check.CheckUtils.isDefaultRecordConstructor;
+
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.model.NAComponent;
+import eu.softpol.lib.nullaudit.core.model.NAField;
+import eu.softpol.lib.nullaudit.core.model.NAMethod;
 import eu.softpol.lib.nullaudit.core.model.NAMethodParam;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
@@ -25,18 +30,13 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
     var naClass = context.naClass();
     var classEffectiveNullScope = context.effectiveClassNullScope();
 
-    var classAugmentedStringTranslator = AugmentedStringTranslator.of(classEffectiveNullScope);
-
     if (classEffectiveNullScope != NullScope.NULL_MARKED) {
 
-      for (var componentInfo : naClass.components()) {
-        var s = "%s %s".formatted(
-            classAugmentedStringTranslator.translate(componentInfo.type()),
-            componentInfo.componentName()
-        );
+      for (var component : naClass.components()) {
+        var s = toString(component, classEffectiveNullScope);
         if (s.contains("*")) {
           context.addIssueForComponent(
-              componentInfo,
+              component,
               Kind.UNSPECIFIED_NULLNESS,
               messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_COMPONENT,
                   s,
@@ -46,14 +46,12 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
       }
 
       if (!naClass.isRecord()) {
-        for (var fieldInfo : naClass.fields()) {
-          var s = "%s %s".formatted(
-              classAugmentedStringTranslator.translate(fieldInfo.type()),
-              fieldInfo.fieldName()
-          );
+        // TODO should we skip static fields?
+        for (var field : naClass.fields()) {
+          var s = toString(field, classEffectiveNullScope);
           if (s.contains("*")) {
             context.addIssueForField(
-                fieldInfo,
+                field,
                 Kind.UNSPECIFIED_NULLNESS,
                 messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_FIELD,
                     s,
@@ -64,10 +62,12 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
       }
     }
 
-    for (var methodInfo : naClass.methods()) {
+    for (var method : naClass.methods()) {
+      var methodEffectiveNullScope = NullScopeUtil.effectiveNullScopeForMethod(
+          classEffectiveNullScope, method);
 
       if (naClass.isRecord()) {
-        var methodName = methodInfo.methodName();
+        var methodName = method.methodName();
         if (methodName.equals("equals")) {
           continue;
         }
@@ -75,44 +75,23 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
           continue;
         }
 
-        if (naClass.getComponent(methodName)
-                .filter(c -> classAugmentedStringTranslator.translate(c.type())
-                    .equals(classAugmentedStringTranslator.translate(methodInfo.returnType())))
-                .isPresent()
-            && methodInfo.parameters().isEmpty()
-        ) {
-          // skip default getter
+        if (isDefaultRecordAccessorMethod(naClass, classEffectiveNullScope, method,
+            methodEffectiveNullScope)) {
+          // skip default accessor
           continue;
         }
-        if (methodName.equals("<init>") && methodInfo.parameters().stream()
-            .map(NAMethodParam::type)
-            .map(classAugmentedStringTranslator::translate)
-            .collect(Collectors.joining(",")).equals(naClass.components().stream()
-                .map(NAComponent::type)
-                .map(classAugmentedStringTranslator::translate)
-                .collect(Collectors.joining(",")))
-        ) {
+        if (isDefaultRecordConstructor(naClass, classEffectiveNullScope, method,
+            methodEffectiveNullScope)) {
           // skip default constructor
           continue;
         }
       }
 
-      var methodEffectiveNullScope = NullScopeUtil.effectiveNullScopeForMethod(
-          classEffectiveNullScope, methodInfo);
-
       if (methodEffectiveNullScope != NullScope.NULL_MARKED) {
-        var augmentedStringTranslator = AugmentedStringTranslator.of(methodEffectiveNullScope);
-        var s = "%s %s(%s)".formatted(
-            augmentedStringTranslator.translate(methodInfo.returnType()),
-            methodInfo.methodName(),
-            methodInfo.parameters().stream()
-                .map(NAMethodParam::type)
-                .map(augmentedStringTranslator::translate)
-                .collect(Collectors.joining(", "))
-        );
+        var s = toString(method, methodEffectiveNullScope);
         if (s.contains("*")) {
           context.addIssueForMethod(
-              methodInfo,
+              method,
               Kind.UNSPECIFIED_NULLNESS,
               messageSolver.resolve(MessageKey.ISSUE_UNSPECIFIED_NULLNESS_METHOD,
                   s,
@@ -121,5 +100,36 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
         }
       }
     }
+  }
+
+  private static String toString(NAComponent component, NullScope nullScope) {
+    var classTypeTranslator = AugmentedStringTranslator.of(nullScope);
+
+    return "%s %s".formatted(
+        classTypeTranslator.translate(component.type()),
+        component.componentName()
+    );
+  }
+
+  private static String toString(NAField field, NullScope nullScope) {
+    var classTypeTranslator = AugmentedStringTranslator.of(nullScope);
+
+    return "%s %s".formatted(
+        classTypeTranslator.translate(field.type()),
+        field.fieldName()
+    );
+  }
+
+  private static String toString(NAMethod method, NullScope nullScope) {
+    var methodTypeTranslator = AugmentedStringTranslator.of(nullScope);
+
+    return "%s %s(%s)".formatted(
+        methodTypeTranslator.translate(method.returnType()),
+        method.methodName(),
+        method.parameters().stream()
+            .map(NAMethodParam::type)
+            .map(methodTypeTranslator::translate)
+            .collect(Collectors.joining(", "))
+    );
   }
 }

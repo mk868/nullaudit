@@ -1,10 +1,10 @@
 package eu.softpol.lib.nullaudit.core.check.verify_jspecify_annotations;
 
-import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
+import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.model.NAMethodParam;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
@@ -71,7 +71,7 @@ public class IrrelevantPrimitiveCheck implements ClassChecker {
   }
 
   private static boolean isAnnotated(PrimitiveTypeNode type) {
-    return type.getAnnotations().contains(TypeUseAnnotation.JSPECIFY_NULLABLE) ||
-           type.getAnnotations().contains(TypeUseAnnotation.JSPECIFY_NON_NULL);
+    return type.getAnnotations().contains(NAAnnotation.NULLABLE) ||
+           type.getAnnotations().contains(NAAnnotation.NON_NULL);
   }
 }

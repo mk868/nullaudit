@@ -1,6 +1,5 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
-import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod.Builder;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethodParam;
@@ -59,7 +58,7 @@ public class MyMethodVisitor extends MethodVisitor {
   @Override
   public AnnotationVisitor visitTypeAnnotation(int typeRef, @Nullable TypePath typePath,
       String descriptor, boolean visible) {
-    var annotation = TypeUseAnnotation.ofDescriptor(descriptor);
+    var annotation = NAAnnotation.fromDescriptor(descriptor);
     var typeReference = new TypeReference(typeRef);
     var sort = typeReference.getSort();
     if (sort == TypeReference.METHOD_RETURN) {
@@ -76,12 +75,12 @@ public class MyMethodVisitor extends MethodVisitor {
     return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
   }
 
-  private void handleMethodReturn(@Nullable TypePath typePath, TypeUseAnnotation annotation) {
+  private void handleMethodReturn(@Nullable TypePath typePath, NAAnnotation annotation) {
     this.returnType = TypeNodeAnnotator.annotate(this.returnType, typePath, annotation);
   }
 
   private void handleMethodFormalParameter(@Nullable TypePath typePath, TypeReference typeReference,
-      TypeUseAnnotation annotation) {
+      NAAnnotation annotation) {
     var index = typeReference.getFormalParameterIndex();
     TypeNode oldType = parameterTypes.get(index);
     TypeNode newType = TypeNodeAnnotator.annotate(oldType, typePath, annotation);

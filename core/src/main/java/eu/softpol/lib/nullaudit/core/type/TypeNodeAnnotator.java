@@ -1,6 +1,6 @@
 package eu.softpol.lib.nullaudit.core.type;
 
-import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
+import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import java.util.ArrayList;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
@@ -9,7 +9,7 @@ import org.objectweb.asm.TypePath;
 public class TypeNodeAnnotator {
 
   public static TypeNode annotate(TypeNode root, @Nullable TypePath typePath,
-      TypeUseAnnotation annotation) {
+      NAAnnotation annotation) {
     if (typePath == null) {
       return root.toBuilder().addAnnotation(annotation).build();
     }
@@ -17,7 +17,7 @@ public class TypeNodeAnnotator {
   }
 
   private static TypeNode traverse(TypeNode node, TypePath path, int pathIndex,
-      TypeUseAnnotation annotation) {
+      NAAnnotation annotation) {
     if (pathIndex >= path.getLength()) {
       return node.toBuilder().addAnnotation(annotation).build();
     }

@@ -2,7 +2,7 @@ package eu.softpol.lib.nullaudit.core.type.translator;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
 import eu.softpol.lib.nullaudit.core.analyzer.NullnessOperator;
-import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
+import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.type.ArrayTypeNode;
 import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
 import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
@@ -56,8 +56,8 @@ public class AugmentedStringTranslator implements Translator<String> {
   private String nullnessOperatorToString(TypeNode typeNode) {
     var operator = NullnessOperator.UNSPECIFIED;
     var annotations = typeNode.getAnnotations();
-    var nullable = annotations.contains(TypeUseAnnotation.JSPECIFY_NULLABLE);
-    var notNull = annotations.contains(TypeUseAnnotation.JSPECIFY_NON_NULL);
+    var nullable = annotations.contains(NAAnnotation.NULLABLE);
+    var notNull = annotations.contains(NAAnnotation.NON_NULL);
     if (nullable && !notNull) {
       operator = NullnessOperator.UNION_NULL;
     } else if (!nullable && notNull) {

@@ -1,6 +1,5 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
-import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAField;
 import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
@@ -34,7 +33,7 @@ public class MyFieldVisitor extends FieldVisitor {
   @Override
   public AnnotationVisitor visitTypeAnnotation(int typeRef, @Nullable TypePath typePath,
       String descriptor, boolean visible) {
-    var annotation = TypeUseAnnotation.ofDescriptor(descriptor);
+    var annotation = NAAnnotation.fromDescriptor(descriptor);
     var typeReference = new TypeReference(typeRef);
     var sort = typeReference.getSort();
     if (sort == TypeReference.FIELD) {

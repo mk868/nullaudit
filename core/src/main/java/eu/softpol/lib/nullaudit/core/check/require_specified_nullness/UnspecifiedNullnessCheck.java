@@ -4,13 +4,13 @@ import static eu.softpol.lib.nullaudit.core.check.CheckUtils.isDefaultRecordAcce
 import static eu.softpol.lib.nullaudit.core.check.CheckUtils.isDefaultRecordConstructor;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
-import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethodParam;
+import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.model.NAComponent;
 import eu.softpol.lib.nullaudit.core.model.NAField;
 import eu.softpol.lib.nullaudit.core.model.NAMethod;
@@ -100,8 +100,7 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
         // check if the first constructor's argument has the outer class type
         if (firstParam.type() instanceof ClassTypeNode classTypeNode &&
             classTypeNode.getClazz().equals(outerClass.name())) {
-          var newType = TypeNodeAnnotator.annotate(firstParam.type(), null,
-              TypeUseAnnotation.JSPECIFY_NON_NULL);
+          var newType = TypeNodeAnnotator.annotate(firstParam.type(), null, NAAnnotation.NON_NULL);
           var parameters = new ArrayList<>(method.parameters());
           parameters.set(0, ImmutableNAMethodParam.builder()
               .from(firstParam)

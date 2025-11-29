@@ -30,7 +30,7 @@ public final class WildcardTypeNode extends CompositeTypeNode {
 
   @Override
   public List<TypeNode> getChildren() {
-    return List.of();
+    return List.of(boundType);
   }
 
   @Override

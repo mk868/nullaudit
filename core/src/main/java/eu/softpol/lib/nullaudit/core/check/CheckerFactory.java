@@ -1,6 +1,7 @@
 package eu.softpol.lib.nullaudit.core.check;
 
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireNullMarked.On;
+import eu.softpol.lib.nullaudit.core.check.prohibit_non_jspecify_annotations.ProhibitNonJSpecifyAnnotationsCheck;
 import eu.softpol.lib.nullaudit.core.check.require_nullmarked.ExplicitNullMarkedOnClassCheck;
 import eu.softpol.lib.nullaudit.core.check.require_nullmarked.ExplicitNullMarkedOnPackageCheck;
 import eu.softpol.lib.nullaudit.core.check.require_specified_nullness.UnspecifiedNullnessCheck;
@@ -35,5 +36,9 @@ public class CheckerFactory {
       case CLASS -> List.of(new ExplicitNullMarkedOnClassCheck(messageSolver));
       case PACKAGE -> List.of(new ExplicitNullMarkedOnPackageCheck(messageSolver));
     };
+  }
+
+  public List<Checker> createProhibitNonJSpecifyAnnotations() {
+    return List.of(new ProhibitNonJSpecifyAnnotationsCheck(messageSolver));
   }
 }

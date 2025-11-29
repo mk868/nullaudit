@@ -42,6 +42,15 @@ public class ReportAssert extends AbstractAssert<ReportAssert, Report> {
     return new ReportIssuesAssert(filteredIssues);
   }
 
+  public ReportIssuesAssert issuesForClassFile(String packageName, String className) {
+    isNotNull();
+    var filteredIssues = actual.issues().stream()
+        .filter(issue -> issue.location().equals(packageName + "." + className) ||
+                         issue.location().startsWith(packageName + "." + className + "#"))
+        .toList();
+    return new ReportIssuesAssert(filteredIssues);
+  }
+
   public ReportIssuesAssert issuesForClass(String packageName, String className) {
     isNotNull();
     var filteredIssues = actual.issues().stream()

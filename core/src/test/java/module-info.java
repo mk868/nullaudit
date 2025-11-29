@@ -7,4 +7,5 @@ open module eu.softpol.lib.nullaudit.coretest {
   requires org.jspecify;
   requires org.junit.jupiter.api;
   requires net.bytebuddy;
+  requires org.checkerframework.checker.qual;
 }

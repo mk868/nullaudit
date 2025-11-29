@@ -31,17 +31,25 @@ public class RulesConfig {
   @Parameter
   private @Nullable VerifyJSpecifyAnnotationsRule verifyJSpecifyAnnotations;
 
+  /**
+   * This rule is used to prohibit the use of non-JSpecify annotations.
+   */
+  @Parameter
+  private @Nullable ProhibitNonJSpecifyAnnotationsRule prohibitNonJSpecifyAnnotations;
+
   public RulesConfig() {
   }
 
   public RulesConfig(
       @Nullable RequireNullMarkedRule requireNullMarked,
       @Nullable RequireSpecifiedNullnessRule requireSpecifiedNullness,
-      @Nullable VerifyJSpecifyAnnotationsRule verifyJSpecifyAnnotations
+      @Nullable VerifyJSpecifyAnnotationsRule verifyJSpecifyAnnotations,
+      @Nullable ProhibitNonJSpecifyAnnotationsRule prohibitNonJSpecifyAnnotations
   ) {
     this.requireNullMarked = requireNullMarked;
     this.requireSpecifiedNullness = requireSpecifiedNullness;
     this.verifyJSpecifyAnnotations = verifyJSpecifyAnnotations;
+    this.prohibitNonJSpecifyAnnotations = prohibitNonJSpecifyAnnotations;
   }
 
   public @Nullable RequireNullMarkedRule getRequireNullMarked() {
@@ -66,5 +74,14 @@ public class RulesConfig {
 
   public void setVerifyJSpecifyAnnotations(@Nullable VerifyJSpecifyAnnotationsRule verifyJSpecifyAnnotations) {
     this.verifyJSpecifyAnnotations = verifyJSpecifyAnnotations;
+  }
+
+  public @Nullable ProhibitNonJSpecifyAnnotationsRule getProhibitNonJSpecifyAnnotations() {
+    return prohibitNonJSpecifyAnnotations;
+  }
+
+  public void setProhibitNonJSpecifyAnnotations(
+      @Nullable ProhibitNonJSpecifyAnnotationsRule prohibitNonJSpecifyAnnotations) {
+    this.prohibitNonJSpecifyAnnotations = prohibitNonJSpecifyAnnotations;
   }
 }

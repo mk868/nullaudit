@@ -8,7 +8,8 @@ public record NullAuditConfig(
     List<String> excludedPackages,
     @Nullable VerifyJSpecifyAnnotations verifyJSpecifyAnnotations,
     @Nullable RequireNullMarked requireNullMarked,
-    @Nullable RequireSpecifiedNullness requireSpecifiedNullness
+    @Nullable RequireSpecifiedNullness requireSpecifiedNullness,
+    @Nullable ProhibitNonJSpecifyAnnotations prohibitNonJSpecifyAnnotations
 ) {
 
   public sealed interface Rule {
@@ -45,27 +46,38 @@ public record NullAuditConfig(
 
   }
 
+  public record ProhibitNonJSpecifyAnnotations(
+      Exclusions exclusions
+  ) implements Rule {
+
+  }
+
   public static NullAuditConfig of() {
-    return new NullAuditConfig(List.of(), null, null, null);
+    return new NullAuditConfig(List.of(), null, null, null, null);
   }
 
   public static NullAuditConfig of(List<String> excludedPackages) {
-    return new NullAuditConfig(excludedPackages, null, null, null);
+    return new NullAuditConfig(excludedPackages, null, null, null, null);
   }
 
   public NullAuditConfig withVerifyJSpecifyAnnotations(@Nullable VerifyJSpecifyAnnotations value) {
     return new NullAuditConfig(this.excludedPackages, value, this.requireNullMarked,
-        this.requireSpecifiedNullness);
+        this.requireSpecifiedNullness, this.prohibitNonJSpecifyAnnotations);
   }
 
   public NullAuditConfig withRequireNullMarked(@Nullable RequireNullMarked value) {
     return new NullAuditConfig(this.excludedPackages, this.verifyJSpecifyAnnotations, value,
-        this.requireSpecifiedNullness);
+        this.requireSpecifiedNullness, this.prohibitNonJSpecifyAnnotations);
   }
 
   public NullAuditConfig withRequireSpecifiedNullness(@Nullable RequireSpecifiedNullness value) {
     return new NullAuditConfig(this.excludedPackages, this.verifyJSpecifyAnnotations,
-        this.requireNullMarked, value);
+        this.requireNullMarked, value, this.prohibitNonJSpecifyAnnotations);
+  }
+
+  public NullAuditConfig withProhibitNonJSpecifyAnnotations(@Nullable ProhibitNonJSpecifyAnnotations value) {
+    return new NullAuditConfig(this.excludedPackages, this.verifyJSpecifyAnnotations,
+        this.requireNullMarked, this.requireSpecifiedNullness, value);
   }
 
 }

@@ -9,13 +9,18 @@ import eu.softpol.lib.nullaudit.core.type.PrimitiveTypeNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import eu.softpol.lib.nullaudit.core.type.UnboundedTypeNode;
 import eu.softpol.lib.nullaudit.core.type.VariableTypeNode;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AugmentedStringTranslator implements Translator<String> {
 
+  private static final Map<NullScope, AugmentedStringTranslator> CACHE = new EnumMap<>(
+      NullScope.class);
+
   private final NullScope scope;
 
-  public AugmentedStringTranslator(NullScope scope) {
+  private AugmentedStringTranslator(NullScope scope) {
     this.scope = scope;
   }
 
@@ -60,5 +65,9 @@ public class AugmentedStringTranslator implements Translator<String> {
       case MINUS_NULL -> "!";
       default -> "*";
     };
+  }
+
+  public static AugmentedStringTranslator of(NullScope scope) {
+    return CACHE.computeIfAbsent(scope, AugmentedStringTranslator::new);
   }
 }

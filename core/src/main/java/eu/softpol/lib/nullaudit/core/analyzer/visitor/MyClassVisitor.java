@@ -2,19 +2,15 @@ package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import static java.util.Objects.requireNonNullElse;
 
-import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAClass;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAComponent;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAField;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod;
-import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethodParam;
 import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.model.NAClass;
-import eu.softpol.lib.nullaudit.core.model.NAMethodParam;
 import eu.softpol.lib.nullaudit.core.signature.FieldSignatureAnalyzer;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignature;
 import eu.softpol.lib.nullaudit.core.signature.MethodSignatureAnalyzer;
-import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -128,8 +124,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     MethodSignature ms = analyzeMethodSignature(methodName, methodDescriptor, methodSignature);
 
-    handleInnerClassConstructor(methodName, ms);
-
     String descriptiveMethodName = computeDescriptiveMethodName(methodName, methodDescriptor);
 
     var parameterTypes = ms.parameterTypes();
@@ -157,23 +151,6 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
           + ") failed", e);
     }
     return ms;
-  }
-
-  private void handleInnerClassConstructor(String methodName, MethodSignature ms) {
-    if (classChain.isEmpty()) {
-      return;
-    }
-    var parameterTypes = ms.parameterTypes();
-    // it's probably inner class
-    var outerClassName = classChain.get(classChain.size() - 1).name();
-    // check if the first constructor's argument has outer class type
-    if (methodName.equals("<init>") &&
-        !parameterTypes.isEmpty() &&
-        parameterTypes.get(0) instanceof ClassTypeNode classTypeNode &&
-        classTypeNode.getClazz().equals(outerClassName)) {
-      classTypeNode.addAnnotation(TypeUseAnnotation.JSPECIFY_NON_NULL); // TODO should not be here
-    }
-    // alternatively, I can search for the ACC_SYNTHETIC field of outerClassName type, but the compiler can skip this field when it's not used.
   }
 
   private String computeDescriptiveMethodName(String methodName, String methodDescriptor) {

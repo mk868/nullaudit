@@ -4,6 +4,7 @@ import static eu.softpol.lib.nullaudit.core.check.CheckUtils.isDefaultRecordAcce
 import static eu.softpol.lib.nullaudit.core.check.CheckUtils.isDefaultRecordConstructor;
 
 import eu.softpol.lib.nullaudit.core.analyzer.NullScope;
+import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
 import eu.softpol.lib.nullaudit.core.i18n.MessageKey;
@@ -13,6 +14,7 @@ import eu.softpol.lib.nullaudit.core.model.NAField;
 import eu.softpol.lib.nullaudit.core.model.NAMethod;
 import eu.softpol.lib.nullaudit.core.model.NAMethodParam;
 import eu.softpol.lib.nullaudit.core.report.Kind;
+import eu.softpol.lib.nullaudit.core.type.ClassTypeNode;
 import eu.softpol.lib.nullaudit.core.type.translator.AugmentedStringTranslator;
 import eu.softpol.lib.nullaudit.core.util.NullScopeUtil;
 import java.util.stream.Collectors;
@@ -84,6 +86,16 @@ public class UnspecifiedNullnessCheck implements ClassChecker {
             methodEffectiveNullScope)) {
           // skip default constructor
           continue;
+        }
+      }
+
+      // ignore the first parameter from the inner class constructor
+      var outerClass = naClass.outerClass();
+      if (outerClass != null && method.isConstructor() && !method.parameters().isEmpty()) {
+        // check if the first constructor's argument has the outer class type
+        if (method.parameters().get(0).type() instanceof ClassTypeNode classTypeNode &&
+            classTypeNode.getClazz().equals(outerClass.name())) {
+          classTypeNode.addAnnotation(TypeUseAnnotation.JSPECIFY_NON_NULL);
         }
       }
 

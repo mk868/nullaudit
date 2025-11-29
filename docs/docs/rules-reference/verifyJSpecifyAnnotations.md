@@ -50,7 +50,7 @@ class DataHolder {
 **Problem detected:**
 
 ```
-[ERROR] com.example.DataHolder#sayHi(java.lang.String): Irrelevant annotations, the method should not be annotated with both @NullMarked and @NullUnmarked at the same time!
+[ERROR] com.example.DataHolder#sayHi(java.lang.String): Conflicting annotations: method should not be annotated with both @NullMarked and @NullUnmarked at the same time!
 ```
 
 ### ❌ Invalid Example 2: Nullable on primitive
@@ -71,7 +71,7 @@ class DataHolder {
 **Problem detected:**
 
 ```
-[ERROR] com.example.DataHolder#bytes: Primitive type cannot be annotated with @Nullable or @NonNull!
+[ERROR] com.example.DataHolder#bytes: Primitive types cannot be annotated with @Nullable or @NonNull!
 ```
 
 ---

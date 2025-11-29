@@ -23,7 +23,7 @@ public class SayHello {
 Gives:
 
 ```
-SayHello#say(java.lang.String): Unspecified nullness found:
+SayHello#say(java.lang.String): Unspecified nullness detected:
 void say(java.lang.String*)
                          ^
 ```
@@ -50,8 +50,8 @@ class DataHolder {
 Gives:
 
 ```
-DataHolder#data: Primitive types cannot be annotated with @Nullable or @NonNull!
-DataHolder#sayHi(java.lang.String): Irrelevant annotations, the method should not be annotated with both @NullMarked and @NullUnmarked at the same time!
+DataHolder#data: Primitive types cannot be annotated with @Nullable or @NonNull.
+DataHolder#sayHi(java.lang.String): Conflicting annotations: method should not be annotated with both @NullMarked and @NullUnmarked at the same time.
 ```
 
 ### :star: `requireNullMarked`

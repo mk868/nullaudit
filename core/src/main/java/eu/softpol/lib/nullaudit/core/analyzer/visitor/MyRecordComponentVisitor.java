@@ -1,8 +1,10 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
-import eu.softpol.lib.nullaudit.core.model.NAComponent;
+import eu.softpol.lib.nullaudit.core.model.ImmutableNAComponent;
+import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.type.QueryNode;
+import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Opcodes;
@@ -12,11 +14,22 @@ import org.objectweb.asm.TypeReference;
 
 public class MyRecordComponentVisitor extends RecordComponentVisitor {
 
-  private final NAComponent naComponent;
+  private final ImmutableNAComponent.Builder naComponentBuilder;
+  private final TypeNode type;
+  private final Runnable onEnd;
 
-  protected MyRecordComponentVisitor(NAComponent naComponent) {
+  protected MyRecordComponentVisitor(ImmutableNAComponent.Builder naComponentBuilder, TypeNode type,
+      Runnable onEnd) {
     super(Opcodes.ASM9);
-    this.naComponent = naComponent;
+    this.naComponentBuilder = naComponentBuilder;
+    this.type = type;
+    this.onEnd = onEnd;
+  }
+
+  @Override
+  public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+    naComponentBuilder.addAnnotations(NAAnnotation.fromDescriptor(descriptor));
+    return super.visitAnnotation(descriptor, visible);
   }
 
   @Override
@@ -32,10 +45,15 @@ public class MyRecordComponentVisitor extends RecordComponentVisitor {
       } else if (typePathStr.contains(".")) {
         // TODO how to handle this case...
       } else {
-        QueryNode.find(naComponent.type(), typePath).addAnnotation(annotation);
+        QueryNode.find(type, typePath).addAnnotation(annotation);
       }
     }
     return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
   }
 
+  @Override
+  public void visitEnd() {
+    super.visitEnd();
+    onEnd.run();
+  }
 }

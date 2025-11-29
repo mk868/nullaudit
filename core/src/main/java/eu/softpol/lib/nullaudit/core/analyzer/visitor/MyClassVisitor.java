@@ -89,15 +89,15 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
       @Nullable String signature) {
 
     var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
-    var naComponent = ImmutableNAComponent.builder()
+    var naComponentBuilder = ImmutableNAComponent.builder()
         .componentName(name)
         .componentDescriptor(descriptor)
         .componentSignature(signature)
-        .type(fs)
-        .build();
-    naClassBuilder.addComponents(naComponent);
+        .type(fs);
 
-    return new MyRecordComponentVisitor(naComponent);
+    return new MyRecordComponentVisitor(naComponentBuilder, fs, () -> {
+      naClassBuilder.addComponents(naComponentBuilder.build());
+    });
   }
 
   @Override
@@ -108,15 +108,15 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
     }
 
     var fs = FieldSignatureAnalyzer.analyze(requireNonNullElse(signature, descriptor));
-    var naField = ImmutableNAField.builder()
+    var naFieldBuilder = ImmutableNAField.builder()
         .fieldName(name)
         .fieldDescriptor(descriptor)
         .fieldSignature(signature)
-        .type(fs)
-        .build();
-    naClassBuilder.addFields(naField);
+        .type(fs);
 
-    return new MyFieldVisitor(naField);
+    return new MyFieldVisitor(naFieldBuilder, fs, () -> {
+      naClassBuilder.addFields(naFieldBuilder.build());
+    });
   }
 
   @Override
@@ -132,22 +132,17 @@ public class MyClassVisitor extends org.objectweb.asm.ClassVisitor {
 
     String descriptiveMethodName = computeDescriptiveMethodName(methodName, methodDescriptor);
 
-    var parameters = ms.parameterTypes().stream()
-        .map(p -> ImmutableNAMethodParam.builder().type(p).build())
-        .map(p -> (NAMethodParam) p)
-        .toList();
+    var parameterTypes = ms.parameterTypes();
 
     var methodBuilder = ImmutableNAMethod.builder()
         .methodName(methodName)
         .descriptiveMethodName(descriptiveMethodName)
         .methodDescriptor(methodDescriptor)
         .methodSignature(methodSignature)
-        .returnType(ms.returnType())
-        .parameters(parameters);
+        .returnType(ms.returnType());
 
-    return new MyMethodVisitor(methodBuilder, ms.returnType(), parameters, () -> {
-      var naMethod = methodBuilder.build();
-      naClassBuilder.addMethods(naMethod);
+    return new MyMethodVisitor(methodBuilder, ms.returnType(), parameterTypes, () -> {
+      naClassBuilder.addMethods(methodBuilder.build());
     });
   }
 

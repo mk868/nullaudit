@@ -2,8 +2,9 @@ package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
 import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod;
+import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethod.Builder;
+import eu.softpol.lib.nullaudit.core.model.ImmutableNAMethodParam;
 import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
-import eu.softpol.lib.nullaudit.core.model.NAMethodParam;
 import eu.softpol.lib.nullaudit.core.type.QueryNode;
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import java.lang.System.Logger.Level;
@@ -25,21 +26,33 @@ public class MyMethodVisitor extends MethodVisitor {
 
   private final ImmutableNAMethod.Builder naMethodBuilder;
   private final TypeNode returnType;
-  private final List<NAMethodParam> parameters;
+  private final List<TypeNode> parameterTypes;
+  private final List<ImmutableNAMethodParam.Builder> parametersBuilders;
   private final Runnable onEnd;
 
-  protected MyMethodVisitor(ImmutableNAMethod.Builder naMethodBuilder, TypeNode returnType,
-      List<NAMethodParam> parameters, Runnable onEnd) {
+  protected MyMethodVisitor(Builder naMethodBuilder, TypeNode returnType,
+      List<TypeNode> parameterTypes, Runnable onEnd) {
     super(Opcodes.ASM9);
     this.naMethodBuilder = naMethodBuilder;
     this.returnType = returnType;
-    this.parameters = parameters;
+    this.parameterTypes = parameterTypes;
+    this.parametersBuilders = parameterTypes.stream()
+        .map(t -> ImmutableNAMethodParam.builder().type(t))
+        .toList();
     this.onEnd = onEnd;
   }
 
   @Override
   public void visitLineNumber(int line, Label start) {
     super.visitLineNumber(line, start);
+  }
+
+  @Override
+  public AnnotationVisitor visitParameterAnnotation(int parameter, String descriptor,
+      boolean visible) {
+    var parameterBuilder = parametersBuilders.get(parameter);
+    parameterBuilder.addAnnotations(NAAnnotation.fromDescriptor(descriptor));
+    return super.visitParameterAnnotation(parameter, descriptor, visible);
   }
 
   @Override
@@ -63,7 +76,8 @@ public class MyMethodVisitor extends MethodVisitor {
     return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
   }
 
-  private void handleMethodReturn(@Nullable TypePath typePath, String typePathStr, TypeUseAnnotation annotation) {
+  private void handleMethodReturn(@Nullable TypePath typePath, String typePathStr,
+      TypeUseAnnotation annotation) {
     if (typePathStr.contains("*")) {
       // TODO super not yet supported
     } else if (typePathStr.contains(".")) {
@@ -73,7 +87,8 @@ public class MyMethodVisitor extends MethodVisitor {
     }
   }
 
-  private void handleMethodFormalParameter(@Nullable TypePath typePath, TypeReference typeReference, String typePathStr,
+  private void handleMethodFormalParameter(@Nullable TypePath typePath, TypeReference typeReference,
+      String typePathStr,
       TypeUseAnnotation annotation) {
     var index = typeReference.getFormalParameterIndex();
     if (typePathStr.contains("*")) {
@@ -81,7 +96,7 @@ public class MyMethodVisitor extends MethodVisitor {
     } else if (typePathStr.contains(".")) {
       // TODO how to handle this case...
     } else {
-      QueryNode.find(parameters.get(index).type(), typePath)
+      QueryNode.find(parameterTypes.get(index), typePath)
           .addAnnotation(annotation);
     }
   }
@@ -95,6 +110,10 @@ public class MyMethodVisitor extends MethodVisitor {
   @Override
   public void visitEnd() {
     super.visitEnd();
+    var parameters = parametersBuilders.stream()
+        .map(ImmutableNAMethodParam.Builder::build)
+        .toList();
+    naMethodBuilder.parameters(parameters);
     onEnd.run();
   }
 }

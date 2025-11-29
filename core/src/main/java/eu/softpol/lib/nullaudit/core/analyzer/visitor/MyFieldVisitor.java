@@ -1,8 +1,10 @@
 package eu.softpol.lib.nullaudit.core.analyzer.visitor;
 
 import eu.softpol.lib.nullaudit.core.annotation.TypeUseAnnotation;
-import eu.softpol.lib.nullaudit.core.model.NAField;
+import eu.softpol.lib.nullaudit.core.model.ImmutableNAField;
+import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import eu.softpol.lib.nullaudit.core.type.QueryNode;
+import eu.softpol.lib.nullaudit.core.type.TypeNode;
 import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
@@ -12,11 +14,21 @@ import org.objectweb.asm.TypeReference;
 
 public class MyFieldVisitor extends FieldVisitor {
 
-  private final NAField naField;
+  private final ImmutableNAField.Builder naFieldBuilder;
+  private final TypeNode type;
+  private final Runnable onEnd;
 
-  protected MyFieldVisitor(NAField naField) {
+  protected MyFieldVisitor(ImmutableNAField.Builder naFieldBuilder, TypeNode type, Runnable onEnd) {
     super(Opcodes.ASM9);
-    this.naField = naField;
+    this.naFieldBuilder = naFieldBuilder;
+    this.type = type;
+    this.onEnd = onEnd;
+  }
+
+  @Override
+  public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+    naFieldBuilder.addAnnotations(NAAnnotation.fromDescriptor(descriptor));
+    return super.visitAnnotation(descriptor, visible);
   }
 
   @Override
@@ -32,10 +44,15 @@ public class MyFieldVisitor extends FieldVisitor {
       } else if (typePathStr.contains(".")) {
         // TODO how to handle this case...
       } else {
-        QueryNode.find(naField.type(), typePath).addAnnotation(annotation);
+        QueryNode.find(type, typePath).addAnnotation(annotation);
       }
     }
     return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
   }
 
+  @Override
+  public void visitEnd() {
+    super.visitEnd();
+    onEnd.run();
+  }
 }

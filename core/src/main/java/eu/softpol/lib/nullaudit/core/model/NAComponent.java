@@ -1,6 +1,7 @@
 package eu.softpol.lib.nullaudit.core.model;
 
 import eu.softpol.lib.nullaudit.core.type.TypeNode;
+import java.util.Set;
 import org.immutables.value.Value;
 import org.jspecify.annotations.Nullable;
 
@@ -14,5 +15,7 @@ public interface NAComponent {
   @Nullable String componentSignature();
 
   TypeNode type();
+
+  Set<NAAnnotation> annotations();
 
 }

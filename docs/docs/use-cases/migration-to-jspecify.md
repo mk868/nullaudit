@@ -56,13 +56,16 @@ Add the plugin to your `pom.xml` and configure:
         <requireSpecifiedNullness>
             <exclusionsFile>legacy-classes.txt</exclusionsFile>
         </requireSpecifiedNullness>
+        <prohibitNonJSpecifyAnnotations>
+            <exclusionsFile>legacy-classes.txt</exclusionsFile>
+        </prohibitNonJSpecifyAnnotations>
     </rules>
 </configuration>
 ```
 
 ---
 
-## Create an exclusions file
+## 2. Create an exclusions file
 
 List all classes you want to temporarily skip during migration:
 
@@ -86,21 +89,25 @@ find ./src/main/java -name "*.java" | sed 's|./src/main/java/||' | sed 's|/|.|g'
 
 ---
 
-## Enforce rules on new code
+## 3. Enforce rules on new code
 
 For each new class — not listed in the `legacy-classes.txt` file:
 
 * Make sure to add the `@NullMarked` on the class.
 * Explicitly annotate fields, parameters, and return types with `@Nullable` when needed.
+* **Do not use legacy annotations** (e.g., `javax.annotation.Nullable`, `org.jetbrains.annotations.NotNull`). The `prohibitNonJSpecifyAnnotations` rule will detect and block them.
 
 ---
 
-## Tighten the rules over time
+## 4. Tighten the rules over time
 
 As you migrate more parts of your codebase:
 
-* Shrink the exclusionsFile list.
-* Aim to eventually remove all exclusions.
+1. Pick a package or a set of classes from `legacy-classes.txt`.
+2. Remove them from the file.
+3. Run `mvn compile` (NullAudit will report errors).
+4. Fix annotations in those classes.
+5. Commit changes.
 
 ---
 
@@ -121,9 +128,9 @@ public class UserService {
 
 Problems:
 
-* No @NullMarked on class or package.
-* Parameter id has unspecified nullness.
-* Return type String has unspecified nullness.
+* No `@NullMarked` on class or package.
+* Parameter `id` has unspecified nullness.
+* Return type `String` has unspecified nullness.
 
 After applying JSpecify annotations:
 
@@ -145,8 +152,8 @@ public class UserService {
 Now:
 
 * The class has a clear nullness context.
-* Parameter id is explicitly declared nullable.
-* Return type is non-null by default.
+* Parameter `id` is explicitly declared nullable.
+* Return type is non-null by default (implied by `@NullMarked`).
 
 ---
 

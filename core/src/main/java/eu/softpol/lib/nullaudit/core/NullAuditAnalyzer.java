@@ -34,7 +34,8 @@ public class NullAuditAnalyzer {
         excludedPackages,
         new VerifyJSpecifyAnnotations(Exclusions.empty()),
         null,
-        new RequireSpecifiedNullness(Exclusions.empty())
+        new RequireSpecifiedNullness(Exclusions.empty()),
+        null
     ));
   }
 
@@ -77,6 +78,13 @@ public class NullAuditAnalyzer {
     });
     Optional.ofNullable(config.requireSpecifiedNullness()).ifPresent(c -> {
       List<Checker> checkers = checkerFactory.createRequireSpecifiedNullness();
+      if (!c.exclusions().isEmpty()) {
+        checkers = IgnoreClassDecorator.of(checkers, c.exclusions());
+      }
+      result.addAll(checkers);
+    });
+    Optional.ofNullable(config.prohibitNonJSpecifyAnnotations()).ifPresent(c -> {
+      List<Checker> checkers = checkerFactory.createProhibitNonJSpecifyAnnotations();
       if (!c.exclusions().isEmpty()) {
         checkers = IgnoreClassDecorator.of(checkers, c.exclusions());
       }

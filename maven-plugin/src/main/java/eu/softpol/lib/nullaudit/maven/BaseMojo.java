@@ -5,11 +5,13 @@ import static java.util.function.Predicate.not;
 import eu.softpol.lib.nullaudit.core.Exclusions;
 import eu.softpol.lib.nullaudit.core.ExclusionsFileParser;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig;
+import eu.softpol.lib.nullaudit.core.NullAuditConfig.ProhibitNonJSpecifyAnnotations;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireNullMarked;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireNullMarked.On;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireSpecifiedNullness;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.VerifyJSpecifyAnnotations;
 import eu.softpol.lib.nullaudit.maven.config.BaseRule;
+import eu.softpol.lib.nullaudit.maven.config.ProhibitNonJSpecifyAnnotationsRule;
 import eu.softpol.lib.nullaudit.maven.config.RequireNullMarkedRule;
 import eu.softpol.lib.nullaudit.maven.config.RequireSpecifiedNullnessRule;
 import eu.softpol.lib.nullaudit.maven.config.RulesConfig;
@@ -140,13 +142,16 @@ public abstract class BaseMojo extends AbstractMojo {
           rulesProp.contains("requireSpecifiedNullness") ? new RequireSpecifiedNullnessRule()
               : null,
           rulesProp.contains("verifyJSpecifyAnnotations") ? new VerifyJSpecifyAnnotationsRule()
-              : null
+              : null,
+          rulesProp.contains("prohibitNonJSpecifyAnnotations")
+              ? new ProhibitNonJSpecifyAnnotationsRule() : null
       );
     }
     return new RulesConfig(
         null,
         new RequireSpecifiedNullnessRule(),
-        new VerifyJSpecifyAnnotationsRule()
+        new VerifyJSpecifyAnnotationsRule(),
+        null
     );
   }
 
@@ -182,6 +187,12 @@ public abstract class BaseMojo extends AbstractMojo {
         Optional.ofNullable(rules.getRequireSpecifiedNullness())
             .filter(BaseRule::isActive)
             .map(r -> new RequireSpecifiedNullness(
+                toExclusions(r)
+            ))
+            .orElse(null),
+        Optional.ofNullable(rules.getProhibitNonJSpecifyAnnotations())
+            .filter(BaseRule::isActive)
+            .map(r -> new ProhibitNonJSpecifyAnnotations(
                 toExclusions(r)
             ))
             .orElse(null)

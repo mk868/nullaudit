@@ -33,6 +33,11 @@ public class CheckUtils {
     return paramSignature.equals(expectedSignature);
   }
 
+  public static boolean isDefaultRecordConstructor(NAClass naClass, NAMethod method) {
+    return isDefaultRecordConstructor(naClass, NullScope.NOT_DEFINED, method,
+        NullScope.NOT_DEFINED);
+  }
+
   public static boolean isDefaultRecordAccessorMethod(NAClass naClass, NullScope classNullScope,
       NAMethod method, NullScope methodNullScope) {
     var methodName = method.methodName();
@@ -49,5 +54,10 @@ public class CheckUtils {
         .map(c -> classTypeTranslator.translate(c.type()))
         .filter(returnTypeStr::equals)
         .isPresent();
+  }
+
+  public static boolean isDefaultRecordAccessorMethod(NAClass naClass, NAMethod method) {
+    return isDefaultRecordAccessorMethod(naClass, NullScope.NOT_DEFINED, method,
+        NullScope.NOT_DEFINED);
   }
 }

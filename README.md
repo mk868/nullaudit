@@ -58,6 +58,26 @@ DataHolder#sayHi(java.lang.String): Conflicting annotations: method should not b
 
 Requires to put `@NullMarked` on classes or packages.
 
+### :star: `prohibitNonJSpecifyAnnotations`
+
+Detects usage of non-JSpecify nullness annotations (e.g., `javax.annotation.Nullable`,
+`org.jetbrains.annotations.NotNull`, `jakarta.annotation.Nullable`). This rule helps enforce a
+single standard for nullness annotations across the codebase.
+
+```java
+import javax.annotation.Nullable;
+
+public class LegacyData {
+  @Nullable String id;
+}
+```
+
+Gives:
+
+```
+LegacyData#id: Prohibited nullable annotation found on field: javax.annotation.Nullable.
+```
+
 ## Features
 
 - Analyzes `.jar` files or directories containing `.class` files.
@@ -106,6 +126,7 @@ configuration to your `pom.xml`:
             <!-- <exclusionsFile>legacy-classes.txt</exclusionsFile> -->
           </requireSpecifiedNullness>
           <verifyJSpecifyAnnotations/>
+          <prohibitNonJSpecifyAnnotations/>
         </rules>
         <!-- Optional: limit the number of issues displayed on the console -->
         <maxErrors>100</maxErrors>

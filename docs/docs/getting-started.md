@@ -26,6 +26,7 @@ In your project's `pom.xml`, add the following configuration:
             <requireNullMarked/>
             <requireSpecifiedNullness/>
             <verifyJSpecifyAnnotations/>
+            <prohibitNonJSpecifyAnnotations/>
         </rules>
     </configuration>
     <executions>

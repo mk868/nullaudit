@@ -9,6 +9,7 @@ import eu.softpol.lib.nullaudit.core.model.NAClass;
 import eu.softpol.lib.nullaudit.core.model.NAComponent;
 import eu.softpol.lib.nullaudit.core.model.NAField;
 import eu.softpol.lib.nullaudit.core.model.NAMethod;
+import eu.softpol.lib.nullaudit.core.model.NAModule;
 import eu.softpol.lib.nullaudit.core.model.NAPackage;
 import eu.softpol.lib.nullaudit.core.report.Kind;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.jspecify.annotations.Nullable;
 public class ClassCheckContext {
 
   private final ClassLocation location;
+  private final @Nullable NAModule naModule;
   private final @Nullable NAPackage naPackage;
   private final NAClass naClass;
   private final CodeAnalysisData codeAnalysisData;
@@ -24,10 +26,12 @@ public class ClassCheckContext {
 
   public ClassCheckContext(
       ClassLocation location,
+      @Nullable NAModule naModule,
       @Nullable NAPackage naPackage,
       NAClass naClass,
       CodeAnalysisData codeAnalysisData, NullScope effectiveClassNullScope) {
     this.location = location;
+    this.naModule = naModule;
     this.naPackage = naPackage;
     this.naClass = naClass;
     this.codeAnalysisData = codeAnalysisData;
@@ -36,6 +40,10 @@ public class ClassCheckContext {
 
   public ClassLocation location() {
     return location;
+  }
+
+  public @Nullable NAModule naModule() {
+    return naModule;
   }
 
   public @Nullable NAPackage naPackage() {

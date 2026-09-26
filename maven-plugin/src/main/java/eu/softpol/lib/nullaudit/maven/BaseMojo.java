@@ -182,7 +182,7 @@ public abstract class BaseMojo extends AbstractMojo {
             .filter(BaseRule::isActive)
             .map(r -> new RequireNullMarked(
                 toExclusions(r),
-                On.fromText(r.getOn())
+                On.parse(r.getOn())
             ))
             .orElse(null),
         Optional.ofNullable(rules.getRequireSpecifiedNullness())

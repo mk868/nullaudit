@@ -15,9 +15,14 @@ public class RequireNullMarkedRule extends BaseRule {
 
 
   /**
-   * Specifies the target location of the {@code @NullMarked} annotation. Determines whether the
-   * {@code @NullMarked} annotation enforcement should apply to classes, or packages. The default
-   * value is "CLASS".
+   * Specifies the target location of the {@code @NullMarked} annotation. Accepted values:
+   * <ul>
+   *   <li>{@code CLASS} - every top-level class must be annotated,</li>
+   *   <li>{@code PACKAGE} - every package must have a {@code package-info} annotated,</li>
+   *   <li>{@code MODULE} - the {@code module-info} must be annotated.</li>
+   * </ul>
+   * Values can be combined with {@code +}, e.g. {@code MODULE+PACKAGE}; the annotation is then
+   * required on <b>every</b> listed location. The default value is "CLASS".
    */
   @Parameter
   private String on = On.CLASS.name();

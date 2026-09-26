@@ -4,6 +4,7 @@ import static java.util.function.Predicate.not;
 
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.ClassLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.MemberLocation;
+import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.ModuleLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeAnalysisData.IssueEntry;
 import eu.softpol.lib.nullaudit.core.report.Issue;
 import eu.softpol.lib.nullaudit.core.report.Kind;
@@ -26,6 +27,11 @@ public class ReportBuilder {
 
   private static List<Issue> createIssues(CodeAnalysisData codeAnalysisData) {
     var resultIssues = new ArrayList<Issue>();
+
+    // issues for module-info
+    codeAnalysisData.issues().entrySet().stream()
+        .filter(kv -> kv.getKey() instanceof ModuleLocation)
+        .forEach(kv -> kv.getValue().forEach(ie -> resultIssues.add(toIssue(kv.getKey(), ie))));
 
     var packages = codeAnalysisData.issues().keySet().stream()
         .map(CodeLocation::packageName)
@@ -128,7 +134,9 @@ public class ReportBuilder {
     if (!codeLocation.packageName().isEmpty()) {
       location += codeLocation.packageName() + ".";
     }
-    if (codeLocation instanceof CodeLocation.PackageLocation __) {
+    if (codeLocation instanceof ModuleLocation __) {
+      location += "module-info";
+    } else if (codeLocation instanceof CodeLocation.PackageLocation __) {
       location += "package-info";
     } else if (codeLocation instanceof ClassLocation classLocation) {
       location += classLocation.className();

@@ -17,5 +17,7 @@ public class RulesConfig {
       .withRequireNullMarked(new RequireNullMarked(Exclusions.empty(), On.CLASS));
   public static final NullAuditConfig REQUIRE_NULLMARKED_ON_PACKAGE = NullAuditConfig.of()
       .withRequireNullMarked(new RequireNullMarked(Exclusions.empty(), On.PACKAGE));
+  public static final NullAuditConfig REQUIRE_NULLMARKED_ON_MODULE = NullAuditConfig.of()
+      .withRequireNullMarked(new RequireNullMarked(Exclusions.empty(), On.MODULE));
 
 }

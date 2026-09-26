@@ -3,6 +3,7 @@ package eu.softpol.lib.nullaudit.core.check;
 import eu.softpol.lib.nullaudit.core.NullAuditConfig.RequireNullMarked.On;
 import eu.softpol.lib.nullaudit.core.check.prohibit_non_jspecify_annotations.ProhibitNonJSpecifyAnnotationsCheck;
 import eu.softpol.lib.nullaudit.core.check.require_nullmarked.ExplicitNullMarkedOnClassCheck;
+import eu.softpol.lib.nullaudit.core.check.require_nullmarked.ExplicitNullMarkedOnModuleCheck;
 import eu.softpol.lib.nullaudit.core.check.require_nullmarked.ExplicitNullMarkedOnPackageCheck;
 import eu.softpol.lib.nullaudit.core.check.require_specified_nullness.UnspecifiedNullnessCheck;
 import eu.softpol.lib.nullaudit.core.check.verify_jspecify_annotations.IrrelevantMarkedCheck;
@@ -10,6 +11,7 @@ import eu.softpol.lib.nullaudit.core.check.verify_jspecify_annotations.Irrelevan
 import eu.softpol.lib.nullaudit.core.check.verify_jspecify_annotations.TypeUseAnnotationsOnClassCheck;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import java.util.List;
+import java.util.Set;
 
 public class CheckerFactory {
 
@@ -31,11 +33,15 @@ public class CheckerFactory {
     );
   }
 
-  public List<Checker> createRequireNullMarked(On on) {
-    return switch (on) {
-      case CLASS -> List.of(new ExplicitNullMarkedOnClassCheck(messageSolver));
-      case PACKAGE -> List.of(new ExplicitNullMarkedOnPackageCheck(messageSolver));
-    };
+  public List<Checker> createRequireNullMarked(Set<On> onSet) {
+    return onSet.stream()
+        .sorted()
+        .<Checker>map(on -> switch (on) {
+          case CLASS -> new ExplicitNullMarkedOnClassCheck(messageSolver);
+          case PACKAGE -> new ExplicitNullMarkedOnPackageCheck(messageSolver);
+          case MODULE -> new ExplicitNullMarkedOnModuleCheck(messageSolver);
+        })
+        .toList();
   }
 
   public List<Checker> createProhibitNonJSpecifyAnnotations() {

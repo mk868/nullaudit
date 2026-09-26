@@ -115,9 +115,10 @@ You can enable the `prohibitNonJSpecifyAnnotations` rule by adding it to your pl
 
 Optional parameters:
 
-| Parameter        | Type     | Default	 | Description                                                                                                      |
-|------------------|----------|----------|------------------------------------------------------------------------------------------------------------------|
-| `exclusionsFile` | `String` | (none)   | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file) |
+| Parameter        | Type     | Default	 | Description                                                                                                                                      |
+|------------------|----------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `exclusionsFile` | `String` | (none)  | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file)                                 |
+| `exclusions`     | `String` | (none)  | Classes or patterns to exclude, defined inline, one per line. Same format as the exclusions file; combined with `exclusionsFile` if both are set |
 
 ---
 

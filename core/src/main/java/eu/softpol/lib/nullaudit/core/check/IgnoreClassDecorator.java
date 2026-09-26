@@ -7,7 +7,7 @@ import eu.softpol.lib.nullaudit.core.matcher.StaticFQCNMatcher;
 import eu.softpol.lib.nullaudit.core.model.NAAnnotation;
 import java.util.List;
 
-public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {
+public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker, ModuleInfoChecker {
 
   private final Checker delegate;
   private final List<FQCNMatcher> matchers;
@@ -20,6 +20,20 @@ public class IgnoreClassDecorator implements ClassChecker, PackageInfoChecker {
             rule -> rule.contains("*") ? new AntLikeFQCNMatcher(rule) : new StaticFQCNMatcher(rule))
         .toList();
     this.ignoredAnnotations = List.copyOf(exclusions.annotations());
+  }
+
+  @Override
+  public void checkModule(ModuleInfoCheckContext context) {
+    if (!(delegate instanceof ModuleInfoChecker moduleInfoChecker)) {
+      return;
+    }
+    for (FQCNMatcher matcher : matchers) {
+      if (matcher.matches("module-info")) {
+        // module-info ignored
+        return;
+      }
+    }
+    moduleInfoChecker.checkModule(context);
   }
 
   @Override

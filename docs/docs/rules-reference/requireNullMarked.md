@@ -81,7 +81,7 @@ Optional parameters:
 | `exclusionsFile`     | `String` | (none)  | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file)                                 |
 | `exclusions`         | `String` | (none)  | Classes or patterns to exclude, defined inline, one per line. Same format as the exclusions file; combined with `exclusionsFile` if both are set |
 | `excludeAnnotations` | `String` | (none)  | Comma-separated list of fully qualified annotation names. Classes with these annotations will be excluded from analysis                          |
-| `on`                 | `String` | `CLASS` | Define where to require putting the `@NullMarked` annotation. Allowed values are `CLASS` or `PACKAGE`                                            |
+| `on`                 | `String` | `CLASS` | Define where to require putting the `@NullMarked` annotation. Allowed values are `CLASS`, `PACKAGE` or `MODULE`                                  |
 
 ---
 
@@ -94,6 +94,7 @@ Recommended for:
 * Teams that want to enforce consistent annotation practices during development and in CI/CD
   pipelines.
 * Projects that prefer package-level nullness declarations (`<on>PACKAGE</on>`).
+* Modular projects that declare nullness on the module (`<on>MODULE</on>`).
 
 ---
 
@@ -103,4 +104,6 @@ Recommended for:
 * When using `<on>CLASS</on>`, the rule does not require `@NullMarked` on package-info.java — it
   only focuses on types (classes, interfaces, enums, etc.).
 * When using `<on>PACKAGE</on>`, all packages must have a package-info.java file with `@NullMarked`.
+* When using `<on>MODULE</on>`, the project must have a module-info.java file with `@NullMarked`.
+  A missing module-info is reported as an issue; it can be excluded with the `module-info` pattern.
 * Annotation-based exclusions only work at the class level, not for individual members or packages.

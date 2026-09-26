@@ -1,11 +1,14 @@
 package eu.softpol.lib.nullaudit.core.analyzer;
 
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.ClassLocation;
+import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.ModuleLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.CodeLocation.PackageLocation;
 import eu.softpol.lib.nullaudit.core.analyzer.visitor.ClassReference;
 import eu.softpol.lib.nullaudit.core.check.Checker;
 import eu.softpol.lib.nullaudit.core.check.ClassCheckContext;
 import eu.softpol.lib.nullaudit.core.check.ClassChecker;
+import eu.softpol.lib.nullaudit.core.check.ModuleInfoCheckContext;
+import eu.softpol.lib.nullaudit.core.check.ModuleInfoChecker;
 import eu.softpol.lib.nullaudit.core.check.PackageInfoCheckContext;
 import eu.softpol.lib.nullaudit.core.check.PackageInfoChecker;
 import eu.softpol.lib.nullaudit.core.model.NAClass;
@@ -68,7 +71,7 @@ public class CheckInvoker {
         naClass.thisClazz().binarySimpleName()
     );
 
-    var classCheckContext = new ClassCheckContext(classLocation, naPackage, naClass,
+    var classCheckContext = new ClassCheckContext(classLocation, naModule, naPackage, naClass,
         codeAnalysisData, classEffectiveNullScope);
     checks.stream()
         .filter(c -> c instanceof ClassChecker)
@@ -87,5 +90,11 @@ public class CheckInvoker {
 
   public void setModule(NAModule naModule) {
     this.naModule = naModule;
+    var moduleInfoCheckContext = new ModuleInfoCheckContext(
+        new ModuleLocation(naModule.moduleName()), naModule, codeAnalysisData);
+    checks.stream()
+        .filter(c -> c instanceof ModuleInfoChecker)
+        .map(c -> (ModuleInfoChecker) c)
+        .forEach(c -> c.checkModule(moduleInfoCheckContext));
   }
 }

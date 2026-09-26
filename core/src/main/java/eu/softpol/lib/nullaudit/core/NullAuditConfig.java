@@ -29,7 +29,8 @@ public record NullAuditConfig(
 
     public enum On {
       CLASS,
-      PACKAGE;
+      PACKAGE,
+      MODULE;
 
       public static On fromText(String text) {
         return Arrays.stream(values())

@@ -9,6 +9,16 @@ public interface CodeLocation {
 
   String packageName();
 
+  record ModuleLocation(
+      @Nullable String module
+  ) implements CodeLocation {
+
+    @Override
+    public String packageName() {
+      return "";
+    }
+  }
+
   record PackageLocation(
       @Nullable String module,
       String packageName

@@ -33,6 +33,21 @@ public abstract class BaseRule {
   @Parameter
   private @Nullable String exclusionsFile;
 
+  /**
+   * Classes (or patterns) to ignore for this rule, defined inline, one per line. Uses the same
+   * format as the {@link #exclusionsFile} content (blank lines and {@code #} comments are ignored).
+   * Can be combined with {@code exclusionsFile}.
+   *
+   * <pre>{@code
+   * <exclusions>
+   *   com.example.legacy.LegacyUser
+   *   com.example.internal.**
+   * </exclusions>
+   * }</pre>
+   */
+  @Parameter
+  private @Nullable String exclusions;
+
   public boolean isActive() {
     return active;
   }
@@ -55,5 +70,13 @@ public abstract class BaseRule {
 
   public void setExclusionsFile(String exclusionsFile) {
     this.exclusionsFile = exclusionsFile;
+  }
+
+  public @Nullable String getExclusions() {
+    return exclusions;
+  }
+
+  public void setExclusions(@Nullable String exclusions) {
+    this.exclusions = exclusions;
   }
 }

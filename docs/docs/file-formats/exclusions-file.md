@@ -71,6 +71,28 @@ Matches:
 
 ---
 
+## Inline exclusions
+
+For a handful of entries, you can skip the file and list them directly in the rule configuration
+with `<exclusions>`.
+Its content follows the same format as the exclusions file (one class/pattern per line, blank lines
+and `#` comments are ignored):
+
+```xml
+
+<requireNullMarked>
+  <exclusions>
+    # legacy models
+    com.example.legacy.LegacyUser
+    com.example.internal.**
+  </exclusions>
+</requireNullMarked>
+```
+
+`<exclusions>` and `<exclusionsFile>` can be used together; entries from both are combined.
+
+---
+
 ## Best Practices
 
 - Prefer using explicit class names for critical exclusions.

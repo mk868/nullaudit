@@ -88,10 +88,11 @@ You can enable the `requireSpecifiedNullness` rule by adding it to your plugin c
 
 Optional parameters:
 
-| Parameter            | Type     | Default	 | Description                                                                                                             |
-|----------------------|----------|----------|-------------------------------------------------------------------------------------------------------------------------|
-| `exclusionsFile`     | `String` | (none)   | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file)        |
-| `excludeAnnotations` | `String` | (none)   | Comma-separated list of fully qualified annotation names. Classes with these annotations will be excluded from analysis |
+| Parameter            | Type     | Default	 | Description                                                                                                                                      |
+|----------------------|----------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `exclusionsFile`     | `String` | (none)  | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file)                                 |
+| `exclusions`         | `String` | (none)  | Classes or patterns to exclude, defined inline, one per line. Same format as the exclusions file; combined with `exclusionsFile` if both are set |
+| `excludeAnnotations` | `String` | (none)  | Comma-separated list of fully qualified annotation names. Classes with these annotations will be excluded from analysis                          |
 
 ---
 

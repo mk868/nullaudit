@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -200,10 +201,15 @@ public abstract class BaseMojo extends AbstractMojo {
   }
 
   private static Exclusions toExclusions(BaseRule rule) {
-    var classes = Optional.ofNullable(rule.getExclusionsFile())
+    var fileClasses = Optional.ofNullable(rule.getExclusionsFile())
         .filter(not(String::isBlank))
         .map(BaseMojo::readClassExclusionsFile)
         .orElse(Set.of());
+    var inlineClasses = Optional.ofNullable(rule.getExclusions())
+        .map(ExclusionsFileParser::parse)
+        .orElse(Set.of());
+    var classes = Stream.concat(fileClasses.stream(), inlineClasses.stream())
+        .collect(Collectors.toUnmodifiableSet());
     var annotations = Optional.ofNullable(rule.getExcludeAnnotations())
         .filter(not(String::isBlank))
         .map(s -> Arrays.stream(s.split(","))

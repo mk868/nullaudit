@@ -76,11 +76,12 @@ You can enable the requireNullMarked rule by adding it to your plugin configurat
 
 Optional parameters:
 
-| Parameter            | Type     | Default | Description                                                                                                             |
-|----------------------|----------|---------|-------------------------------------------------------------------------------------------------------------------------|
-| `exclusionsFile`     | `String` | (none)  | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file)        |
-| `excludeAnnotations` | `String` | (none)  | Comma-separated list of fully qualified annotation names. Classes with these annotations will be excluded from analysis |
-| `on`                 | `String` | `CLASS` | Define where to require putting the `@NullMarked` annotation. Allowed values are `CLASS` or `PACKAGE`                   |
+| Parameter            | Type     | Default | Description                                                                                                                                      |
+|----------------------|----------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `exclusionsFile`     | `String` | (none)  | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file)                                 |
+| `exclusions`         | `String` | (none)  | Classes or patterns to exclude, defined inline, one per line. Same format as the exclusions file; combined with `exclusionsFile` if both are set |
+| `excludeAnnotations` | `String` | (none)  | Comma-separated list of fully qualified annotation names. Classes with these annotations will be excluded from analysis                          |
+| `on`                 | `String` | `CLASS` | Define where to require putting the `@NullMarked` annotation. Allowed values are `CLASS` or `PACKAGE`                                            |
 
 ---
 

@@ -21,7 +21,8 @@ public class RequireNullMarkedRule extends BaseRule {
    *   <li>{@code PACKAGE} - every package must have a {@code package-info} annotated,</li>
    *   <li>{@code MODULE} - the {@code module-info} must be annotated.</li>
    * </ul>
-   * The default value is "CLASS".
+   * Values can be combined with {@code +}, e.g. {@code MODULE+PACKAGE}; the annotation is then
+   * required on <b>every</b> listed location. The default value is "CLASS".
    */
   @Parameter
   private String on = On.CLASS.name();

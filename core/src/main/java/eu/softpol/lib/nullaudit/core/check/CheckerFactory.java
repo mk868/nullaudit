@@ -11,6 +11,7 @@ import eu.softpol.lib.nullaudit.core.check.verify_jspecify_annotations.Irrelevan
 import eu.softpol.lib.nullaudit.core.check.verify_jspecify_annotations.TypeUseAnnotationsOnClassCheck;
 import eu.softpol.lib.nullaudit.core.i18n.MessageSolver;
 import java.util.List;
+import java.util.Set;
 
 public class CheckerFactory {
 
@@ -32,12 +33,15 @@ public class CheckerFactory {
     );
   }
 
-  public List<Checker> createRequireNullMarked(On on) {
-    return switch (on) {
-      case CLASS -> List.of(new ExplicitNullMarkedOnClassCheck(messageSolver));
-      case PACKAGE -> List.of(new ExplicitNullMarkedOnPackageCheck(messageSolver));
-      case MODULE -> List.of(new ExplicitNullMarkedOnModuleCheck(messageSolver));
-    };
+  public List<Checker> createRequireNullMarked(Set<On> onSet) {
+    return onSet.stream()
+        .sorted()
+        .<Checker>map(on -> switch (on) {
+          case CLASS -> new ExplicitNullMarkedOnClassCheck(messageSolver);
+          case PACKAGE -> new ExplicitNullMarkedOnPackageCheck(messageSolver);
+          case MODULE -> new ExplicitNullMarkedOnModuleCheck(messageSolver);
+        })
+        .toList();
   }
 
   public List<Checker> createProhibitNonJSpecifyAnnotations() {

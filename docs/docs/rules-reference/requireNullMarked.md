@@ -76,12 +76,12 @@ You can enable the requireNullMarked rule by adding it to your plugin configurat
 
 Optional parameters:
 
-| Parameter            | Type     | Default | Description                                                                                                                                      |
-|----------------------|----------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| `exclusionsFile`     | `String` | (none)  | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file)                                 |
-| `exclusions`         | `String` | (none)  | Classes or patterns to exclude, defined inline, one per line. Same format as the exclusions file; combined with `exclusionsFile` if both are set |
-| `excludeAnnotations` | `String` | (none)  | Comma-separated list of fully qualified annotation names. Classes with these annotations will be excluded from analysis                          |
-| `on`                 | `String` | `CLASS` | Define where to require putting the `@NullMarked` annotation. Allowed values are `CLASS`, `PACKAGE` or `MODULE`                                  |
+| Parameter            | Type     | Default | Description                                                                                                                                                                                                               |
+|----------------------|----------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `exclusionsFile`     | `String` | (none)  | Path to a text file listing classes to exclude, see [Exclusions File Format](/docs/file-formats/exclusions-file)                                                                                                          |
+| `exclusions`         | `String` | (none)  | Classes or patterns to exclude, defined inline, one per line. Same format as the exclusions file; combined with `exclusionsFile` if both are set                                                                          |
+| `excludeAnnotations` | `String` | (none)  | Comma-separated list of fully qualified annotation names. Classes with these annotations will be excluded from analysis                                                                                                   |
+| `on`                 | `String` | `CLASS` | Define where to require putting the `@NullMarked` annotation. Allowed values are `CLASS`, `PACKAGE` or `MODULE`, they can be combined with `+` (e.g. `MODULE+PACKAGE`) - then **every** listed location must be annotated |
 
 ---
 
@@ -95,6 +95,21 @@ Recommended for:
   pipelines.
 * Projects that prefer package-level nullness declarations (`<on>PACKAGE</on>`).
 * Modular projects that declare nullness on the module (`<on>MODULE</on>`).
+* Libraries consumed both from the module path and the class path (`<on>MODULE+PACKAGE</on>` or
+  `<on>MODULE+CLASS</on>`) - the module-level annotation is not visible to class path consumers.
+
+### Requiring `@NullMarked` on several locations
+
+```xml
+
+<configuration>
+    <rules>
+        <requireNullMarked>
+            <on>MODULE+PACKAGE</on>
+        </requireNullMarked>
+    </rules>
+</configuration>
+```
 
 ---
 

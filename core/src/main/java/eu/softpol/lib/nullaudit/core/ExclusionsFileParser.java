@@ -9,11 +9,14 @@ import java.util.Set;
 
 public class ExclusionsFileParser {
 
+  private static final char BOM = '﻿';
+
   private ExclusionsFileParser() {
   }
 
   /**
-   * Reads patterns from the given file path, ignoring blank lines and comments (#).
+   * Reads patterns from the given file path, ignoring blank lines and comments (#). A leading UTF-8
+   * BOM is skipped.
    *
    * @param filePath Path to the file listing excluded classes (or patterns).
    * @return exclusions object
@@ -22,7 +25,12 @@ public class ExclusionsFileParser {
   public static Set<String> parse(Path filePath) throws IOException {
     Set<String> patterns = new HashSet<>();
 
-    for (String line : Files.readAllLines(filePath, StandardCharsets.UTF_8)) {
+    var lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
+    if (!lines.isEmpty() && !lines.get(0).isEmpty() && lines.get(0).charAt(0) == BOM) {
+      lines.set(0, lines.get(0).substring(1));
+    }
+
+    for (String line : lines) {
       String trimmed = line.trim();
       // skip comments and blank lines
       if (trimmed.isEmpty() || trimmed.startsWith("#")) {

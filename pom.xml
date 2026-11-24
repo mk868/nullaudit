@@ -100,7 +100,7 @@
       <dependency>
         <groupId>io.github.ascopes.jct</groupId>
         <artifactId>java-compiler-testing</artifactId>
-        <version>6.0.1</version>
+        <version>7.0.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -156,7 +156,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>3.6.4</version>
+          <version>3.7.0</version>
         </plugin>
         <plugin>
           <groupId>org.sonatype.central</groupId>
